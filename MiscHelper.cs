@@ -1,13 +1,11 @@
 ﻿using ReLogic.Graphics;
-using Terraria.Graphics.Shaders;
+using System.Reflection;
+using Terraria.GameContent.UI;
 
 namespace ShopLookup
 {
     public static class MiscHelper
     {
-        private static long id = 0;
-        public static long ID => id;
-        public static long NextID => id++;
         public static Rectangle NewRec(Vector2 start, Vector2 size) => NewRec(start.ToPoint(), size.ToPoint());
         public static Rectangle NewRec(Vector2 start, float width, float height)
         {
@@ -71,159 +69,6 @@ namespace ShopLookup
             return font.MeasureString(text) * scale;
         }
         /// <summary>
-        /// 花费文本
-        /// </summary>
-        public static void NewCombatTextValue(Rectangle location, float cost)
-        {
-            int platinum = (int)(cost / 1000000);
-            int gold = (int)((cost - platinum * 1000000) / 10000);
-            int silver = (int)((cost - platinum * 1000000 - gold * 10000) / 100);
-            int copper = (int)(cost - platinum * 1000000 - gold * 10000 - silver * 100);
-            Color color = Color.Orange;
-            if (platinum > 0)
-            {
-                color = Color.White;
-                CombatText.NewText(location, color, $"{platinum}铂金{gold}金{silver}银{copper}铜");
-            }
-            else if (gold > 0)
-            {
-                color = Color.Gold;
-                CombatText.NewText(location, color, $"{gold}金{silver}银{copper}铜");
-            }
-            else if (silver > 0)
-            {
-                color = Color.Silver;
-                CombatText.NewText(location, color, $"{silver}银{copper}铜");
-            }
-            else
-            {
-                CombatText.NewText(location, color, $"{copper}铜");
-            }
-        }
-        public static bool InScreen(Vector2 pos)
-        {
-            float x = Main.screenPosition.X + Main.screenWidth;
-            float y = Main.screenPosition.Y + Main.screenHeight;
-            return pos.X < x && pos.X > Main.screenPosition.X && pos.Y < y && pos.Y > Main.screenPosition.Y;
-        }
-        public static void ReadyEffect(Player player)
-        {
-            SoundEngine.PlaySound(SoundID.MaxMana, player.Center);
-            for (int i = 0; i < 5; i++)
-            {
-                int num = Dust.NewDust(player.position, player.width, player.height, DustID.ManaRegeneration, 0f, 0f, 255, default, Main.rand.Next(20, 26) * 0.1f);
-                Main.dust[num].noLight = true;
-                Main.dust[num].noGravity = true;
-                Main.dust[num].velocity *= 0.5f;
-            }
-        }
-        public static void Yoraiz0rEye(Player player, int dusttype)
-        {
-            int num = 0;
-            num += player.bodyFrame.Y / 56;
-            if (num >= Main.OffsetsPlayerHeadgear.Length)
-            {
-                num = 0;
-            }
-            Vector2 vector = new Vector2(player.width / 2, player.height / 2) + Main.OffsetsPlayerHeadgear[num] + (player.MountedCenter - player.Center);
-            player.sitting.GetSittingOffsetInfo(player, out Vector2 value, out float y);
-            vector += value + new Vector2(0f, y);
-            float num2 = -11.5f * player.gravDir;
-            if (player.gravDir == -1f)
-            {
-                num2 -= 4f;
-            }
-            Vector2 vector2 = new Vector2(3 * player.direction - ((player.direction == 1) ? 1 : 0), num2) + Vector2.UnitY * player.gfxOffY + vector;
-            Vector2 vector3 = new Vector2(3 * player.shadowDirection[1] - ((player.direction == 1) ? 1 : 0), num2) + vector;
-            Vector2 vector4 = Vector2.Zero;
-            if (player.mount.Active && player.mount.Cart)
-            {
-                int num3 = Math.Sign(player.velocity.X);
-                if (num3 == 0)
-                {
-                    num3 = player.direction;
-                }
-                vector4 = new Vector2(MathHelper.Lerp(0f, -8f, player.fullRotation / 0.7853982f), MathHelper.Lerp(0f, 2f, Math.Abs(player.fullRotation / 0.7853982f))).RotatedBy(player.fullRotation, default);
-                if (num3 == Math.Sign(player.fullRotation))
-                {
-                    vector4 *= MathHelper.Lerp(1f, 0.6f, Math.Abs(player.fullRotation / 0.7853982f));
-                }
-            }
-            if (player.fullRotation != 0f)
-            {
-                vector2 = vector2.RotatedBy(player.fullRotation, player.fullRotationOrigin);
-                vector3 = vector3.RotatedBy(player.fullRotation, player.fullRotationOrigin);
-            }
-            float num4 = 0f;
-            Vector2 vector5 = player.position + vector2 + vector4;
-            Vector2 vector6 = player.oldPosition + vector3 + vector4;
-            vector6.Y -= num4 / 2f;
-            vector5.Y -= num4 / 2f;
-            float num5 = 1f;
-            switch (player.yoraiz0rEye % 10)
-            {
-                case 1:
-                    return;
-                case 2:
-                    num5 = 0.5f;
-                    break;
-                case 3:
-                    num5 = 0.625f;
-                    break;
-                case 4:
-                    num5 = 0.75f;
-                    break;
-                case 5:
-                    num5 = 0.875f;
-                    break;
-                case 6:
-                    num5 = 1f;
-                    break;
-                case 7:
-                    num5 = 1.1f;
-                    break;
-            }
-            if (player.yoraiz0rEye < 7)
-            {
-                DelegateMethods.v3_1 = Main.hslToRgb(Main.rgbToHsl(player.eyeColor).X, 1f, 0.5f).ToVector3() * 0.5f * num5;
-                if (player.velocity != Vector2.Zero)
-                {
-                    Utils.PlotTileLine(player.Center, player.Center + player.velocity * 2f, 4f, new Utils.TileActionAttempt(DelegateMethods.CastLightOpen));
-                }
-                else
-                {
-                    Utils.PlotTileLine(player.Left, player.Right, 4f, new Utils.TileActionAttempt(DelegateMethods.CastLightOpen));
-                }
-            }
-            int num6 = (int)Vector2.Distance(vector5, vector6) / 3 + 1;
-            if (Vector2.Distance(vector5, vector6) % 3f != 0f)
-            {
-                num6++;
-            }
-            for (float num7 = 1f; num7 <= num6; num7 += 1f)
-            {
-                Dust dust = Main.dust[Dust.NewDust(player.Center, 0, 0, DustID.TheDestroyer, 0f, 0f, 0, default, 1f)];
-                dust.position = Vector2.Lerp(vector6, vector5, num7 / num6);
-                dust.noGravity = true;
-                dust.velocity = Vector2.Zero;
-                dust.customData = player;
-                dust.scale = num5;
-                dust.shader = GameShaders.Armor.GetSecondaryShader(player.cYorai, player);
-                dust.type = dusttype;
-            }
-        }
-        /// <summary>
-        /// 模式时间间隔区分
-        /// </summary>
-        public static int ModeNum(int commontime, int experttime, int mastertime)
-        {
-            return Main.expertMode ? (Main.masterMode ? mastertime : experttime) : commontime;
-        }
-        public static float ModeNum(float commontime, float experttime, float mastertime)
-        {
-            return Main.expertMode ? (Main.masterMode ? mastertime : experttime) : commontime;
-        }
-        /// <summary>
         /// 自动命名空间路径
         /// </summary>
         /// <param name="type"></param>
@@ -252,26 +97,6 @@ namespace ShopLookup
         /// <param name="fileName"></param>
         /// <returns></returns>
         public static string Path(this object type, string fileName) => type.Path(false) + fileName;
-
-        public static float Distance(this Entity entity, Entity target)
-        {
-            return entity.Distance(target.Center);
-        }
-        /*/// <summary>
-        /// 本次伤害归零，传入攻击者扣除1dps
-        /// </summary>
-        public static void NoDamage(this NPC target, ref NPC.HitInfo info, Player attacker = null)
-        {
-            info.Damage = 1;
-            info.HideCombatText = true;
-            target.Cure(1, default);
-            attacker?.addDPS(-1);
-        }*/
-        /// <summary>
-        /// 非多人客户端
-        /// </summary>
-        /// <returns></returns>
-        public static bool NetShoot() => Main.netMode != NetmodeID.MultiplayerClient;
         public static Texture2D Tex(this Entity entity)
         {
             if (entity is Projectile proj)
@@ -287,34 +112,6 @@ namespace ShopLookup
                 return TextureAssets.Item[item.type].Value;
             }
             throw new Exception("不支持的Entity类型");
-        }
-        /// <summary>
-        /// Buff基本设定
-        /// </summary>
-        /// <param name="buff"></param>
-        /// <param name="db">是否debuff</param>
-        /// <param name="nurse">护士是否不可取消</param>
-        /// <param name="display">是否不显示计时</param>
-        /// <param name="noSave">退出后是否不保存</param>
-        /// <param name="ex">若是db，是否专家以上延长时长</param>
-        public static void SetBuff(this ModBuff buff, bool db, bool nurse, bool display, bool noSave, bool ex)
-        {
-            int type = buff.Type;
-            Main.debuff[type] = db;
-            BuffID.Sets.NurseCannotRemoveDebuff[type] = nurse;
-            Main.buffNoTimeDisplay[type] = display;
-            Main.buffNoSave[type] = noSave;
-            BuffID.Sets.LongerExpertDebuff[type] = ex;
-        }
-        public static bool Precent(float n)
-        {
-            int d = 1;
-            while (n % 1 != 0)
-            {
-                n *= 10;
-                d *= 10;
-            }
-            return Main.rand.NextBool((int)n, d);
         }
         public static Rectangle ScaleRec(this Rectangle r, Vector2 scale)
         {
@@ -381,6 +178,29 @@ namespace ShopLookup
             Texture2D texture = TextureAssets.MagicPixel.Value;
             Vector2 unit = end - start;
             spriteBatch.Draw(texture, start + unit / 2 - Main.screenPosition, new Rectangle(0, 0, 1, 1), color, unit.ToRotation() + MathHelper.PiOver2, new Vector2(0.5f, 0.5f), new Vector2(wide, unit.Length()), SpriteEffects.None, 0f);
+        }
+        public static bool CurrencyType(int currencyID, out int itemType)
+        {
+            itemType = -1;
+            if (currencyID == -1) return false;
+            if (CustomCurrencyManager.TryGetCurrencySystem(currencyID, out CustomCurrencySystem system))
+            {
+                Type type = system.GetType();
+                var coinDict = system.GetType().GetField("_valuePerUnit", BindingFlags.Instance | BindingFlags.NonPublic);
+                if (coinDict != null)
+                {
+                    foreach ((int coinType, int value) in coinDict.GetValue(system) as Dictionary<int, int>)
+                    {
+                        if (value == 1)
+                        {
+                            itemType = coinType;
+                            return true;
+                        }
+                    }
+
+                }
+            }
+            return false;
         }
     }
 }

@@ -87,8 +87,8 @@ namespace ShopLookup.Content
 
                     NPC npc = new();
                     npc.SetDefaults(type);
-                    string info = npc.FullName + "  " + npc.ModNPC == null ? Language.GetTextValue
-                        (LocalKey + "Vanilla") : npc.ModNPC.Mod.DisplayName;
+                    string info = npc.FullName + "  " + (npc.ModNPC == null ? Language.GetTextValue
+                        (LocalKey + "Vanilla") : npc.ModNPC.Mod.DisplayName);
                     TextUIE condition = new(Decription(info, entry.Conditions, out float h), drawStyle: 2);
                     condition.SetPos(72, 5, 0, 0.5f);
                     bottom.Register(condition);
@@ -121,14 +121,6 @@ namespace ShopLookup.Content
         }
         private void LookupAll(int npcType)
         {
-            TextSnippet[] t = new TextSnippet[]
-            {
-                new($"[i/s9999:{ItemID.PlatinumCoin}]")
-                /*new($"[i/s9999:{ItemID.PlatinumCoin}][i/s9999:{ItemID.GoldCoin}]" +
-                $"[i/s9999:{ItemID.SilverCoin}][i/s9999:{ItemID.CopperCoin}]")*/
-            };
-            Main.NewText(t[0]);
-            Main.NewText(ChatManager.GetStringSize(FontAssets.MouseText.Value, t, Vector2.One));
             RegisterScroll(out UIContainerPanel view);
             foreach (AbstractNPCShop shop in NPCShopDatabase.AllShops)
             {
@@ -171,11 +163,10 @@ namespace ShopLookup.Content
                             y += 62;
                             count++;
                         }*/
-                        UISnippet text = new(t);
-                        text.SetPos(250, 10 + y);
-                        view.AddElement(text);
-                        y += 62;
-
+                        ShopItem shopitem = new(entry.Item);
+                        shopitem.SetPos(20, y);
+                        view.AddElement(shopitem);
+                        y += 110;
                     }
                     return;
                 }
