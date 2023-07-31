@@ -1,0 +1,14 @@
+# This file will automatically update with entries for new content after a build and reload
+
+Items: {
+	lllo: {
+		DisplayName: lllo
+		Tooltip: ""
+	}
+}
+
+NoSell: 没有城镇NPC售卖这个物品
+NoCondition: 在任意时候出售
+Keybinds.ShopLookup.DisplayName: 查询售卖
+Source: 来自：{0}
+Vanilla: 原版

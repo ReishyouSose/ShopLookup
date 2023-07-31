@@ -1,0 +1,14 @@
+# This file will automatically update with entries for new content after a build and reload
+
+Items: {
+	lllo: {
+		DisplayName: lllo
+		Tooltip: ""
+	}
+}
+
+NoSell: No TownNPCs sell this
+NoCondition: Sell at any time
+Keybinds.ShopLookup.DisplayName: Shop Lookup
+Source: From {0}
+Vanilla: Terraria

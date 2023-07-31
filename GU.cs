@@ -1,0 +1,14 @@
+﻿global using Microsoft.Xna.Framework;
+global using Microsoft.Xna.Framework.Graphics;
+global using ShopLookup.UISupport.UIElements;
+global using System;
+global using System.Collections.Generic;
+global using System.Linq;
+global using Terraria;
+global using Terraria.Audio;
+global using Terraria.GameContent;
+global using Terraria.ID;
+global using Terraria.ModLoader;
+global using Terraria.UI.Chat;
+global using static ShopLookup.MiscHelper;
+global using static Terraria.ModLoader.AbstractNPCShop;
