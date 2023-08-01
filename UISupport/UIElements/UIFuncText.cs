@@ -22,7 +22,6 @@ namespace ShopLookup.UISupport.UIElements
             DynamicSpriteFont font = FontAssets.MouseText.Value;
             size = font.GetStringSize(Text, this.scale);
             SetSize(size);
-            DrawRec[0] = true;
         }
 
         public override void DrawSelf(SpriteBatch sb)

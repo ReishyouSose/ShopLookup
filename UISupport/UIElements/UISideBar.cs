@@ -196,22 +196,22 @@
 
             if (dir is 2 or 3)
             {
-                Draw(sb, Tex, rec.TopLeft(), coords[0], size);
+                SimpleDraw(sb, Tex, rec.TopLeft(), coords[0], size);
             }
 
             if (dir is 0 or 3)
             {
-                Draw(sb, Tex, rec.TopRight(), coords[2], size);
+                SimpleDraw(sb, Tex, rec.TopRight(), coords[2], size);
             }
 
             if (dir is 1 or 2)
             {
-                Draw(sb, Tex, rec.BottomLeft(), coords[6], size);
+                SimpleDraw(sb, Tex, rec.BottomLeft(), coords[6], size);
             }
 
             if (dir is 0 or 1)
             {
-                Draw(sb, Tex, rec.BottomRight(), coords[8], size);
+                SimpleDraw(sb, Tex, rec.BottomRight(), coords[8], size);
             }
             //关闭画笔
             sb.End();

@@ -26,10 +26,10 @@
             sb.Draw(Tex, NewRec(rec.TopLeft() - new Vector2(dis / 2, 0), dis, rec.Height), coords[3], Color.White);
             sb.Draw(Tex, NewRec(rec.TopRight() - new Vector2(dis / 2, 0), dis, rec.Height), coords[5], Color.White);
             sb.Draw(Tex, NewRec(rec.BottomLeft() - new Vector2(0, dis / 2), rec.Width, dis), coords[7], Color.White);
-            Draw(sb, Tex, rec.TopLeft(), coords[0], size);
-            Draw(sb, Tex, rec.TopRight(), coords[2], size);
-            Draw(sb, Tex, rec.BottomLeft(), coords[6], size);
-            Draw(sb, Tex, rec.BottomRight(), coords[8], size);
+            SimpleDraw(sb, Tex, rec.TopLeft(), coords[0], size);
+            SimpleDraw(sb, Tex, rec.TopRight(), coords[2], size);
+            SimpleDraw(sb, Tex, rec.BottomLeft(), coords[6], size);
+            SimpleDraw(sb, Tex, rec.BottomRight(), coords[8], size);
         }
     }
 }

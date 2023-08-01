@@ -8,6 +8,12 @@
     <LangVersion>latest</LangVersion>
   </PropertyGroup>
   <ItemGroup>
+    <AdditionalFiles Remove="UISupport\UIElements\New\**" />
+    <Compile Remove="UISupport\UIElements\New\**" />
+    <EmbeddedResource Remove="UISupport\UIElements\New\**" />
+    <None Remove="UISupport\UIElements\New\**" />
+  </ItemGroup>
+  <ItemGroup>
     <None Remove="Localization\zh-Hans_Mods.ShopLookup.hjson" />
   </ItemGroup>
   <ItemGroup>

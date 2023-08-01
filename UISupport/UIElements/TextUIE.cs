@@ -46,7 +46,7 @@ namespace ShopLookup.UISupport.UIElements
                     break;
             }
             ChatManager.DrawColorCodedStringWithShadow(sb, font, text, drawPos, Color.Black, 0, origin, scale);
-            ChatManager.DrawColorCodedString(sb, font, text, drawPos, color, 0, origin, scale);
+            ChatManager.DrawColorCodedString(sb, font, text, drawPos, Color.White, 0, origin, scale);
         }
     }
 }

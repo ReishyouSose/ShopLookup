@@ -1,5 +1,6 @@
 ﻿using ShopLookup.Content;
 using Terraria.UI;
+using static Terraria.UI.Gamepad.UILinkPointNavigator;
 
 namespace ShopLookup
 {
@@ -37,6 +38,35 @@ namespace ShopLookup
                 ref var visable = ref ui.Info.IsVisible;
                 if (Main.HoverItem.type == ItemID.None)
                 {
+                    int hoverNPC = Main.LocalPlayer.talkNPC;
+                    if (Main.LocalPlayer.talkNPC != -1)
+                    {
+                        if (TryGetNPCShop(Main.npc[hoverNPC].type, out var shop))
+                        {
+                            if (!visable) visable = true;
+                            ui.ChangeNPC(shop.NpcType);
+                            return;
+                        }
+                    }
+                    hoverNPC = Shortcuts.NPCS_LastHovered;
+                    if (hoverNPC < -10)
+                    {
+                        if (TryGetNPCShop(-(hoverNPC + 10), out var shop))
+                        {
+                            if (!visable) visable = true;
+                            ui.ChangeNPC(shop.NpcType);
+                            return;
+                        }
+                    }
+                    if (hoverNPC >= 0)
+                    {
+                        if (TryGetNPCShop(Main.npc[hoverNPC].type, out var shop))
+                        {
+                            if (!visable) visable = true;
+                            ui.ChangeNPC(shop.NpcType);
+                            return;
+                        }
+                    }
                     visable = !visable;
                 }
                 else
@@ -44,7 +74,14 @@ namespace ShopLookup
                     if (!visable) visable = true;
                     ui.ChangeItem(Main.HoverItem.type);
                 }
-                ui.LoadShopNPC();
+                if (!ui.firstLoad)
+                {
+                    ui.RemoveAll();
+                    ui.OnInitialization();
+                    ui.LoadShopNPC();
+                    ui.firstLoad = true;
+                    ui.Info.IsVisible = true;
+                }
             }
         }
         public override void ModifyInterfaceLayers(List<GameInterfaceLayer> layers)

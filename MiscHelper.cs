@@ -185,7 +185,6 @@ namespace ShopLookup
             if (currencyID == -1) return false;
             if (CustomCurrencyManager.TryGetCurrencySystem(currencyID, out CustomCurrencySystem system))
             {
-                Type type = system.GetType();
                 var coinDict = system.GetType().GetField("_valuePerUnit", BindingFlags.Instance | BindingFlags.NonPublic);
                 if (coinDict != null)
                 {
@@ -198,6 +197,44 @@ namespace ShopLookup
                         }
                     }
 
+                }
+            }
+            return false;
+        }
+        /// <summary>
+        /// 获取相对于给定大小的自动缩放修正
+        /// </summary>
+        /// <returns>用于乘算的修正值</returns>
+        public static float AutoScale(this Rectangle drawRec, float size = 52, float scale = 0.75f)
+        {
+            float ZoomX = drawRec.Size().X / (size * scale);
+            float ZoomY = drawRec.Size().Y / (size * scale);
+            return 1f / Math.Max(MathF.Sqrt(ZoomX * ZoomX + ZoomY * ZoomY), 1);
+        }
+        public static IEnumerable<(int itemId, int count)> ToCoins(int money)
+        {
+            int copper = money % 100;
+            money /= 100;
+            int silver = money % 100;
+            money /= 100;
+            int gold = money % 100;
+            money /= 100;
+            int plat = money;
+
+            yield return (ItemID.PlatinumCoin, plat);
+            yield return (ItemID.GoldCoin, gold);
+            yield return (ItemID.SilverCoin, silver);
+            yield return (ItemID.CopperCoin, copper);
+        }
+        public static bool TryGetNPCShop(int npcType, out AbstractNPCShop shop)
+        {
+            shop = null;
+            foreach (AbstractNPCShop nshop in NPCShopDatabase.AllShops)
+            {
+                if (nshop.NpcType == npcType)
+                {
+                    shop = nshop;
+                    return true;
                 }
             }
             return false;

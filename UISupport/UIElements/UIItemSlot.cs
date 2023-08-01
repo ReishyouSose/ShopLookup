@@ -188,7 +188,7 @@ namespace ShopLookup.UISupport.UIElements
             //float scale = Info.Size.X / 52f;
             DynamicSpriteFont font = FontAssets.MouseText.Value;
             //调用原版的介绍绘制
-            if (Info.IsMouseHover && ContainedItem != null &&  ContainedItem.type != ItemID.None)
+            if (Info.IsMouseHover && ContainedItem != null && ContainedItem.type != ItemID.None)
             {
                 Main.hoverItemName = ContainedItem.Name;
                 Main.HoverItem = ContainedItem.Clone();
@@ -202,14 +202,12 @@ namespace ShopLookup.UISupport.UIElements
                 DrawColor * Opacity, SlotBackTexture, CornerSize, 1f);
             if (ContainedItem != null && ContainedItem.type != ItemID.None)
             {
-                var frame = Main.itemAnimations[ContainedItem.type] != null ? Main.itemAnimations[ContainedItem.type].GetFrame(TextureAssets.Item[ContainedItem.type].Value) : Item.GetDrawHitbox(ContainedItem.type, null);
-                float ZoomX = frame.Size().X / (DrawRectangle.Width * 0.75f);
-                float ZoomY = frame.Size().Y / (DrawRectangle.Height * 0.75f);
-                float zoom = MathF.Sqrt(ZoomX * ZoomX + ZoomY * ZoomY);
+                var frame = Main.itemAnimations[ContainedItem.type] != null ? Main.itemAnimations[ContainedItem.type]
+                    .GetFrame(TextureAssets.Item[ContainedItem.type].Value) : Item.GetDrawHitbox(ContainedItem.type, null);
                 //绘制物品贴图
                 sb.Draw(TextureAssets.Item[ContainedItem.type].Value, new Vector2(DrawRectangle.X + DrawRectangle.Width / 2,
                     DrawRectangle.Y + DrawRectangle.Height / 2), frame, Color.White * Opacity, 0f,
-                    new Vector2(frame.Width, frame.Height) / 2f, 1 / (zoom > 1 ? zoom : 1), 0, 0);
+                    new Vector2(frame.Width, frame.Height) / 2f, 1 * frame.AutoScale(), 0, 0);
 
                 //绘制物品左下角那个代表数量的数字
                 if (ContainedItem.stack > 1)

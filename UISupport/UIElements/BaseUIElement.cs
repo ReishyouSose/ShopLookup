@@ -267,6 +267,12 @@ namespace ShopLookup.UISupport.UIElements
             /// </summary>
             public event UIMouseEvent OnMouseOut;
 
+            public event UIMouseEvent OnMouseHover;
+
+            public delegate bool UICalculate(BaseUIElement baseElement);
+            public event UICalculate OnCalculation;
+            public void MouseHover(BaseUIElement element) => OnMouseHover?.Invoke(element);
+
             public void LeftClick(BaseUIElement element) => OnLeftClick?.Invoke(element);
 
             public void RightClick(BaseUIElement element) => OnRightClick?.Invoke(element);
@@ -347,7 +353,7 @@ namespace ShopLookup.UISupport.UIElements
         /// <summary>
         /// 是否绘制UI碰撞箱，0是整框，1是内框
         /// </summary>
-        public bool[] DrawRec = new bool[2];
+        public Color?[] DrawRec = new Color?[2];
         public static int TextYoffset;
 
         public Action<SpriteBatch> ReDraw = null;
@@ -454,14 +460,14 @@ namespace ShopLookup.UISupport.UIElements
             }
             //绘制子元素
             DrawChildren(sb);
-            if (DrawRec[0])
+            if (DrawRec[0].HasValue)
             {
-                MiscHelper.DrawRec(sb, Info.TotalHitBox, 2f, Color.White, false);
+                MiscHelper.DrawRec(sb, Info.TotalHitBox, 2f, DrawRec[0].Value, false);
             }
 
-            if (DrawRec[1])
+            if (DrawRec[1].HasValue)
             {
-                MiscHelper.DrawRec(sb, Info.HitBox, 2f, Color.White, false);
+                MiscHelper.DrawRec(sb, Info.HitBox, 2f, DrawRec[0].Value, false);
             }
 
             //如果启用溢出隐藏
@@ -579,10 +585,6 @@ namespace ShopLookup.UISupport.UIElements
             Info.TotalHitBox = new Rectangle((int)Info.TotalLocation.X, (int)Info.TotalLocation.Y, (int)Info.TotalSize.X, (int)Info.TotalSize.Y);
 
             Info.InitDone = true;
-            if (DrawRec[0])
-            {
-
-            }
             ChildrenElements.ForEach(child => { child?.Calculation(); });
         }
 
@@ -715,7 +717,7 @@ namespace ShopLookup.UISupport.UIElements
                 uie.ResetState();
             }
         }
-        public static void Draw(SpriteBatch sb, Texture2D Tex, Vector2 pos, Rectangle? coord,
+        public static void SimpleDraw(SpriteBatch sb, Texture2D Tex, Vector2 pos, Rectangle? coord,
              Vector2 origin, Vector2? scale = null, Color? color = null)
         {
             sb.Draw(Tex, pos, coord, color ?? Color.White, 0, origin, scale ?? Vector2.One, 0, 0);

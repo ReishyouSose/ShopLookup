@@ -136,6 +136,14 @@
             }
 
             interactContainerElementsBuffer = interact;
+            foreach (var ce in interactContainerElementsBuffer)
+            {
+                if (ce.Info.IsMouseHover)
+                {
+                    ce.Events.MouseHover(ce);
+                }
+            }
+
 
             if (mouseLeftDown != Main.mouseLeft)
             {

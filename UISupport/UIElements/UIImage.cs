@@ -29,11 +29,12 @@ namespace ShopLookup.UISupport.UIElements
         /// 0是铺满，1是中心
         /// </summary>
         public int DrawStyle { get; set; }
-        public UIImage(Texture2D tex, Vector2 size, Color? color = null)
+        public UIImage(Texture2D tex, Vector2? size = null, Color? color = null)
         {
             Tex = tex;
             this.color = color ?? Color.White;
-            SetSize(size.X, size.Y);
+            size ??= tex.Size();
+            SetSize(size.Value.X, size.Value.Y);
         }
         public UIImage(Texture2D tex, float x, float y, float Xpercent = 0, float Ypercent = 0, Color? color = null)
         {
@@ -52,7 +53,7 @@ namespace ShopLookup.UISupport.UIElements
             }
             else if (DrawStyle == 1)
             {
-                Draw(sb, Tex, Center(), null, Tex.Size() / 2f);
+                SimpleDraw(sb, Tex, Center(), null, Tex.Size() / 2f);
             }
         }
         public void ChangeColor(Color color) => this.color = color;

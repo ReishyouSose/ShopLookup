@@ -12,18 +12,19 @@ namespace ShopLookup.UISupport.UIElements
         private bool isMouseDown = false;
         private float alpha = 0f;
         private float waitToWheelValue = 0f;
+        private bool hide;
         public bool UseScrollWheel = false;
 
         public float WheelValue
         {
-            get { return wheelValue; }
+            get { return Math.Clamp(wheelValue, 0, 1); }
             set
             {
                 waitToWheelValue = Math.Clamp(value, 0, 1);
             }
         }
 
-        public VerticalScrollbar(float wheelValue = 0f)
+        public VerticalScrollbar(float wheelValue = 0f, bool hide = false)
         {
             Info.Width.Set(20f, 0f);
             Info.Left.Set(-20f, 1f);
@@ -33,7 +34,9 @@ namespace ShopLookup.UISupport.UIElements
             Info.ButtomMargin.Pixel = 5f;
             Info.IsSensitive = true;
             Tex = T2D("ShopLookup/UISupport/Asset/VerticalScrollbar");
+            Info.IsHidden = hide;
             WheelValue = wheelValue;
+            this.hide = hide;
         }
 
         public override void LoadEvents()
@@ -62,6 +65,7 @@ namespace ShopLookup.UISupport.UIElements
             inner = new UIImage(T2D("ShopLookup/UISupport/Asset/VerticalScrollbarInner"), 16, 26);
             inner.Info.Left.Pixel = -(inner.Info.Width.Pixel - Info.Width.Pixel) / 2f;
             inner.ChangeColor(Color.White * alpha);
+            inner.Info.IsHidden = hide;
             Register(inner);
         }
 
@@ -72,7 +76,6 @@ namespace ShopLookup.UISupport.UIElements
             {
                 return;
             }
-
             bool isMouseHover = ParentElement.GetCanHitBox().Contains(Main.MouseScreen.ToPoint());
             if ((isMouseHover || isMouseDown) && alpha < 1f)
             {

@@ -3,17 +3,19 @@
     public class ShopItem : BaseUIElement
     {
         public UIItemSlot slot;
-        public UIItem[] vanilla;
-        public UIItem value;
-        public ShopItem(Item item)
+        public UICurrency currency;
+        public ShopItem(Entry entry)
         {
             SetSize(80, 80);
-            DrawRec[0] = true;
-            slot = new(item);
+            //DrawRec[0] = true;
+            slot = new(entry.Item);
             slot.SetCenter(0, 26, 0.5f);
             Register(slot);
 
-            if (CurrencyType(item.shopSpecialCurrency, out int coinType))
+            currency = new(entry);
+            currency.SetPos(0, 56);
+            Register(currency);
+            /*if (CurrencyType(item.shopSpecialCurrency, out int coinType))
             {
                 value = new(coinType, item.shopCustomPrice.Value);
                 value.SetSize(16, 16);
@@ -39,22 +41,7 @@
                     Register(coins);
                     vanilla[i] = coins;
                 }
-            }
-        }
-        public static IEnumerable<(int itemId, int count)> ToCoins(int money)
-        {
-            int copper = money % 100;
-            money /= 100;
-            int silver = money % 100;
-            money /= 100;
-            int gold = money % 100;
-            money /= 100;
-            int plat = money;
-
-            if (plat > 0) yield return (ItemID.PlatinumCoin, plat);
-            if (gold > 0) yield return (ItemID.GoldCoin, gold);
-            if (silver > 0) yield return (ItemID.SilverCoin, silver);
-            if (copper > 0) yield return (ItemID.CopperCoin, copper);
+            }*/
         }
     }
 }
