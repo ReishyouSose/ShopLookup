@@ -42,7 +42,6 @@ namespace ShopLookup
                     ui.OnInitialization();
                     ui.LoadShopNPC();
                     ui.firstLoad = true;
-                    visable = true;
                 }
                 if (Main.HoverItem.type == ItemID.None)
                 {

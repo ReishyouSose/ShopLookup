@@ -11,6 +11,7 @@ namespace ShopLookup.Content
         public UIPanel bg;
         public UIItemSlot focusItem;
         public ShopNPCSlot focusNPC;
+        public TextUIE indexText;
         public UIBottom ItemBg, side, ShopBg, indexBg;
         public UIContainerPanel view, indexView;
         public bool firstLoad;
@@ -90,10 +91,6 @@ namespace ShopLookup.Content
             ShopBg.SetPos(0, 20 + 52 + 10);
             bg.Register(ShopBg);
 
-            TextUIE text = new(Language.GetTextValue(LocalKey + "Index"));
-            text.SetPos(20 + 26, text.TextSize.Y / 2f + 6);
-            ShopBg.Register(text);
-
             UIImage vline = new(LineTex, 2, 20);
             vline.SetPos(20 + 52 + 9, 5);
             ShopBg.Register(vline);
@@ -127,6 +124,11 @@ namespace ShopLookup.Content
         {
             focusItem.Info.IsVisible = false;
             ShopBg.Info.IsVisible = true;
+            ShopBg.Remove(indexText);
+            indexText = new(Language.GetTextValue(LocalKey + "Index"));
+            indexText.SetPos(20 + 26, indexText.TextSize.Y / 2f + 6);
+            ShopBg.Register(indexText);
+
             focusNPC.Info.IsVisible = true;
             focusNPC.ChangeNPC(type, null);
             LookupShop(type);
@@ -341,7 +343,7 @@ namespace ShopLookup.Content
                 }
             }
         }
-        private string Decription(string info, IEnumerable<Condition> cds, float width, out float height)
+        private static string Decription(string info, IEnumerable<Condition> cds, float width, out float height)
         {
             string conditions = "";
             var font = FontAssets.MouseText.Value;
@@ -352,7 +354,12 @@ namespace ShopLookup.Content
                 int i = 1;
                 foreach (Condition c in cds)
                 {
-                    conditions += c.Description.Value;
+                    string cdesc = c.Description.Value;
+                    conditions += cdesc;
+                    /*if (c.Description.Key == cdesc)
+                    {
+
+                    }*/
                     if (i == 1 && count > 1)
                     {
                         height = font.MeasureString(c.Description.Value).Y;
