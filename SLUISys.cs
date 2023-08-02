@@ -36,6 +36,14 @@ namespace ShopLookup
             {
                 SLUI ui = ShopLookup.Ins.uis.Elements[SLUI.NmakeKey] as SLUI;
                 ref var visable = ref ui.Info.IsVisible;
+                if (!ui.firstLoad)
+                {
+                    ui.RemoveAll();
+                    ui.OnInitialization();
+                    ui.LoadShopNPC();
+                    ui.firstLoad = true;
+                    visable = true;
+                }
                 if (Main.HoverItem.type == ItemID.None)
                 {
                     int hoverNPC = Main.LocalPlayer.talkNPC;
@@ -73,14 +81,6 @@ namespace ShopLookup
                 {
                     if (!visable) visable = true;
                     ui.ChangeItem(Main.HoverItem.type);
-                }
-                if (!ui.firstLoad)
-                {
-                    ui.RemoveAll();
-                    ui.OnInitialization();
-                    ui.LoadShopNPC();
-                    ui.firstLoad = true;
-                    ui.Info.IsVisible = true;
                 }
             }
         }

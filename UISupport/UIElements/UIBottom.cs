@@ -28,6 +28,13 @@
                     dragging = false;
                 }
             };
+            Events.OnLeftDoubleClick += element =>
+            {
+                if (CanDrag)
+                {
+                    dragging = false;
+                }
+            };
             Events.OnMouseOut += element =>
             {
                 if (CanDrag)

@@ -1,4 +1,7 @@
 displayName = Shop Lookup
 author = Reits
-version = 0.1.1
+version = 0.1.3
 side = Client
+hideCode = True
+hideResources = True
+homepage = https://github.com/ReishyouSose/ShopLookup

@@ -41,7 +41,19 @@ namespace ShopLookup.Content
             focusItem = new(null, TextureAssets.InventoryBack9.Value)
             {
                 CanPutInSlot = new((item) => false),
-                CanTakeOutSlot = new((Item) => false),
+                CanTakeOutSlot = new((item) => false),
+            };
+            focusItem.Events.OnLeftClick += (evt) =>
+            {
+                int id = Main.LocalPlayer.inventory[58].type;
+                if (id > ItemID.None)
+                {
+                    ChangeItem(id);
+                }
+            };
+            focusItem.Events.OnRightClick += (evt) =>
+            {
+                ChangeItem(ItemID.None);
             };
             focusItem.SetPos(20, 20);
             bg.Register(focusItem);
@@ -49,6 +61,11 @@ namespace ShopLookup.Content
             focusNPC = new(NPCID.None, null);
             focusNPC.SetPos(20, 20);
             focusNPC.Info.IsVisible = false;
+            focusNPC.Events.OnRightClick += (evt) =>
+            {
+                ChangeItem(ItemID.None);
+                ItemBg.RemoveAll();
+            };
             bg.Register(focusNPC);
 
             int offset = 20 + 52 + 10;
@@ -117,6 +134,7 @@ namespace ShopLookup.Content
         private void LookupOne()
         {
             RegisterScroll(false, ref view);
+            if (focusItem.ContainedItem.type == ItemID.None) return;
             List<(int npcType, string shopName, Entry entry)> shops = new();
             foreach (AbstractNPCShop shop in NPCShopDatabase.AllShops)
             {
