@@ -1,3 +1,4 @@
+using ShopLookup.Content;
 using ShopLookup.UISupport;
 
 namespace ShopLookup
@@ -18,11 +19,12 @@ namespace ShopLookup
         private void On_WorldGen_SaveAndQuit(On_WorldGen.orig_SaveAndQuit orig, Action callback)
         {
             orig(callback);
-            if (!Main.dedServ)
+            foreach (ContainerElement ui in Ins.uis.Elements.Values)
             {
-                foreach (ContainerElement ui in Ins.uis.Elements.Values)
+                ui.Info.IsVisible = false;
+                if (ui is SLUI slui)
                 {
-                    ui.Info.IsVisible = false;
+                    slui.firstLoad = false;
                 }
             }
         }

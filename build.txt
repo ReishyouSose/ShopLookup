@@ -1,6 +1,6 @@
 ﻿displayName = Shop Lookup 商店查询
 author = Reits
-version = 0.1.5
+version = 0.1.6
 side = Client
 hideCode = True
 hideResources = True

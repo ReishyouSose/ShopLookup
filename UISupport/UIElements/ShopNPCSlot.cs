@@ -9,14 +9,12 @@ namespace ShopLookup.UISupport.UIElements
         public int npcType;
         public int headIndex;
         public string npcName;
-        public string shopName;
         public string SourceModName;
-        public ShopNPCSlot(int npcType, string shopName, float scale = 1f, Texture2D bg = null)
+        public ShopNPCSlot(int npcType, float scale = 1f, Texture2D bg = null)
         {
             SetSize(52 * scale, 52 * scale);
             this.scale = scale;
             this.npcType = npcType;
-            this.shopName = shopName;
             this.bg = bg ?? TextureAssets.InventoryBack2.Value;
             Main.instance.LoadNPC(npcType);
             headIndex = NPC.TypeToDefaultHeadIndex(npcType);
@@ -29,7 +27,6 @@ namespace ShopLookup.UISupport.UIElements
         public void ChangeNPC(int npcType, string shopName)
         {
             this.npcType = npcType;
-            this.shopName = shopName;
             Main.instance.LoadNPC(npcType);
             headIndex = NPC.TypeToDefaultHeadIndex(npcType);
             NPC npc = new();

@@ -71,5 +71,6 @@ namespace ShopLookup.UISupport.UIElements
             base.Calculation();
         }
         public void ChangeImage(string texKey) => Tex = ModContent.Request<Texture2D>(texKey, AssetRequestMode.ImmediateLoad).Value;
+        public void ChangeImage(Texture2D tex) => Tex = tex;
     }
 }

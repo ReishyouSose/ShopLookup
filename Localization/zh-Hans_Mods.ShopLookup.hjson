@@ -13,3 +13,5 @@ Keybinds.ShopLookup.DisplayName: 查询售卖
 Source: 来自{0}
 Vanilla: 原版
 Index: 索引
+Filter: 模组筛选：{0}
+Switch: 左击或右击以切换

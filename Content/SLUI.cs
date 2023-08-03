@@ -7,15 +7,21 @@ namespace ShopLookup.Content
     {
         public const string LocalKey = "Mods.ShopLookup.";
         public const string NmakeKey = "ShopLookup.Content.SLUI";
+        public const string AssetKey = "ShopLookup/UISupport/Asset/";
         public static Texture2D LineTex => TextureAssets.MagicPixel.Value;
         public UIPanel bg;
         public UIItemSlot focusItem;
         public ShopNPCSlot focusNPC;
         public TextUIE indexText;
+        public UIImage _switch;
         public UIBottom ItemBg, side, ShopBg, indexBg;
         public UIContainerPanel view, indexView;
         public bool firstLoad;
-        internal static List<int> pylons = new();
+        private int FocusMod;
+        internal static List<int> pylons;
+        internal static Dictionary<int, string> added;
+        internal static List<(string name, string inName)> mods;
+        internal static int modCount;
         public override void OnInitialization()
         {
             base.OnInitialization();
@@ -31,7 +37,7 @@ namespace ShopLookup.Content
             bg.SetCenter(0, 0, 0.5f, 0.5f);
             Register(bg);
 
-            UIImage close = new(T2D("ShopLookup/UISupport/Asset/Close"));
+            UIImage close = new(T2D(AssetKey + "Close"));
             close.SetPos(bg.Width - 18, 0);
             close.Events.OnLeftClick += (evt) =>
             {
@@ -59,7 +65,7 @@ namespace ShopLookup.Content
             focusItem.SetPos(20, 20);
             bg.Register(focusItem);
 
-            focusNPC = new(NPCID.None, null);
+            focusNPC = new(NPCID.None);
             focusNPC.SetPos(20, 20);
             focusNPC.Info.IsVisible = false;
             focusNPC.Events.OnRightClick += (evt) =>
@@ -79,9 +85,44 @@ namespace ShopLookup.Content
             vLine.SetCenter(offset, 20 + 26);
             bg.Register(vLine);
 
-            side = new(500 - offset - 30, 52);
+            side = new(500 - offset - 30 - 10 - 52, 52);
             side.SetPos(offset + 10, 20);
             bg.Register(side);
+
+            _switch = new(T2D(AssetKey + "Slot"));
+            _switch.Info.IsSensitive = true;
+            _switch.SetPos(offset + 10 + side.Width + 10, 20);
+            _switch.ReDraw = (sb) =>
+            {
+                _switch.DrawSelf(sb);
+                if (_switch.Info.IsMouseHover)
+                {
+                    Main.hoverItemName = Language.GetText(LocalKey + "Filter")
+                    .WithFormatArgs(mods[FocusMod].name).Value
+                    + "\n" + $"[{FocusMod + 1}/{modCount}]"
+                    + "\n" + Language.GetTextValue(LocalKey + "Switch");
+                }
+            };
+
+            UIImage icon = new(T2D(AssetKey + "All"), 52, 52)
+            {
+                DrawStyle = 1,
+            };
+            icon.SetCenter(0, 0, 0.5f, 0.5f);
+            _switch.Register(icon);
+            _switch.Events.OnLeftClick += (evt) =>
+            {
+                if (++FocusMod == modCount) FocusMod = 0;
+                icon.ChangeImage(GetIcon());
+                SwitchShopNPC();
+            };
+            _switch.Events.OnRightClick += (evt) =>
+            {
+                if (--FocusMod < 0) FocusMod = modCount - 1;
+                icon.ChangeImage(GetIcon());
+                SwitchShopNPC();
+            };
+            bg.Register(_switch);
 
             ItemBg = new(500, 360 - offset);
             ItemBg.SetCenter(0, offset / 2f, 0.5f, 0.5f);
@@ -91,6 +132,10 @@ namespace ShopLookup.Content
             ShopBg.SetPos(0, 20 + 52 + 10);
             bg.Register(ShopBg);
 
+            indexText = new(Language.GetTextValue(LocalKey + "Index"));
+            indexText.SetPos(20 + 26, indexText.TextSize.Y / 2f + 6);
+            ShopBg.Register(indexText);
+
             UIImage vline = new(LineTex, 2, 20);
             vline.SetPos(20 + 52 + 9, 5);
             ShopBg.Register(vline);
@@ -99,7 +144,7 @@ namespace ShopLookup.Content
             hline.SetPos(20, 30);
             ShopBg.Register(hline);
 
-            indexBg = new(side.Width, 30);
+            indexBg = new(side.Width + 62, 30);
             indexBg.SetPos(offset + 10, 0);
             ShopBg.Register(indexBg);
             ShopBg.Info.IsVisible = false;
@@ -111,6 +156,15 @@ namespace ShopLookup.Content
             {
                 Info.IsVisible = false;
             }
+        }
+        private Texture2D GetIcon()
+        {
+            return T2D(FocusMod switch
+            {
+                0 => AssetKey + "All",
+                1 => AssetKey + "Vanilla",
+                _ => mods[FocusMod].inName + "/icon_small"
+            }) ?? T2D(AssetKey + "NoIcon");
         }
         public void ChangeItem(int type)
         {
@@ -124,10 +178,6 @@ namespace ShopLookup.Content
         {
             focusItem.Info.IsVisible = false;
             ShopBg.Info.IsVisible = true;
-            ShopBg.Remove(indexText);
-            indexText = new(Language.GetTextValue(LocalKey + "Index"));
-            indexText.SetPos(20 + 26, indexText.TextSize.Y / 2f + 6);
-            ShopBg.Register(indexText);
 
             focusNPC.Info.IsVisible = true;
             focusNPC.ChangeNPC(type, null);
@@ -170,7 +220,7 @@ namespace ShopLookup.Content
                     vLine.SetCenter(72, 0, 0, 0.5f);
                     bottom.Register(vLine);
 
-                    ShopNPCSlot slot = new(type, shopName, 1f);
+                    ShopNPCSlot slot = new(type, 1f);
                     if (h > 0)
                     {
                         bottom.Info.Height.Pixel += h;
@@ -217,7 +267,7 @@ namespace ShopLookup.Content
 
             HorizontalScrollbar scroll = new();
             scroll.Info.IsHidden = true;
-            scroll.Info.Top.Pixel += 10;
+            scroll.Info.Top.Pixel += 11;
             indexView.SetHorizontalScrollbar(scroll);
             indexBg.Register(scroll);
 
@@ -305,9 +355,13 @@ namespace ShopLookup.Content
         }
         public void LoadShopNPC()
         {
-            foreach (Entry entry in NPCShopDatabase.GetPylonEntries())
+            if (pylons == null)
             {
-                pylons.Add(entry.Item.type);
+                pylons = new();
+                foreach (Entry entry in NPCShopDatabase.GetPylonEntries())
+                {
+                    pylons.Add(entry.Item.type);
+                }
             }
 
             side.RemoveAll();
@@ -327,19 +381,69 @@ namespace ShopLookup.Content
             side.Register(scroll);
             int x = 0;
 
-            Dictionary<int, bool> added = new();
+            added = new();
+            mods = new() { ("All", "All") };
             foreach (AbstractNPCShop shop in NPCShopDatabase.AllShops)
             {
                 if (!added.ContainsKey(shop.NpcType))
                 {
-                    ShopNPCSlot slot = new(shop.NpcType, shop.Name, 1f, TextureAssets.InventoryBack2.Value);
+                    ShopNPCSlot slot = new(shop.NpcType, 1f, TextureAssets.InventoryBack2.Value);
                     slot.Info.Left.Pixel = x + 5;
                     slot.Events.OnMouseOver += (evt) => Shortcuts.NPCS_LastHovered = -10 - slot.npcType;
                     slot.Events.OnMouseOut += (evt) => Shortcuts.NPCS_LastHovered = -2;
                     slot.Events.OnRightClick += (evt) => ChangeNPC(slot.npcType); ;
                     view.AddElement(slot);
                     x += 62;
-                    added.Add(shop.NpcType, true);
+                    NPC npc = new();
+                    npc.SetDefaults(shop.NpcType);
+                    ModNPC mn = npc.ModNPC;
+                    string modName = "Terraria";
+                    string inName = modName;
+                    if (mn != null)
+                    {
+                        modName = mn.Mod.DisplayName;
+                        inName = mn.Mod.Name;
+                    }
+                    added.Add(shop.NpcType, modName);
+                    if (!mods.Contains((modName, inName)))
+                    {
+                        mods.Add((modName, inName));
+                    }
+                }
+            }
+            modCount = mods.Count;
+            FocusMod = 0;
+        }
+        public void SwitchShopNPC()
+        {
+            side.RemoveAll();
+
+            UIContainerPanel view = new();
+            view.SetSize(0, 0, 1, 1);
+            view.Info.SetMargin(0);
+            side.Register(view);
+
+            HorizontalScrollbar scroll = new()
+            {
+                UseScrollWheel = true,
+            };
+            scroll.Info.IsHidden = true;
+            scroll.Info.Top.Pixel += 20;
+            view.SetHorizontalScrollbar(scroll);
+            side.Register(scroll);
+            int x = 0;
+
+            foreach ((int npcType, string modName) in added)
+            {
+                if (FocusMod == 0 || modName == mods[FocusMod].name)
+                {
+                    ShopNPCSlot slot = new(npcType, 1f, TextureAssets.InventoryBack2.Value);
+                    slot.Info.Left.Pixel = x + 5;
+                    slot.Events.OnMouseOver += (evt) => Shortcuts.NPCS_LastHovered = -10 - slot.npcType;
+                    slot.Events.OnMouseOut += (evt) => Shortcuts.NPCS_LastHovered = -2;
+                    slot.Events.OnRightClick += (evt) => ChangeNPC(slot.npcType); ;
+                    view.AddElement(slot);
+                    x += 62;
                 }
             }
         }
