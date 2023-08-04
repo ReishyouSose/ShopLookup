@@ -50,9 +50,25 @@ namespace ShopLookup
                     {
                         if (TryGetNPCShop(Main.npc[hoverNPC].type, out var shop))
                         {
-                            if (!visable) visable = true;
-                            ui.ChangeNPC(shop.NpcType);
-                            return;
+                            if (!visable)
+                            {
+                                visable = true;
+                                ui.ChangeNPC(shop.NpcType);
+                                return;
+                            }
+                            else
+                            {
+                                if (ui.focusNPC.npcType == shop.NpcType)
+                                {
+                                    visable = false;
+                                    return;
+                                }
+                                else
+                                {
+                                    ui.ChangeNPC(shop.NpcType);
+                                    return;
+                                }
+                            }
                         }
                     }
                     hoverNPC = Shortcuts.NPCS_LastHovered;

@@ -214,6 +214,8 @@ namespace ShopLookup.Content
                     string info = npc.FullName + "  " + Language.GetTextValue(LocalKey + "Index") + " | " + shopName;
                     TextUIE condition = new(Decription(info, entry.Conditions, 480 - 82, out float h), drawStyle: 2);
                     condition.SetPos(82, 5, 0, 0.5f);
+                    bottom.Info.Height.Pixel += h;
+                    bottom.Calculation();
                     bottom.Register(condition);
 
                     UIImage vLine = new(LineTex, 2, bottom.Info.Height.Pixel - 20);
@@ -221,10 +223,6 @@ namespace ShopLookup.Content
                     bottom.Register(vLine);
 
                     ShopNPCSlot slot = new(type, 1f);
-                    if (h > 0)
-                    {
-                        bottom.Info.Height.Pixel += h;
-                    }
                     slot.SetPos(10, -26, 0, 0.5f);
                     bottom.Register(slot);
 
