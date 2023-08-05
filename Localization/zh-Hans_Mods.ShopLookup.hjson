@@ -41,7 +41,7 @@ Configs: {
 
 		PermanentTips: {
 			Label: 常驻悬浮条件提示
-			Tooltip: 
+			Tooltip:
 				'''
 				如果启用
 				那么即使关闭随身商店

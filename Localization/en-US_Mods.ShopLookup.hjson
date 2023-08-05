@@ -41,7 +41,7 @@ Configs: {
 
 		PermanentTips: {
 			Label: Permanent Hover Tip
-			Tooltip: 
+			Tooltip:
 				'''
 				if enabled
 				Then even if the portable store is disable
