@@ -95,7 +95,7 @@ namespace ShopLookup.Content
                         Main.NewText(Language.GetTextValue(SLUI.LocalKey + "NoEnough"));
                     }
                 }
-                else
+                else if (i.type == item.type)
                 {
                     if ((buySpeed < 1 || buyTime % buySpeed == 0) && i.stack < i.maxStack)
                     {
