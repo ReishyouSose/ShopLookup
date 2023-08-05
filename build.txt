@@ -1,7 +1,7 @@
-﻿displayName = Shop Lookup 商店查询
+﻿displayName = Shop Lookup商店查询/Portable Shop随身商店
 author = Reits
-version = 0.1.8
-side = Client
+version = 0.2.0
+side = Both
 hideCode = True
 hideResources = True
 homepage = https://github.com/ReishyouSose/ShopLookup

@@ -15,3 +15,42 @@ Vanilla: Terraria
 Index: Index
 Filter: Mod Filer: {0}
 Switch: Left click or Right click to switch
+NoEnough: You don't have enough currency
+NoActive: No corresponding NPC visit in the world
+CantBuy: Purchase conditions not met
+
+Configs: {
+	SLConfig: {
+		DisplayName: Mod Config
+
+		Portable: {
+			Label: Allow Portable Store
+			Tooltip:
+				'''
+				Whether to open the portable store
+				if enable, when you meet the following conditions
+				· Fulfill all selling conditions for the item
+				· Corresponding NPC visiting the world
+				· Have enough currency
+				Then you can directly use the original price in the UI panel
+				(Not affected by NPC's happiness) to buy item
+
+				At the same time, the condition hover tip will be enabled
+				'''
+		}
+
+		PermanentTips: {
+			Label: Permanent Hover Tip
+			Tooltip: 
+				'''
+				if enabled
+				Then even if the portable store is disable
+				there also have condition hover tip
+
+				When the mouse hovers over the information slot
+				the sell conditions that have been reached will be highlighted in green
+				otherwise it will be red
+				'''
+		}
+	}
+}

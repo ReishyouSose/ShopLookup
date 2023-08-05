@@ -333,7 +333,7 @@ namespace ShopLookup.Content
                         bottom.Info.IsSensitive = true;
                         bottom.Register(itemInfo);
 
-                        ShopItem shopitem = new(entry);
+                        ShopItem shopitem = new(entry, npcType);
                         shopitem.SetPos(0, -40, 0, 0.5f);
                         bottom.Register(shopitem);
 
@@ -442,7 +442,7 @@ namespace ShopLookup.Content
                     slot.Info.Left.Pixel = x + 5;
                     slot.Events.OnMouseOver += (evt) => Shortcuts.NPCS_LastHovered = -10 - slot.npcType;
                     slot.Events.OnMouseOut += (evt) => Shortcuts.NPCS_LastHovered = -2;
-                    slot.Events.OnRightClick += (evt) => ChangeNPC(slot.npcType); ;
+                    slot.Events.OnRightClick += (evt) => ChangeNPC(slot.npcType);
                     view.AddElement(slot);
                     x += 62;
                 }

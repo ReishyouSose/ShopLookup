@@ -13,7 +13,7 @@ namespace ShopLookup.Content
         public bool noCondition;
         private bool MouseHover;
         private static readonly Color G = new(0, 230, 100, 255);
-        private static readonly Color R = new(255, 75, 100, 255);
+        private static readonly Color R = new(255, 50, 100, 255);
         public ItemInfo(string info, IEnumerable<Condition> cds, float width, DynamicSpriteFont font = null)
         {
             this.font = font ?? FontAssets.MouseText.Value;
@@ -60,43 +60,56 @@ namespace ShopLookup.Content
         {
             Rectangle hitbox = HitBox();
             Vector2 drawPos = hitbox.TopLeft();
-            if (MouseHover)
+            bool portable = ShopLookup.Portable;
+            if (portable || ShopLookup.PermanentTips)
             {
-                int count = infos.Count;
-                bool sell = true;
-                for (int i = 0; i < count; i++)
+                var parentChild = ParentElement.ChildrenElements;
+                if (MouseHover)
                 {
-                    string text = infos[i];
-                    Color c = Color.White;
-                    if (i > 0)
+                    int count = infos.Count;
+                    bool sell = true;
+                    for (int i = 0; i < count; i++)
                     {
-                        if (noCondition)
+                        string text = infos[i];
+                        Color c = Color.White;
+                        if (i > 0)
                         {
-                            c = Color.LightGreen;
-                            sell = true;
-                        }
-                        else
-                        {
-                            if (cds[i - 1].IsMet()) c = Color.LightGreen;
+                            if (noCondition)
+                            {
+                                c = Color.LightGreen;
+                                sell = true;
+                            }
                             else
                             {
-                                c = R;
-                                if (sell) sell = false;
+                                if (cds[i - 1].IsMet()) c = Color.LightGreen;
+                                else
+                                {
+                                    c = R;
+                                    if (sell) sell = false;
+                                }
                             }
                         }
+                        ChatManager.DrawColorCodedStringWithShadow(sb, font, text, drawPos, c,
+                            0, Vector2.Zero, Vector2.One, -1, 1.5f);
+                        drawPos.Y += yOff[i] + font.LineSpacing;
                     }
-                    ChatManager.DrawColorCodedStringWithShadow(sb, font, text, drawPos, c,
-                        0, Vector2.Zero, Vector2.One, -1, 1.5f);
-                    drawPos.Y += yOff[i] + font.LineSpacing;
+                    if (portable)
+                    {
+                        ((UIImage)parentChild.First(x => x is UIImage)).color = sell ? G : R;
+                        ((ShopItem)parentChild.First(x => x is ShopItem)).canBuy = sell;
+                    }
                 }
-                ((UIImage)ParentElement.ChildrenElements.First(x => x is UIImage))
-                    .color = sell ? G : R;
+                else
+                {
+                    ChatManager.DrawColorCodedStringWithShadow(sb, font, text, drawPos, Color.White,
+                        0, Vector2.Zero, Vector2.One, -1, 1.5f);
+                    if (portable) ((UIImage)parentChild.First(x => x is UIImage)).color = Color.White;
+                }
             }
             else
             {
-                ChatManager.DrawColorCodedStringWithShadow(sb, font, text, drawPos, Color.White, 0, Vector2.Zero, Vector2.One, -1, 1.5f);
-                ((UIImage)ParentElement.ChildrenElements.First(x => x is UIImage))
-                    .color = Color.White;
+                ChatManager.DrawColorCodedStringWithShadow(sb, font, text, drawPos, Color.White,
+                    0, Vector2.Zero, Vector2.One, -1, 1.5f);
             }
         }
         private static int CriterionOffset(DynamicSpriteFont font, string text)

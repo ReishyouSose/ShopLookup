@@ -15,3 +15,42 @@ Vanilla: 原版
 Index: 索引
 Filter: 模组筛选：{0}
 Switch: 左击或右击以切换
+NoEnough: 你没有足够的货币
+NoActive: 世界中没有对应NPC到访
+CantBuy: 有未达成的购买条件
+
+Configs: {
+	SLConfig: {
+		DisplayName: 模组配置
+
+		Portable: {
+			Label: 随身商店
+			Tooltip:
+				'''
+				是否启用随身商店
+				如果启用，那么当你满足以下条件时
+				· 达成物品所需售卖条件
+				· 有对应的NPC到访世界
+				· 有足够的货币
+				你就可以直接在UI面板中
+				以原价购买物品（不受NPC幸福度影响）
+
+				同时悬浮条件提示会启用
+				'''
+		}
+
+		PermanentTips: {
+			Label: 常驻悬浮条件提示
+			Tooltip: 
+				'''
+				如果启用
+				那么即使关闭随身商店
+				也会有悬浮条件提示
+
+				当鼠标悬浮在信息栏上时
+				已达成的售卖条件会被高亮为绿色
+				反之为红色
+				'''
+		}
+	}
+}

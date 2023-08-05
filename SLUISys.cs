@@ -1,4 +1,5 @@
-﻿using ShopLookup.Content;
+﻿using ReLogic.Content;
+using ShopLookup.Content;
 using Terraria.UI;
 using static Terraria.UI.Gamepad.UILinkPointNavigator;
 
@@ -8,6 +9,9 @@ namespace ShopLookup
     {
         public Point size;
         public static ModKeybind Keybind { get; private set; }
+        internal static Asset<Texture2D> coins;
+        internal static int[] coinCount ;
+        internal static bool DrawCoins;
         public override void Load()
         {
             Keybind = KeybindLoader.RegisterKeybind(Mod, Mod.Name, "L");
@@ -20,12 +24,14 @@ namespace ShopLookup
                     ShopLookup.Ins.uis.Calculation();
                     ShopLookup.Ins.uis.OnResolutionChange();
                 };
+                coins = ModContent.Request<Texture2D>("ShopLookup/UISupport/Asset/Coins");
+                coinCount = new int[4];
             }
-
         }
         public override void UpdateUI(GameTime gt)
         {
             base.UpdateUI(gt);
+            DrawCoins = false;
             if (size != Main.ScreenSize)
             {
                 size = Main.ScreenSize;
@@ -108,7 +114,23 @@ namespace ShopLookup
                    "ShopLookup : SLUISys",
                    delegate
                    {
-                       ShopLookup.Ins.uis.Draw(Main.spriteBatch);
+                       var sb = Main.spriteBatch;
+                       ShopLookup.Ins.uis.Draw(sb);
+                       if (DrawCoins)
+                       {
+                           Vector2 pos = Main.MouseScreen + Vector2.One * 16;
+                           sb.Draw(coins.Value, pos, null, Color.White);
+                           Vector2 center = pos + new Vector2(3 + 24 + 12 + 8, 22);
+                           for (int i = 0; i < 4; i++)
+                           {
+                               var font = FontAssets.MouseText.Value;
+                               string text = coinCount[i].ToString();
+                               Vector2 origin = font.MeasureString(text);
+                               origin = new(origin.X, origin.Y / 2f);
+                               ChatManager.DrawColorCodedString(sb, font, text, center + i * Vector2.UnitX * 51,
+                                   Color.White, 0, origin, Vector2.One * 0.8f);
+                           }
+                       }
                        return true;
                    },
                    InterfaceScaleType.UI)

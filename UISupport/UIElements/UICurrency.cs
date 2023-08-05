@@ -40,6 +40,23 @@
                 }
             }
         }
+        public override void Update(GameTime gt)
+        {
+            base.Update(gt);
+            if (Info.IsMouseHover)
+            {
+                if (special)
+                {
+                    Main.HoverItem = currency;
+                    Main.hoverItemName = currency.Name;
+                }
+                else if (coins != null)
+                {
+                    SLUISys.coinCount = coins;
+                    SLUISys.DrawCoins = true;
+                }
+            }
+        }
         public override void DrawSelf(SpriteBatch sb)
         {
             var rec = HitBox();
@@ -47,11 +64,6 @@
             var font = FontAssets.MouseText.Value;
             if (special)
             {
-                if (Info.IsMouseHover)
-                {
-                    Main.HoverItem = currency;
-                    Main.hoverItemName = currency.Name;
-                }
                 //绘制物品贴图
                 Vector2 offset = Vector2.UnitX * rec.Width / 4f;
                 SimpleDraw(sb, tex, center - offset, frame, frame.Size() / 2f, scale * frame.AutoScale(30, 1f));
@@ -63,23 +75,6 @@
             }
             else
             {
-                if (Info.IsMouseHover)
-                {
-                    string coin = "";
-                    for (int i = 0; i < 4; i++)
-                    {
-                        int count = coins[i];
-                        if (count > 0)
-                        {
-                            coin += "[i/s";
-                            coin += count;
-                            coin += ":";
-                            coin += 74 - i;
-                            coin += "]";
-                        }
-                    }
-                    Main.hoverItemName = coin;
-                }
                 for (int i = 0; i < 4; i++)
                 {
                     string text = coins[i].ToString();
@@ -92,14 +87,13 @@
                         3 => 0.875f,
                         _ => 0
                     } * rec.Width + rec.Left, center.Y + 4 * scale.Y);
-                    ChatManager.DrawColorCodedStringShadow(sb, font, text, pos, Color.Black, 0, origin, scale * 0.75f);
-                    ChatManager.DrawColorCodedString(sb, font, text, pos, i switch
+                    ChatManager.DrawColorCodedStringWithShadow(sb, font, text, pos, i switch
                     {
                         1 => Color.Gold,
                         2 => Color.Silver,
                         3 => Color.Orange,
                         _ => Color.White
-                    }, 0, origin, scale * 0.75f);
+                    }, 0, origin, scale * 0.75f, -1, 1.5f);
                 }
             }
         }
