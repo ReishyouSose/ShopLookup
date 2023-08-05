@@ -67,12 +67,12 @@ namespace ShopLookup.UISupport.UIElements
             bool isMouseHover = ParentElement.GetCanHitBox().Contains(Main.MouseScreen.ToPoint());
             if ((isMouseHover || isMouseDown) && alpha < 1f)
             {
-                alpha += 0.01f;
+                alpha += 0.04f;
             }
 
             if (!(isMouseHover || isMouseDown) && alpha > 0f)
             {
-                alpha -= 0.01f;
+                alpha -= 0.04f;
             }
 
             inner.ChangeColor(Color.White * alpha);
@@ -86,12 +86,12 @@ namespace ShopLookup.UISupport.UIElements
 
             if (UseScrollWheel && isMouseHover && whell != state.ScrollWheelValue)
             {
-                WheelValue -= (state.ScrollWheelValue - whell) / 10f / width;
+                WheelValue -= (state.ScrollWheelValue - whell) / 10f / width * 2;
                 whell = state.ScrollWheelValue;
             }
             if (isMouseDown && mouseX != Main.mouseX)
             {
-                WheelValue = (Main.mouseX - Info.Location.X - 13f) / width;
+                WheelValue = (Main.mouseX - Info.Location.X - 13f) / width * 2;
                 mouseX = Main.mouseX;
             }
 

@@ -8,7 +8,11 @@
         {
             SetSize(80, 80);
             //DrawRec[0] = true;
-            slot = new(entry.Item);
+            slot = new(entry.Item)
+            {
+                CanPutInSlot = (new(Item => false)),
+                CanTakeOutSlot = (new(Item => false)),
+            };
             slot.SetCenter(0, 26, 0.5f);
             Register(slot);
 

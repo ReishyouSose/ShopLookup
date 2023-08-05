@@ -15,8 +15,11 @@ namespace ShopLookup.UISupport.UIElements
             }
         }
         private InnerPanel _innerPanel;
+        public Vector2 InnerSize => _innerPanel.HitBox().Size();
         private VerticalScrollbar _verticalScrollbar;
+        public VerticalScrollbar Vscroll => _verticalScrollbar;
         private HorizontalScrollbar _horizontalScrollbar;
+        public HorizontalScrollbar Hscroll => _horizontalScrollbar;
         private float verticalWhellValue;
         private float horizontalWhellValue;
         private Vector2 innerPanelMinLocation;
@@ -49,7 +52,7 @@ namespace ShopLookup.UISupport.UIElements
         public override void Update(GameTime gt)
         {
             base.Update(gt);
-            if (Info.IsMouseHover&&(_verticalScrollbar != null | _horizontalScrollbar != null))
+            if (Info.IsMouseHover && (_verticalScrollbar != null | _horizontalScrollbar != null))
             {
                 PlayerInput.LockVanillaMouseScroll("ShopLookupScroll");
             }

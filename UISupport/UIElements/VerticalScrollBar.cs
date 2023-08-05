@@ -14,6 +14,7 @@ namespace ShopLookup.UISupport.UIElements
         private float waitToWheelValue = 0f;
         private bool hide;
         public bool UseScrollWheel = false;
+        public void SetWheel(float value) => wheelValue = Math.Clamp(value, 0, 1);
 
         public float WheelValue
         {
@@ -44,14 +45,7 @@ namespace ShopLookup.UISupport.UIElements
             base.LoadEvents();
             Events.OnLeftDown += element =>
             {
-                if (!isMouseDown)
-                {
-                    //float height = Info.Size.Y - 26f;
-                    //WheelValue = ((float)Main.mouseY - Info.Location.Y - 13f) / height;
-                    //mouseY = Main.mouseY;
-
-                    isMouseDown = true;
-                }
+                if (!isMouseDown) isMouseDown = true;
             };
             Events.OnLeftUp += element =>
             {
@@ -79,12 +73,12 @@ namespace ShopLookup.UISupport.UIElements
             bool isMouseHover = ParentElement.GetCanHitBox().Contains(Main.MouseScreen.ToPoint());
             if ((isMouseHover || isMouseDown) && alpha < 1f)
             {
-                alpha += 0.01f;
+                alpha += 0.04f;
             }
 
             if (!(isMouseHover || isMouseDown) && alpha > 0f)
             {
-                alpha -= 0.01f;
+                alpha -= 0.04f;
             }
 
             inner.ChangeColor(Color.White * alpha);

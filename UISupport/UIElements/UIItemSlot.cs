@@ -79,8 +79,6 @@ namespace ShopLookup.UISupport.UIElements
             base.LoadEvents();
             Events.OnLeftClick += element =>
             {
-                //开启背包
-                Main.playerInventory = true;
 
                 //当鼠标没物品，框里有物品的时候
                 if (Main.mouseItem.type == ItemID.None && ContainedItem != null && ContainedItem.type != ItemID.None)
@@ -88,6 +86,8 @@ namespace ShopLookup.UISupport.UIElements
                     //如果可以拿起物品
                     if (CanTakeOutSlot == null || CanTakeOutSlot(ContainedItem))
                     {
+                        //开启背包
+                        Main.playerInventory = true;
                         //拿出物品
                         Main.mouseItem = ContainedItem.Clone();
                         if (!Infinity)
