@@ -174,14 +174,14 @@ namespace ShopLookup.Content
             focusItem.ContainedItem = new(type);
             LookupOne();
         }
-        public void ChangeNPC(int type, string id = null, int itemid = -1)
+        public void ChangeNPC(int type)
         {
             focusItem.Info.IsVisible = false;
             ShopBg.Info.IsVisible = true;
 
             focusNPC.Info.IsVisible = true;
             focusNPC.ChangeNPC(type, null);
-            LookupShop(type, id, itemid);
+            LookupShop(type);
         }
         private void LookupOne()
         {
@@ -208,10 +208,6 @@ namespace ShopLookup.Content
                 {
                     UIBottom bottom = new(480, 72);
                     bottom.Info.IsSensitive = true;
-                    bottom.Events.OnRightClick += (evt) =>
-                    {
-                        ChangeNPC(type, shopName, itemid);
-                    };
                     bottom.SetCenter(0, y, 0.5f);
                     view.AddElement(bottom);
 
@@ -251,7 +247,7 @@ namespace ShopLookup.Content
                 ItemBg.Register(noSell);
             }
         }
-        private void LookupShop(int npcType, string id = null, int itemid = -1)
+        private void LookupShop(int npcType)
         {
             List<string> shopIndex = new();
             foreach (AbstractNPCShop shop in NPCShopDatabase.AllShops)
@@ -301,9 +297,9 @@ namespace ShopLookup.Content
                 };
                 indexView.AddElement(index);
             }
-            ViewShop(npcType, id ?? shopIndex[0], itemid);
+            ViewShop(npcType, shopIndex[0]);
         }
-        private void ViewShop(int npcType, string shopName, int itemtype = -1)
+        private void ViewShop(int npcType, string shopName)
         {
             RegisterScroll(true, ref view);
             foreach (AbstractNPCShop shop in NPCShopDatabase.AllShops)
@@ -323,15 +319,10 @@ namespace ShopLookup.Content
                     foreach (Entry entry in entrys)
                     {
                         UIBottom bottom = new(480, 80);
-                        //bottom.DrawRec[0] = true;
                         bottom.SetCenter(0, y, 0.5f);
                         view.AddElement(bottom);
 
                         Item item = entry.Item;
-                        if (item.type == itemtype)
-                        {
-                            pos = y;
-                        }
                         string info = entry.Item.Name;
 
                         ItemInfo itemInfo = new(info, entry.Conditions, 480 - 120);
@@ -359,11 +350,7 @@ namespace ShopLookup.Content
                             count++;
                             y += 90;
                         }
-                        else y += bottom.Height;
                     }
-                    float value = (pos - 46) / (y - 46);
-                    view.Vscroll.WheelValue = value;
-                    Main.NewText((value, view.Vscroll.WheelValue));
                 }
             }
         }

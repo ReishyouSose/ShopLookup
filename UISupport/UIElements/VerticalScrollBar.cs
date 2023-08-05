@@ -7,18 +7,27 @@ namespace ShopLookup.UISupport.UIElements
         private readonly Texture2D Tex;
         private UIImage inner;
         private float mouseY;
-        private float wheelValue;
+        private float realWheelValue;
+        public float RealWheelValue
+        {
+            get { return realWheelValue; }
+            set { realWheelValue = Math.Clamp(value, 0, 1); }
+        }
         private int whell = 0;
         private bool isMouseDown = false;
         private float alpha = 0f;
         private float waitToWheelValue = 0f;
+        public float WaitToWhellValue
+        {
+            get => waitToWheelValue;
+            set => waitToWheelValue = Math.Clamp(value, 0, 1);
+        }
         private bool hide;
         public bool UseScrollWheel = false;
-        public void SetWheel(float value) => wheelValue = Math.Clamp(value, 0, 1);
 
         public float WheelValue
         {
-            get { return Math.Clamp(wheelValue, 0, 1); }
+            get { return Math.Clamp(realWheelValue, 0, 1); }
             set
             {
                 waitToWheelValue = Math.Clamp(value, 0, 1);
@@ -93,6 +102,7 @@ namespace ShopLookup.UISupport.UIElements
             if (UseScrollWheel && isMouseHover && whell != state.ScrollWheelValue)
             {
                 WheelValue -= (state.ScrollWheelValue - whell) / 6f / height;
+                //WheelValue -= 20 * Math.Sign(state.ScrollWheelValue - whell) / 6f / height;
                 whell = state.ScrollWheelValue;
             }
             if (isMouseDown && mouseY != Main.mouseY)
@@ -102,10 +112,10 @@ namespace ShopLookup.UISupport.UIElements
             }
 
             inner.Info.Top.Pixel = WheelValue * height;
-            wheelValue += (waitToWheelValue - wheelValue) / 6f;
-
-            if (waitToWheelValue != wheelValue)
+            RealWheelValue = Math.Clamp((WaitToWhellValue - RealWheelValue), -1, 1) / 6f + RealWheelValue;
+            if ((int)(WaitToWhellValue * 100) / 100f != (int)(RealWheelValue * 100) / 100f)
             {
+                //Main.NewText(RealWheelValue);
                 Calculation();
             }
         }

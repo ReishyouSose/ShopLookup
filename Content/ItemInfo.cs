@@ -12,13 +12,13 @@ namespace ShopLookup.Content
         public string text;
         public bool noCondition;
         private bool MouseHover;
-        private static readonly Color G = new Color(0, 230, 100, 255);
-        private static readonly Color R = new Color(255, 50, 100, 255);
+        private static readonly Color G = new(0, 230, 100, 255);
+        private static readonly Color R = new(255, 75, 100, 255);
         public ItemInfo(string info, IEnumerable<Condition> cds, float width, DynamicSpriteFont font = null)
         {
             this.font = font ?? FontAssets.MouseText.Value;
             font = this.font;
-            yOff = new() { Math.Max(font.MeasureString(info).Y - font.LineSpacing, 0)};
+            yOff = new() { CriterionOffset(font, info) };
             infos = new() { info };
             this.cds = cds.ToArray();
             if (cds.Any())
@@ -28,7 +28,7 @@ namespace ShopLookup.Content
                     string cdesc = c.Description.Value;
                     cdesc = font.CreateWrappedText(cdesc, width);
                     infos.Add(cdesc);
-                    yOff.Add(Math.Max(font.MeasureString(cdesc).Y - font.LineSpacing, 0));
+                    yOff.Add(CriterionOffset(font, cdesc));
                 }
             }
             else
@@ -98,6 +98,18 @@ namespace ShopLookup.Content
                 ((UIImage)ParentElement.ChildrenElements.First(x => x is UIImage))
                     .color = Color.White;
             }
+        }
+        private static int CriterionOffset(DynamicSpriteFont font, string text)
+        {
+            int space = font.LineSpacing;
+            float y = font.MeasureString(text).Y;
+            int line = (int)(y / space);
+            float offset = y % space;
+            if (y - offset <= 5)
+            {
+                line++;
+            }
+            return Math.Max(line * space - space, 0);
         }
         private static string Decription(string info, IEnumerable<Condition> cds, float width, out float height)
         {
