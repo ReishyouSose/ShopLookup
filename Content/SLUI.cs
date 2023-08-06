@@ -18,6 +18,7 @@ namespace ShopLookup.Content
         public UIContainerPanel view, indexView;
         public bool firstLoad;
         private int FocusMod;
+        private static bool noIcon;
         internal static List<int> pylons;
         internal static Dictionary<int, string> added;
         internal static List<(string name, string inName)> mods;
@@ -52,11 +53,7 @@ namespace ShopLookup.Content
             };
             focusItem.Events.OnLeftClick += (evt) =>
             {
-                int id = Main.LocalPlayer.inventory[58].type;
-                if (id > ItemID.None)
-                {
-                    ChangeItem(id);
-                }
+                ChangeItem(Main.LocalPlayer.inventory[58].type);
             };
             focusItem.Events.OnRightClick += (evt) =>
             {
@@ -68,6 +65,10 @@ namespace ShopLookup.Content
             focusNPC = new(NPCID.None);
             focusNPC.SetPos(20, 20);
             focusNPC.Info.IsVisible = false;
+            focusNPC.Events.OnLeftClick += (evt) =>
+            {
+                ChangeItem(Main.mouseItem.type);
+            };
             focusNPC.Events.OnRightClick += (evt) =>
             {
                 ChangeItem(ItemID.None);
@@ -101,6 +102,7 @@ namespace ShopLookup.Content
                     .WithFormatArgs(mods[FocusMod].name).Value
                     + "\n" + $"[{FocusMod + 1}/{modCount}]"
                     + "\n" + Language.GetTextValue(LocalKey + "Switch");
+                    if (noIcon) Main.hoverItemName += "\n" + Language.GetTextValue(LocalKey + "NoIcon");
                 }
             };
 
@@ -159,12 +161,26 @@ namespace ShopLookup.Content
         }
         private Texture2D GetIcon()
         {
-            return T2D(FocusMod switch
+            if (FocusMod < 2)
             {
-                0 => AssetKey + "All",
-                1 => AssetKey + "Vanilla",
-                _ => mods[FocusMod].inName + "/icon_small"
-            }) ?? T2D(AssetKey + "NoIcon");
+                noIcon = false;
+                return T2D(AssetKey + (FocusMod == 0 ? "All" : "Vanilla"));
+            }
+            else
+            {
+                try
+                {
+                    Texture2D tex = T2D(mods[FocusMod].inName + "/icon_small");
+                    if (tex != null)
+                    {
+                        noIcon = false;
+                        return tex;
+                    }
+                }
+                catch (Exception) { }
+                noIcon = true;
+                return T2D(AssetKey + "NoIcon");
+            }
         }
         public void ChangeItem(int type)
         {

@@ -52,7 +52,6 @@
                 Info.Left.Pixel += offestValue.X;
                 Info.Top.Pixel += offestValue.Y;
                 startPoint = Main.MouseScreen;
-
                 Calculation();
             }
         }

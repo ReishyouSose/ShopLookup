@@ -12,10 +12,13 @@ namespace ShopLookup.Content
         private int buySpeed = 10;
         private int buyStack = 1;
         private bool Buying;
+        public override Rectangle GetCanHitBox()
+        {
+            return Rectangle.Intersect(HitBox(), ParentElement.ParentElement.ParentElement.GetCanHitBox());
+        }
         public ShopItem(Entry entry, int npcType)
         {
             SetSize(80, 80);
-            //DrawRec[0] = true;
             slot = new(entry.Item)
             {
                 CanPutInSlot = new(Item => false),

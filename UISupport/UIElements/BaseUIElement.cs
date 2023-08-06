@@ -334,12 +334,9 @@ namespace ShopLookup.UISupport.UIElements
                 Vector2 location = Vector2.Transform(Info.Location, Main.UIScaleMatrix),
                     bottomRight = Vector2.Transform(Info.Location + Info.Size, Main.UIScaleMatrix);
 
-                Rectangle rectangle = new();
-                rectangle.X = (int)location.X;
-                rectangle.Y = (int)location.Y;
-                rectangle.Width = (int)Math.Max(bottomRight.X - location.X, 0);
-                rectangle.Height = (int)Math.Max(bottomRight.Y - location.Y, 0);
-                return rectangle;
+                return new((int)location.X, (int)location.Y,
+                    (int)Math.Max(bottomRight.X - location.X, 0),
+                    (int)Math.Max(bottomRight.Y - location.Y, 0));
             }
         }
 
@@ -460,14 +457,33 @@ namespace ShopLookup.UISupport.UIElements
             }
             //绘制子元素
             DrawChildren(sb);
+            static void DrawMouse(SpriteBatch sb)
+            {
+                ChatManager.DrawColorCodedStringWithShadow(sb, FontAssets.MouseText.Value, "+",
+                    Main.MouseScreen, Color.Red, 0, Vector2.Zero, Vector2.One);
+            }
             if (DrawRec[0].HasValue)
             {
-                MiscHelper.DrawRec(sb, Info.TotalHitBox, 2f, DrawRec[0].Value, false);
+                sb.End();
+                sb.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend, SamplerState.PointClamp,
+                    DepthStencilState.None, overflowHiddenRasterizerState, null);
+                MiscHelper.DrawRec(sb, Info.HitBox.ScaleRec(Main.UIScaleMatrix), 2f, DrawRec[0].Value, false);
+                DrawMouse(sb);
+                sb.End();
+                sb.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend, SamplerState.PointClamp,
+                    DepthStencilState.None, overflowHiddenRasterizerState, null, Main.UIScaleMatrix);
             }
 
             if (DrawRec[1].HasValue)
             {
+                sb.End();
+                sb.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend, SamplerState.PointClamp,
+                    DepthStencilState.None, overflowHiddenRasterizerState, null);
                 MiscHelper.DrawRec(sb, Info.HitBox, 2f, DrawRec[0].Value, false);
+                DrawMouse(sb);
+                sb.End();
+                sb.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend, SamplerState.PointClamp,
+                    DepthStencilState.None, overflowHiddenRasterizerState, null, Main.UIScaleMatrix);
             }
 
             //如果启用溢出隐藏
@@ -654,7 +670,7 @@ namespace ShopLookup.UISupport.UIElements
         {
             return ParentElement == null
                 ? Rectangle.Intersect(new Rectangle(0, 0, Main.screenWidth, Main.screenHeight), HitBox())
-                : Rectangle.Intersect(Rectangle.Intersect(HitBox(), ParentElement.HiddenOverflowRectangle), ParentElement.GetCanHitBox());
+                : Rectangle.Intersect(Rectangle.Intersect(HitBox(), ParentElement.HitBox()), ParentElement.GetCanHitBox());
         }
 
         /// <summary>

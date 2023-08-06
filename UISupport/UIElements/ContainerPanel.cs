@@ -52,7 +52,7 @@ namespace ShopLookup.UISupport.UIElements
         public override void Update(GameTime gt)
         {
             base.Update(gt);
-            if (Info.IsMouseHover && (_verticalScrollbar != null | _horizontalScrollbar != null))
+            if (HitBox().Contains(Main.MouseScreen.ToPoint()) && (_verticalScrollbar != null | _horizontalScrollbar != null))
             {
                 PlayerInput.LockVanillaMouseScroll("ShopLookupScroll");
             }

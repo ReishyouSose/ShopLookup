@@ -11,7 +11,6 @@ namespace ShopLookup.Content
         public DynamicSpriteFont font;
         public string text;
         public bool noCondition;
-        private bool MouseHover;
         private static readonly Color G = new(0, 230, 100, 255);
         private static readonly Color R = new(255, 50, 100, 255);
         public ItemInfo(string info, IEnumerable<Condition> cds, float width, DynamicSpriteFont font = null)
@@ -54,7 +53,10 @@ namespace ShopLookup.Content
         public override void Update(GameTime gt)
         {
             base.Update(gt);
-            MouseHover = ParentElement.Info.IsMouseHover;
+        }
+        public override Rectangle GetCanHitBox()
+        {
+            return Rectangle.Intersect(ParentElement.HitBox(), ParentElement.ParentElement.ParentElement.GetCanHitBox());
         }
         public override void DrawSelf(SpriteBatch sb)
         {
@@ -64,7 +66,7 @@ namespace ShopLookup.Content
             if (portable || ShopLookup.PermanentTips)
             {
                 var parentChild = ParentElement.ChildrenElements;
-                if (MouseHover)
+                if (Info.IsMouseHover)
                 {
                     int count = infos.Count;
                     bool sell = true;
@@ -93,17 +95,14 @@ namespace ShopLookup.Content
                             0, Vector2.Zero, Vector2.One, -1, 1.5f);
                         drawPos.Y += yOff[i] + font.LineSpacing;
                     }
-                    if (portable)
-                    {
-                        ((UIImage)parentChild.First(x => x is UIImage)).color = sell ? G : R;
-                        ((ShopItem)parentChild.First(x => x is ShopItem)).canBuy = sell;
-                    }
+                    ((UIImage)parentChild.First(x => x is UIImage)).color = sell ? G : R;
+                    ((ShopItem)parentChild.First(x => x is ShopItem)).canBuy = sell;
                 }
                 else
                 {
                     ChatManager.DrawColorCodedStringWithShadow(sb, font, text, drawPos, Color.White,
                         0, Vector2.Zero, Vector2.One, -1, 1.5f);
-                    if (portable) ((UIImage)parentChild.First(x => x is UIImage)).color = Color.White;
+                    ((UIImage)parentChild.First(x => x is UIImage)).color = Color.White;
                 }
             }
             else

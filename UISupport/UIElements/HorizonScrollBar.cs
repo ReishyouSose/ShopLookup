@@ -64,7 +64,7 @@ namespace ShopLookup.UISupport.UIElements
             {
                 return;
             }
-            bool isMouseHover = ParentElement.GetCanHitBox().Contains(Main.MouseScreen.ToPoint());
+            bool isMouseHover = ParentElement.HitBox().Contains(Main.MouseScreen.ToPoint());
             if ((isMouseHover || isMouseDown) && alpha < 1f)
             {
                 alpha += 0.04f;

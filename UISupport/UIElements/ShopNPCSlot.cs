@@ -10,6 +10,15 @@ namespace ShopLookup.UISupport.UIElements
         public int headIndex;
         public string npcName;
         public string SourceModName;
+        private bool mouseRight;
+        public override Rectangle GetCanHitBox()
+        {
+            if (ParentElement.ParentElement != null)
+            {
+                return Rectangle.Intersect(ParentElement.ParentElement.HitBox(), HitBox());
+            }
+            return base.GetCanHitBox();
+        }
         public ShopNPCSlot(int npcType, float scale = 1f, Texture2D bg = null)
         {
             SetSize(52 * scale, 52 * scale);
@@ -32,6 +41,10 @@ namespace ShopLookup.UISupport.UIElements
             NPC npc = new();
             npc.SetDefaults(npcType);
             npcName = npc.FullName;
+        }
+        public override void Update(GameTime gt)
+        {
+            base.Update(gt);
         }
         public override void DrawSelf(SpriteBatch sb)
         {

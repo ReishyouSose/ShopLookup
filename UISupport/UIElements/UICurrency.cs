@@ -12,7 +12,6 @@
         private readonly Texture2D tex;
         public UICurrency(Entry entry)
         {
-            //DrawRec[0] = true;
             scale = Vector2.One;
             SetSize(80, 24);
             Item item = entry.Item;
@@ -43,6 +42,12 @@
         public override void Update(GameTime gt)
         {
             base.Update(gt);
+        }
+        public override void DrawSelf(SpriteBatch sb)
+        {
+            var rec = HitBox();
+            Vector2 center = rec.Center();
+            var font = FontAssets.MouseText.Value;
             if (Info.IsMouseHover)
             {
                 if (special)
@@ -56,12 +61,6 @@
                     SLUISys.DrawCoins = true;
                 }
             }
-        }
-        public override void DrawSelf(SpriteBatch sb)
-        {
-            var rec = HitBox();
-            Vector2 center = rec.Center();
-            var font = FontAssets.MouseText.Value;
             if (special)
             {
                 //绘制物品贴图
