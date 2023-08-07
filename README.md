@@ -6,7 +6,7 @@ A mod of Terraria TML
 {
     if (ModLoader.TryGetMod("ShopLookup", out Mod slu))
     {
-        slu.Call("NonPermanent", ModContent.NPCType<YourNPC>(), Condition.BloodMoon);
+        slu.Call("NonPermanent", ModContent.NPCType\<YourNPC\>(), Condition.BloodMoon);
     }
 }
 </code></pre>
