@@ -17,6 +17,7 @@ namespace ShopLookup
             Keybind = KeybindLoader.RegisterKeybind(Mod, Mod.Name, "L");
             if (!Main.dedServ)
             {
+                NonPermanentNPC.Load();
                 ShopLookup.Ins.uis = new();
                 ShopLookup.Ins.uis.Load();
                 Main.OnResolutionChanged += (evt) =>
@@ -52,7 +53,7 @@ namespace ShopLookup
                 if (Main.HoverItem.type == ItemID.None)
                 {
                     int hoverNPC = Main.LocalPlayer.talkNPC;
-                    if (Main.LocalPlayer.talkNPC != -1)
+                    if (hoverNPC != -1)
                     {
                         if (TryGetNPCShop(Main.npc[hoverNPC].type, out var shop))
                         {

@@ -11,12 +11,18 @@ namespace ShopLookup.Content
         private int buyTime;
         private int buySpeed = 10;
         private int buyStack = 1;
-        private bool Buying;
+        /// <summary>
+        /// 生成条件是否满足
+        /// </summary>
+        public bool Spawn { get; private set; }
+        private readonly IEnumerable<Condition> conditions;
+        public bool Buying { get; private set; }
+        public bool Permanent { get; private set; }
         public override Rectangle GetCanHitBox()
         {
             return Rectangle.Intersect(HitBox(), ParentElement.ParentElement.ParentElement.GetCanHitBox());
         }
-        public ShopItem(Entry entry, int npcType)
+        public ShopItem(Entry entry, int npcType, bool permanent, IEnumerable<Condition> conditions)
         {
             SetSize(80, 80);
             slot = new(entry.Item)
@@ -25,19 +31,12 @@ namespace ShopLookup.Content
                 CanTakeOutSlot = new(Item => false),
             };
             slot.SetCenter(0, 26, 0.5f);
+            this.npcType = npcType;
+            Permanent = permanent;
+            this.conditions = conditions;
             slot.Events.OnLeftClick += evt =>
             {
-                if (!ShopLookup.Portable) return;
-                if (!canBuy)
-                {
-                    Main.NewText(Language.GetTextValue(SLUI.LocalKey + "CantBuy"));
-                    return;
-                }
-                if (NPC.FindFirstNPC(npcType) == -1)
-                {
-                    Main.NewText(Language.GetTextValue(SLUI.LocalKey + "NoActive"));
-                    return;
-                }
+                if (!CanBuyItem()) return;
                 Item item = entry.Item;
                 Player p = Main.LocalPlayer;
                 ref Item i = ref Main.mouseItem;
@@ -52,17 +51,7 @@ namespace ShopLookup.Content
             };
             slot.Events.OnRightDown += evt =>
             {
-                if (!ShopLookup.Portable) return;
-                if (!canBuy)
-                {
-                    Main.NewText(Language.GetTextValue(SLUI.LocalKey + "CantBuy"));
-                    return;
-                }
-                if (NPC.FindFirstNPC(npcType) >= 0)
-                {
-                    Buying = true;
-                }
-                else Main.NewText(Language.GetTextValue(SLUI.LocalKey + "NoActive"));
+                CanBuyItem(true);
             };
             slot.Events.OnRightUp += evt =>
             {
@@ -77,6 +66,43 @@ namespace ShopLookup.Content
             currency = new(entry);
             currency.SetPos(0, 56);
             Register(currency);
+        }
+        private bool CanBuyItem(bool right = false)
+        {
+            if (!ShopLookup.Portable) return false;
+            if (!canBuy)
+            {
+                Main.NewText(Language.GetTextValue(SLUI.LocalKey + "CantBuy"));
+                return false;
+            }
+            if (NPC.FindFirstNPC(npcType) >= 0)
+            {
+                Buying = right;
+                Main.playerInventory = true;
+                return true;
+            }
+            else
+            {
+                if (!Permanent)
+                {
+                    if (conditions.All(x => x.IsMet()))
+                    {
+                        Buying = right;
+                        Main.playerInventory = true;
+                        return true;
+                    }
+                    else
+                    {
+                        Main.NewText(Language.GetTextValue(SLUI.LocalKey + "NoSpawn"));
+                        return false;
+                    }
+                }
+                else
+                {
+                    Main.NewText(Language.GetTextValue(SLUI.LocalKey + "NoActive"));
+                    return false;
+                }
+            }
         }
         public override void Update(GameTime gt)
         {

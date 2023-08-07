@@ -1,5 +1,4 @@
 ﻿using Terraria.Localization;
-using static Terraria.UI.Gamepad.UILinkPointNavigator;
 
 namespace ShopLookup.Content
 {
@@ -196,7 +195,7 @@ namespace ShopLookup.Content
             ShopBg.Info.IsVisible = true;
 
             focusNPC.Info.IsVisible = true;
-            focusNPC.ChangeNPC(type, null);
+            focusNPC.ChangeNPC(type);
             LookupShop(type);
         }
         private void LookupOne()
@@ -331,7 +330,9 @@ namespace ShopLookup.Content
                         if (entry.Item.type == ItemID.None) continue;
                         entrys.Add(entry);
                     }
-                    float pos = 0;
+                    //float pos = 0;
+
+                    bool permanent = !NonPermanentNPC.TryGet(npcType, out IEnumerable<Condition> conditions);
                     foreach (Entry entry in entrys)
                     {
                         UIBottom bottom = new(480, 80);
@@ -348,8 +349,7 @@ namespace ShopLookup.Content
                         bottom.Calculation();
                         bottom.Info.IsSensitive = true;
                         bottom.Register(itemInfo);
-
-                        ShopItem shopitem = new(entry, npcType);
+                        ShopItem shopitem = new(entry, npcType, permanent, conditions);
                         shopitem.SetPos(0, -40, 0, 0.5f);
                         bottom.Register(shopitem);
 
@@ -406,8 +406,6 @@ namespace ShopLookup.Content
                 {
                     ShopNPCSlot slot = new(shop.NpcType, 1f, TextureAssets.InventoryBack2.Value);
                     slot.Info.Left.Pixel = x + 5;
-                    slot.Events.OnMouseOver += (evt) => Shortcuts.NPCS_LastHovered = -10 - slot.npcType;
-                    slot.Events.OnMouseOut += (evt) => Shortcuts.NPCS_LastHovered = -2;
                     slot.Events.OnRightClick += (evt) => ChangeNPC(slot.npcType); ;
                     view.AddElement(slot);
                     x += 62;
@@ -456,8 +454,6 @@ namespace ShopLookup.Content
                 {
                     ShopNPCSlot slot = new(npcType, 1f, TextureAssets.InventoryBack2.Value);
                     slot.Info.Left.Pixel = x + 5;
-                    slot.Events.OnMouseOver += (evt) => Shortcuts.NPCS_LastHovered = -10 - slot.npcType;
-                    slot.Events.OnMouseOut += (evt) => Shortcuts.NPCS_LastHovered = -2;
                     slot.Events.OnRightClick += (evt) => ChangeNPC(slot.npcType);
                     view.AddElement(slot);
                     x += 62;

@@ -14,6 +14,9 @@
     <None Remove="UISupport\UIElements\New\**" />
   </ItemGroup>
   <ItemGroup>
+    <None Remove="description_workshop.txt" />
+    <None Remove="description_workshop_en.txt" />
+    <None Remove="icon_workshop.png" />
     <None Remove="Localization\zh-Hans_Mods.ShopLookup.hjson" />
   </ItemGroup>
   <ItemGroup>

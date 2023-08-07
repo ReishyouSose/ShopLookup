@@ -1,14 +1,5 @@
-# This file will automatically update with entries for new content after a build and reload
-
-Items: {
-	lllo: {
-		DisplayName: lllo
-		Tooltip: ""
-	}
-}
-
 NoSell: 没有城镇NPC售卖这个物品
-NoCondition: 在任意时候出售
+NoCondition: 任何时候
 Keybinds.ShopLookup.DisplayName: 查询售卖
 Source: 来自{0}
 Vanilla: 原版
@@ -19,6 +10,9 @@ NoEnough: 你没有足够的货币
 NoActive: 世界中没有对应NPC到访
 CantBuy: 有未达成的购买条件
 NoIcon: 这个Mod没有icon_small贴图文件
+Travel: 需要世界上有两个城镇NPC
+NonPermanent: 非常驻NPC
+NoSpawn: 不满足这个非常驻NPC的生成条件
 
 Configs: {
 	SLConfig: {

@@ -70,24 +70,33 @@ namespace ShopLookup.Content
                 {
                     int count = infos.Count;
                     bool sell = true;
+                    ShopItem shopItem = parentChild.First(x => x is ShopItem) as ShopItem;
                     for (int i = 0; i < count; i++)
                     {
                         string text = infos[i];
                         Color c = Color.White;
                         if (i > 0)
                         {
-                            if (noCondition)
+                            if (shopItem.Buying)
                             {
                                 c = Color.LightGreen;
                                 sell = true;
                             }
                             else
                             {
-                                if (cds[i - 1].IsMet()) c = Color.LightGreen;
+                                if (noCondition)
+                                {
+                                    c = Color.LightGreen;
+                                    sell = true;
+                                }
                                 else
                                 {
-                                    c = R;
-                                    if (sell) sell = false;
+                                    if (cds[i - 1].IsMet()) c = Color.LightGreen;
+                                    else
+                                    {
+                                        c = R;
+                                        if (sell) sell = false;
+                                    }
                                 }
                             }
                         }
@@ -96,7 +105,7 @@ namespace ShopLookup.Content
                         drawPos.Y += yOff[i] + font.LineSpacing;
                     }
                     ((UIImage)parentChild.First(x => x is UIImage)).color = sell ? G : R;
-                    ((ShopItem)parentChild.First(x => x is ShopItem)).canBuy = sell;
+                    shopItem.canBuy = sell;
                 }
                 else
                 {

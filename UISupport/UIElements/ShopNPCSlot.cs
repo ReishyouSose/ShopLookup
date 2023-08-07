@@ -1,4 +1,6 @@
-﻿using Terraria.Localization;
+﻿using ShopLookup.Content;
+using Terraria.Localization;
+using static Terraria.UI.Gamepad.UILinkPointNavigator;
 
 namespace ShopLookup.UISupport.UIElements
 {
@@ -10,7 +12,9 @@ namespace ShopLookup.UISupport.UIElements
         public int headIndex;
         public string npcName;
         public string SourceModName;
-        private bool mouseRight;
+        public bool Permanent;
+        private Texture2D head;
+        private IEnumerable<Condition> conditions;
         public override Rectangle GetCanHitBox()
         {
             if (ParentElement.ParentElement != null)
@@ -29,18 +33,46 @@ namespace ShopLookup.UISupport.UIElements
             headIndex = NPC.TypeToDefaultHeadIndex(npcType);
             NPC npc = new();
             npc.SetDefaults(npcType);
+            ModNPC mn = npc.ModNPC;
+            if (headIndex == -1 && mn != null)
+            {
+                try
+                {
+                    head = T2D(mn.Texture + "_Head");
+                }
+                catch (Exception) { }
+            }
+            Permanent = !NonPermanentNPC.TryGet(npcType, out conditions);
             npcName = npc.FullName;
-            SourceModName = npc.ModNPC == null ? Language
+            SourceModName = mn == null ? Language
                 .GetTextValue("Mods.ShopLookup.Vanilla") : npc.ModNPC.Mod.DisplayName;
         }
-        public void ChangeNPC(int npcType, string shopName)
+        public override void LoadEvents()
+        {
+            Events.OnMouseOver += (evt) => Shortcuts.NPCS_LastHovered = -10 - npcType;
+            Events.OnMouseOut += (evt) => Shortcuts.NPCS_LastHovered = -2;
+        }
+        public void ChangeNPC(int npcType)
         {
             this.npcType = npcType;
             Main.instance.LoadNPC(npcType);
             headIndex = NPC.TypeToDefaultHeadIndex(npcType);
+            Permanent = !NonPermanentNPC.TryGet(npcType, out conditions);
             NPC npc = new();
             npc.SetDefaults(npcType);
+            ModNPC mn = npc.ModNPC;
+            if (headIndex == -1 && mn != null)
+            {
+                try
+                {
+                    head = T2D(mn.Texture + "_Head");
+                }
+                catch (Exception) { }
+            }
+            Permanent = !NonPermanentNPC.TryGet(npcType, out conditions);
             npcName = npc.FullName;
+            SourceModName = mn == null ? Language
+                .GetTextValue("Mods.ShopLookup.Vanilla") : npc.ModNPC.Mod.DisplayName;
         }
         public override void Update(GameTime gt)
         {
@@ -50,9 +82,14 @@ namespace ShopLookup.UISupport.UIElements
         {
             var rec = HitBox();
             sb.Draw(bg, rec.TopLeft(), null, Color.White);
+            Texture2D head;
             if (headIndex != -1)
             {
-                Texture2D head = TextureAssets.NpcHead[headIndex].Value;
+                head = TextureAssets.NpcHead[headIndex].Value;
+            }
+            else head = this.head;
+            if (head != null)
+            {
                 sb.Draw(head, rec.Center(), null, Color.White, 0, head.Size() / 2f, scale, 0, 0);
             }
             else
@@ -65,6 +102,15 @@ namespace ShopLookup.UISupport.UIElements
             if (Info.IsMouseHover)
             {
                 Main.hoverItemName = npcName + "\n" + SourceModName;
+                if (!Permanent)
+                {
+                    Main.hoverItemName += "\n" + "非常驻NPC";
+                    foreach (Condition c in conditions)
+                    {
+                        Main.hoverItemName += "\n" + (c.IsMet() ?
+                            "[c/00E664:" : "[c/FF3264:") + $"{c.Description.Value}]";
+                    }
+                }
             }
         }
     }
