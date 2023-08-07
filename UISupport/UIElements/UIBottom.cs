@@ -5,10 +5,10 @@
         public bool CanDrag = false;
         private bool dragging = false;
         private Vector2 startPoint = Vector2.Zero;
-        public UIBottom(float x, float y)
+        public UIBottom(float x, float y, float xp = 0, float yp = 0)
         {
             Info.CanBeInteract = true;
-            SetSize(x, y);
+            SetSize(x, y, xp, yp);
         }
         public override void LoadEvents()
         {

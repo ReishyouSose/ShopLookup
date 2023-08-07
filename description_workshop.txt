@@ -7,6 +7,8 @@
 [*]支持在房屋查询UI中使用
 [*]在UI面板中右键NPC栏位可以查询他们的商店
 [/list]
+Ui面板的右下角有一个小按钮
+按住拖动以改动面板大小
 [hr][/hr]
 [h1][b]随身商店[/b][/h1]
 在满足条件的情况下随时随地购买NPC商店的物品！
@@ -26,4 +28,3 @@
 [hr][/hr]
 Discord：[url=store.steampowered.com] https://discord.gg/fjFpgBkRBZ [/url]
 QQ群：574904188
-[quote=tModLoader]Developed By Reits[/quote]

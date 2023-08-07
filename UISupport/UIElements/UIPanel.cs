@@ -20,8 +20,7 @@
             Rectangle[] coords = Rec3x3(dis, dis);
             Rectangle rec = HitBox();
             Vector2 size = new(Tex.Width / 6f);
-            //sb.Draw(ShadowTex, NewRec(rec.TopLeft(), rec.Width, rec.Height), null, color * 0.5f);
-            sb.Draw(Tex, rec, coords[4], color * opacity);
+            sb.Draw(TextureAssets.MagicPixel.Value, rec, new(0, 0, 1, 1), color * opacity);
             sb.Draw(Tex, NewRec(rec.TopLeft() - new Vector2(0, dis / 2), rec.Width, dis), coords[1], Color.White);
             sb.Draw(Tex, NewRec(rec.TopLeft() - new Vector2(dis / 2, 0), dis, rec.Height), coords[3], Color.White);
             sb.Draw(Tex, NewRec(rec.TopRight() - new Vector2(dis / 2, 0), dis, rec.Height), coords[5], Color.White);

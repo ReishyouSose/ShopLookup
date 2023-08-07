@@ -7,6 +7,8 @@ Please bind shortcut keys before using
 [*]Support for NPC slots located in the housing lookup UI panel
 [*]Right click on the NPC slot in the UI panel to lookup their shop
 [/list]
+There is a small button in the lower right corner of the UI panel
+Press and hold to change the size of the panel
 [hr][/hr]
 [h1][b]Portable Shop[/b][/h1]
 Buy items from the NPC shop anytime, anywhere if the conditions are met!
@@ -26,4 +28,3 @@ go and see how to make purchase adaptations for this type of NPC
 [hr][/hr]
 Discord: [url=store.steampowered.com] https://discord.gg/fjFpgBkRBZ [/url]
 QQ group: 574904188
-[quote=tModLoader]Developed By Reits[/quote]

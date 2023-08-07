@@ -1,6 +1,6 @@
 ﻿displayName = Shop Lookup商店查询/Portable Shop随身商店
 author = Reits
-version = 0.2.4
+version = 0.2.5
 side = Both
 hideCode = True
 hideResources = True
