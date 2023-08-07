@@ -10,29 +10,7 @@ public override void PostSetupContent()
     {
         slu.Call("NonPermanent", ModContent.NPCType&lt;YourNPC&gt;(), Condition.BloodMoon);
     }
-})</span><span class="pl-kos">,</span>
-	<span class="pl-k">new</span> <span class="pl-smi">Dictionary</span><span class="pl-c1">&lt;</span><span class="pl-smi">string</span><span class="pl-kos">,</span> <span class="pl-smi">object</span><span class="pl-c1">&gt;</span><span class="pl-kos">(</span><span class="pl-kos">)</span> <span class="pl-kos">{</span>
-		<span class="pl-kos">[</span><span class="pl-s"><span class="pl-s">"</span>spawnItems<span class="pl-s">"</span></span><span class="pl-kos">]</span> <span class="pl-c1">=</span> ModContent<span class="pl-kos">.</span><span class="pl-smi">ItemType</span><span class="pl-c1">&lt;</span><span class="pl-smi">MyBossSpawner</span><span class="pl-c1">&gt;</span><span class="pl-kos">(</span><span class="pl-kos">)</span><span class="pl-kos">,</span>
-		<span class="pl-c">// Other optional arguments as needed...</span>
-	<span class="pl-kos">}</span>
-<span class="pl-kos">)</span><span class="pl-kos">;</span></pre><div class="zeroclipboard-container position-absolute right-0 top-0">
-    <clipboard-copy aria-label="Copy" class="ClipboardButton btn js-clipboard-copy m-2 p-0 tooltipped-no-delay" data-copy-feedback="Copied!" data-tooltip-direction="w" value="
-// 在Mod中或者ModSystem中。 In Mod/ModSystem
-public override void PostSetupContent()
-{
-    if (ModLoader.TryGetMod("ShopLookup", out Mod slu))
-    {
-        slu.Call("NonPermanent", ModContent.NPCType&lt;YourNPC&gt;(), Condition.BloodMoon);
-    }
-}" tabindex="0" role="button" style="display: inherit;">
-      <svg aria-hidden="true" height="16" viewBox="0 0 16 16" version="1.1" width="16" data-view-component="true" class="octicon octicon-copy js-clipboard-copy-icon m-2">
-    <path d="M0 6.75C0 5.784.784 5 1.75 5h1.5a.75.75 0 0 1 0 1.5h-1.5a.25.25 0 0 0-.25.25v7.5c0 .138.112.25.25.25h7.5a.25.25 0 0 0 .25-.25v-1.5a.75.75 0 0 1 1.5 0v1.5A1.75 1.75 0 0 1 9.25 16h-7.5A1.75 1.75 0 0 1 0 14.25Z"></path><path d="M5 1.75C5 .784 5.784 0 6.75 0h7.5C15.216 0 16 .784 16 1.75v7.5A1.75 1.75 0 0 1 14.25 11h-7.5A1.75 1.75 0 0 1 5 9.25Zm1.75-.25a.25.25 0 0 0-.25.25v7.5c0 .138.112.25.25.25h7.5a.25.25 0 0 0 .25-.25v-7.5a.25.25 0 0 0-.25-.25Z"></path>
-</svg>
-      <svg aria-hidden="true" height="16" viewBox="0 0 16 16" version="1.1" width="16" data-view-component="true" class="octicon octicon-check js-clipboard-check-icon color-fg-success d-none m-2">
-    <path d="M13.78 4.22a.75.75 0 0 1 0 1.06l-7.25 7.25a.75.75 0 0 1-1.06 0L2.22 9.28a.751.751 0 0 1 .018-1.042.751.751 0 0 1 1.042-.018L6 10.94l6.72-6.72a.75.75 0 0 1 1.06 0Z"></path>
-</svg>
-    </clipboard-copy>
-  </div></div>
+})</span><span class="pl-kos">,</span></div>
 
 
 <h2 role="document" aria-multiline="true" aria-label="区块：标题" tabindex="0" class="block-editor-rich-text__editable block-editor-block-list__block wp-block wp-block-heading rich-text" id="block-2d11ea3e-dad3-43f1-8cff-056f1f6d29f3" data-block="2d11ea3e-dad3-43f1-8cff-056f1f6d29f3" data-type="core/heading" data-title="标题" contenteditable="true" style="white-space: pre-wrap; min-width: 1px;" data-listener-added_c57c1c82="true">Arguments/参数</h2><ol tabindex="0" class="block-editor-block-list__block wp-block wp-block-list block-editor-block-list__layout" id="block-07f620d9-59d6-40ec-878f-c558aa557ca9" role="document" aria-label="区块：列表" data-block="07f620d9-59d6-40ec-878f-c558aa557ca9" data-type="core/list" data-title="列表" data-is-drop-zone="true"><li tabindex="0" id="block-c492c771-5b4b-4916-8edd-b8f1de43d41c" role="document" aria-label="区块：列表项目" data-block="c492c771-5b4b-4916-8edd-b8f1de43d41c" data-type="core/list-item" data-title="列表项目" class="block-editor-block-list__block wp-block wp-block-list-item block-editor-block-list__layout"><div role="textbox" aria-multiline="true" aria-label="列表文字" contenteditable="true" class="block-editor-rich-text__editable rich-text" style="white-space: pre-wrap; min-width: 1px;" data-listener-added_c57c1c82="true"><strong>string MethodName </strong><br data-rich-text-line-break="true">请填 <code>"NonPermanent"</code><br data-rich-text-line-break="true">Fill in <code>"NonPermanent"</code></div></li><li tabindex="0" id="block-981251c3-905c-4d09-b363-ded382aa5bd9" role="document" aria-label="区块：列表项目" data-block="981251c3-905c-4d09-b363-ded382aa5bd9" data-type="core/list-item" data-title="列表项目" class="block-editor-block-list__block wp-block wp-block-list-item block-editor-block-list__layout"><div role="textbox" aria-multiline="true" aria-label="列表文字" contenteditable="true" class="block-editor-rich-text__editable rich-text" style="white-space: pre-wrap; min-width: 1px;" data-listener-added_c57c1c82="true"><strong>int npcType </strong><br data-rich-text-line-break="true">填入这个NPC的id<br data-rich-text-line-break="true">Fill in the ID of this NPC</div></li><li tabindex="0" id="block-6f2c08c1-853e-495c-9f0a-090c52a27fe9" role="document" aria-label="区块：列表项目" data-block="6f2c08c1-853e-495c-9f0a-090c52a27fe9" data-type="core/list-item" data-title="列表项目" class="block-editor-block-list__block wp-block wp-block-list-item block-editor-block-list__layout"><div role="textbox" aria-multiline="true" aria-label="列表文字" contenteditable="true" class="block-editor-rich-text__editable rich-text" style="white-space: pre-wrap; min-width: 1px;" data-listener-added_c57c1c82="true"><strong data-rich-text-format-boundary="true">params Condition[] conditions</strong><br data-rich-text-line-break="true">填入这个NPC的生成条件，就像给NPC商店添加物品那样<br data-rich-text-line-break="true">Fill in the generation conditions of this NPC, like writing conditions when adding items to the NPC shop.
