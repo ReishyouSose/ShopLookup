@@ -1,4 +1,3 @@
-using ShopLookup.Content;
 using ShopLookup.UISupport;
 using static ShopLookup.Content.NonPermanentNPC;
 
