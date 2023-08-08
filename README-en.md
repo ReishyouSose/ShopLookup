@@ -1,5 +1,5 @@
 ﻿# Shop Lookup
-
+English | [简体中文](README.md)
 ## Mod Call
 
 ### NonPermanent
@@ -48,5 +48,6 @@ if (ModLoader.TryGetMod("ShopLookup", out Mod slu))
 The initial loading will look for all NPCs head texture, you can add texture files with "_Head" based on ModNPC.Texture
 No need for [AutoloadHead], this mod can finds it
 
-ExampleTravelNPC.png
-ExampleTravelNPC_Head.png
+For example：
+- ExampleTravelNPC.png
+- ExampleTravelNPC_Head.png

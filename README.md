@@ -1,5 +1,5 @@
 # Shop Lookup
-
+[English](README-en.md) | 简体中文
 ## NonPermanent
 
 用于给你的Mod的非常驻NPC指定售卖条件。
@@ -43,8 +43,8 @@ if (ModLoader.TryGetMod("ShopLookup", out Mod slu))
 
 ## Head Texture
 
-初次加载会寻找所有NPC的头像贴图，你可以添加基于ModNPC.Texture的带“_Head”的贴图文件
-无需[AutoloadHead]，这个Mod可以找到它
+初次加载会寻找所有NPC的头像贴图，你可以添加基于ModNPC.Texture的带“_Head”的贴图文件。无需[AutoloadHead]，这个Mod可以找到它。
 
-ExampleTravelNPC.png
-ExampleTravelNPC_Head.png
+例如：
+- ExampleTravelNPC.png
+- ExampleTravelNPC_Head.png
