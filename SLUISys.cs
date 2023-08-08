@@ -17,7 +17,7 @@ namespace ShopLookup
             Keybind = KeybindLoader.RegisterKeybind(Mod, Mod.Name, "L");
             if (!Main.dedServ)
             {
-                NonPermanentNPC.Load();
+                ExtraNPCInfo.Load();
                 ShopLookup.Ins.uis = new();
                 ShopLookup.Ins.uis.Load();
                 Main.OnResolutionChanged += (evt) =>

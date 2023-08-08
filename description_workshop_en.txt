@@ -8,7 +8,7 @@ Please bind shortcut keys before using
 [*]Right click on the NPC slot in the UI panel to lookup their shop
 [/list]
 There is a small button in the lower right corner of the UI panel
-Press and hold to change the size of the panel
+Press and hold to change size of the panel
 [hr][/hr]
 [h1][b]Portable Shop[/b][/h1]
 Buy items from the NPC shop anytime, anywhere if the conditions are met!
@@ -25,6 +25,9 @@ as long as their generation conditions are met, they don't need to visit[/b]
 [h1][b]Written to other Mod authors[/b][/h1]
 If your mod adds a non-Permanent NPC like the Traveling Merchant, then you can visit the mod homepage through the game,
 go and see how to make purchase adaptations for this type of NPC
+The initial loading will look for all NPCs head texture, you can add texture files with "_Head" based on ModNPC.Texture
+No need for [AutoloadHead], this mod can finds it
+You can also add localization to the store index
 [hr][/hr]
 Discord: [url=store.steampowered.com] https://discord.gg/fjFpgBkRBZ [/url]
 QQ group: 574904188

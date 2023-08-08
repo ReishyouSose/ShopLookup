@@ -8,6 +8,7 @@ public override void PostSetupContent()
     if (ModLoader.TryGetMod("ShopLookup", out Mod slu))
     {
         slu.Call("NonPermanent", ModContent.NPCType&lt;YourNPC&gt;(), Condition.BloodMoon);
+        // slu.Call("ShopName", int npcType, string shopName, LocalizedText text);
     }
 }
 </code></pre>

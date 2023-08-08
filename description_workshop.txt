@@ -7,8 +7,7 @@
 [*]支持在房屋查询UI中使用
 [*]在UI面板中右键NPC栏位可以查询他们的商店
 [/list]
-Ui面板的右下角有一个小按钮
-按住拖动以改动面板大小
+Ui面板的右下角有一个小按钮，按住拖动以改变面板大小
 [hr][/hr]
 [h1][b]随身商店[/b][/h1]
 在满足条件的情况下随时随地购买NPC商店的物品！
@@ -25,6 +24,9 @@ Ui面板的右下角有一个小按钮
 [h1][b]写给其他Mod作者[/b][/h1]
 如果你的Mod添加了类似旅商的非常驻NPC，那么你可以通过游戏内访问Mod主页
 去看看如何给这类NPC做购买适配
+初次加载会寻找所有NPC的头像贴图，你可以添加基于ModNPC.Texture的带“_Head”的贴图文件
+无需[AutoloadHead]，这个Mod可以找到它
+你还可以给商店索引添加本地化
 [hr][/hr]
 Discord：[url=store.steampowered.com] https://discord.gg/fjFpgBkRBZ [/url]
 QQ群：574904188

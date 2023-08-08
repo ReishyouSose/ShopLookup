@@ -687,7 +687,6 @@ namespace ShopLookup.UISupport.UIElements
         public int Height => HitBox().Height;
         public int Left => HitBox().Left;
         public int Top => HitBox().Top;
-        public Player player => Main.LocalPlayer;
 
         public void SetPos(float x, float y, float Xpercent = 0, float Ypercent = 0)
         {

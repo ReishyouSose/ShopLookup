@@ -276,7 +276,7 @@ namespace ShopLookup.Content
 
                     NPC npc = new();
                     npc.SetDefaults(type);
-                    string info = npc.FullName + "  " + Language.GetTextValue(LocalKey + "Index") + " | " + shopName;
+                    string info = npc.FullName + "  " + Language.GetTextValue(LocalKey + "Index") + " | " + GetShopLT(type, shopName);
 
                     TextUIE condition = new(Decription(info, entry.Conditions, bottom.Width - 82, out float h), drawStyle: 2);
                     condition.SetPos(82, 5, 0, 0.5f);
@@ -338,7 +338,7 @@ namespace ShopLookup.Content
             int j = 10;
             for (int i = 0; i < shopIndex.Count; i++)
             {
-                TextUIE index = new(shopIndex[i], null, new(1));
+                TextUIE index = new(GetShopLT(npcType, shopIndex[i]), null, new(1));
                 index.SetSize(index.TextSize);
                 index.SetCenter(index.Width / 2f + j, 5, 0, 0.5f);
                 j += index.Width + 15;
@@ -362,6 +362,29 @@ namespace ShopLookup.Content
             }
             ViewShop(npcType, shopIndex[0]);
         }
+        private static string GetShopLT(int npcType, string index)
+        {
+            string shopDisplay = index;
+            if (shopDisplay == "Shop")
+            {
+                shopDisplay = Language.GetTextValue("LegacyInterface.28");
+            }
+            else
+            {
+                if (npcType == NPCID.Painter)
+                {
+                    shopDisplay = Language.GetTextValue("GameUI.PainterDecor");
+                }
+                else if (ExtraNPCInfo.NameTryGet(npcType, out var info))
+                {
+                    if (shopDisplay == info.index)
+                    {
+                        shopDisplay = info.text.Value;
+                    }
+                }
+            }
+            return shopDisplay;
+        }
         private void ViewShop(int npcType, string shopName)
         {
             foreach (AbstractNPCShop shop in NPCShopDatabase.AllShops)
@@ -379,7 +402,7 @@ namespace ShopLookup.Content
                     }
                     //float pos = 0;
 
-                    bool permanent = !NonPermanentNPC.TryGet(npcType, out IEnumerable<Condition> conditions);
+                    bool permanent = !ExtraNPCInfo.NonTryGet(npcType, out IEnumerable<Condition> conditions);
                     foreach (Entry entry in entrys)
                     {
                         UIBottom bottom = new(0, 80, 1);

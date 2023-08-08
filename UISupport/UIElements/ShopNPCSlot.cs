@@ -42,7 +42,7 @@ namespace ShopLookup.UISupport.UIElements
                 }
                 catch (Exception) { }
             }
-            Permanent = !NonPermanentNPC.TryGet(npcType, out conditions);
+            Permanent = !ExtraNPCInfo.NonTryGet(npcType, out conditions);
             npcName = npc.FullName;
             SourceModName = mn == null ? Language
                 .GetTextValue("Mods.ShopLookup.Vanilla") : npc.ModNPC.Mod.DisplayName;
@@ -57,7 +57,7 @@ namespace ShopLookup.UISupport.UIElements
             this.npcType = npcType;
             Main.instance.LoadNPC(npcType);
             headIndex = NPC.TypeToDefaultHeadIndex(npcType);
-            Permanent = !NonPermanentNPC.TryGet(npcType, out conditions);
+            Permanent = !ExtraNPCInfo.NonTryGet(npcType, out conditions);
             NPC npc = new();
             npc.SetDefaults(npcType);
             ModNPC mn = npc.ModNPC;
@@ -69,7 +69,7 @@ namespace ShopLookup.UISupport.UIElements
                 }
                 catch (Exception) { }
             }
-            Permanent = !NonPermanentNPC.TryGet(npcType, out conditions);
+            Permanent = !ExtraNPCInfo.NonTryGet(npcType, out conditions);
             npcName = npc.FullName;
             SourceModName = mn == null ? Language
                 .GetTextValue("Mods.ShopLookup.Vanilla") : npc.ModNPC.Mod.DisplayName;
@@ -102,7 +102,7 @@ namespace ShopLookup.UISupport.UIElements
             if (Info.IsMouseHover)
             {
                 Main.hoverItemName = npcName + "\n" + SourceModName;
-                if (!Permanent)
+                if (!Permanent && (ShopLookup.Portable || ShopLookup.PermanentTips))
                 {
                     Main.hoverItemName += "\n" + "非常驻NPC";
                     foreach (Condition c in conditions)

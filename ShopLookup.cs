@@ -1,5 +1,6 @@
 using ShopLookup.UISupport;
-using static ShopLookup.Content.NonPermanentNPC;
+using Terraria.Localization;
+using static ShopLookup.Content.ExtraNPCInfo;
 
 namespace ShopLookup
 {
@@ -31,22 +32,41 @@ namespace ShopLookup
                             }
                             if (conditions.Any())
                             {
-                                if (TryGet(npcType, out var c))
+                                if (NonTryGet(npcType, out var c))
                                 {
-                                    Conbine(npcType, c, conditions);
+                                    NonConbine(npcType, c, conditions);
                                 }
                                 else
                                 {
-                                    Add(npcType, conditions);
+                                    NonAdd(npcType, conditions);
                                 }
                             }
-                            else Add(npcType, NoC);
+                            else NonAdd(npcType, NoC);
                         }
                         else Logger.Warn("Please call in Mod.PostSetupContent / ModSystem.PostSetupContent");
                     }
                     else Logger.Warn("parameter 2 type error");
                 }
-                else Logger.Warn("No method with this name, \"NonPermanent\" should be filled in");
+                else if (type == "ShopName")
+                {
+                    if (args[1] is int npcType)
+                    {
+                        if (args[2] is string index)
+                        {
+                            if (args[3] is LocalizedText text)
+                            {
+                                if (!NameTryGet(npcType, out _))
+                                {
+                                    NameAdd(npcType, index, text);
+                                }
+                            }
+                            else Logger.Warn("parameter 4 type error");
+                        }
+                        else Logger.Warn("parameter 3 type error");
+                    }
+                    else Logger.Warn("parameter 2 type error");
+                }
+                else Logger.Warn("No method with this name");
             }
             else Logger.Warn("parameter 1 type error");
             return null;
