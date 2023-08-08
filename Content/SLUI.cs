@@ -342,9 +342,10 @@ namespace ShopLookup.Content
                 index.SetSize(index.TextSize);
                 index.SetCenter(index.Width / 2f + j, 5, 0, 0.5f);
                 j += index.Width + 15;
+                string shopid = shopIndex[i];
                 index.Events.OnLeftClick += (evt) =>
                 {
-                    ViewShop(npcType, index.text);
+                    ViewShop(npcType, shopid);
                 };
                 index.ReDraw = (sb) =>
                 {
@@ -364,26 +365,25 @@ namespace ShopLookup.Content
         }
         private static string GetShopLT(int npcType, string index)
         {
-            string shopDisplay = index;
-            if (shopDisplay == "Shop")
+            if (ExtraNPCInfo.NameTryGet(npcType, out var info))
             {
-                shopDisplay = Language.GetTextValue("LegacyInterface.28");
+                if (index == info.index)
+                {
+                    return info.text.Value;
+                }
+            }
+            if (index == "Shop")
+            {
+                return Language.GetTextValue("LegacyInterface.28");
             }
             else
             {
                 if (npcType == NPCID.Painter)
                 {
-                    shopDisplay = Language.GetTextValue("GameUI.PainterDecor");
-                }
-                else if (ExtraNPCInfo.NameTryGet(npcType, out var info))
-                {
-                    if (shopDisplay == info.index)
-                    {
-                        shopDisplay = info.text.Value;
-                    }
+                    index = Language.GetTextValue("GameUI.PainterDecor");
                 }
             }
-            return shopDisplay;
+            return index;
         }
         private void ViewShop(int npcType, string shopName)
         {
