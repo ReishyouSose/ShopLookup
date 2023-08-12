@@ -1,12 +1,11 @@
 ﻿using System.ComponentModel;
 using Terraria.ModLoader.Config;
-using static Terraria.GameContent.Animations.Actions.NPCs;
 
 namespace ShopLookup.Content
 {
     internal class SLConfig : ModConfig
     {
-        public override ConfigScope Mode => ConfigScope.ServerSide;
+        public override ConfigScope Mode => ConfigScope.ClientSide;
 
         [DefaultValue(false)]
         public bool Portable;

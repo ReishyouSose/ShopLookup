@@ -2,12 +2,14 @@
 
 namespace ShopLookup.UISupport.UIElements
 {
+
     public class VerticalScrollbar : BaseUIElement
     {
         private readonly Texture2D Tex;
         private UIImage inner;
         private float mouseY;
         private float realWheelValue;
+        public int? WheelPixel;
         public float RealWheelValue
         {
             get { return realWheelValue; }
@@ -23,7 +25,9 @@ namespace ShopLookup.UISupport.UIElements
             set => waitToWheelValue = Math.Clamp(value, 0, 1);
         }
         private bool hide;
-        public bool UseScrollWheel = false;
+        public bool UseScrollWheel = true;
+        public UIContainerPanel View { get; set; }
+        public float ViewMovableY => View.MovableSize.Y;
 
         public float WheelValue
         {
@@ -34,7 +38,7 @@ namespace ShopLookup.UISupport.UIElements
             }
         }
 
-        public VerticalScrollbar(float wheelValue = 0f, bool hide = false)
+        public VerticalScrollbar(int? wheelPixel = 52, float wheelValue = 0f, bool hide = false)
         {
             Info.Width.Set(20f, 0f);
             Info.Left.Set(-20f, 1f);
@@ -45,6 +49,7 @@ namespace ShopLookup.UISupport.UIElements
             Info.IsSensitive = true;
             Tex = T2D("ShopLookup/UISupport/Asset/VerticalScrollbar");
             Info.IsHidden = hide;
+            WheelPixel = wheelPixel;
             WheelValue = wheelValue;
             this.hide = hide;
         }
@@ -101,8 +106,11 @@ namespace ShopLookup.UISupport.UIElements
 
             if (UseScrollWheel && isMouseHover && whell != state.ScrollWheelValue)
             {
-                WheelValue -= (state.ScrollWheelValue - whell) / 6f / height;
-                //WheelValue -= 20 * Math.Sign(state.ScrollWheelValue - whell) / 6f / height;
+                if (WheelPixel.HasValue)
+                {
+                    WheelValue -= WheelPixel.Value / ViewMovableY * Math.Sign(state.ScrollWheelValue - whell);
+                }
+                else WheelValue -= (state.ScrollWheelValue - whell) / 6f / height;
                 whell = state.ScrollWheelValue;
             }
             if (isMouseDown && mouseY != Main.mouseY)
@@ -111,11 +119,10 @@ namespace ShopLookup.UISupport.UIElements
                 mouseY = Main.mouseY;
             }
 
-            inner.Info.Top.Pixel = WheelValue * height;
-            RealWheelValue = Math.Clamp((WaitToWhellValue - RealWheelValue), -1, 1) / 6f + RealWheelValue;
+            inner.Info.Top.Pixel = Math.Max(0, WheelValue * height);
+            RealWheelValue = Math.Clamp(WaitToWhellValue - RealWheelValue, -1, 1) / 6f + RealWheelValue;
             if ((int)(WaitToWhellValue * 100) / 100f != (int)(RealWheelValue * 100) / 100f)
             {
-                //Main.NewText(RealWheelValue);
                 Calculation();
             }
         }

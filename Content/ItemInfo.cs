@@ -25,6 +25,11 @@ namespace ShopLookup.Content
                 foreach (Condition c in cds)
                 {
                     string cdesc = c.Description.Value;
+                    if (cdesc == c.Description.Key)
+                    {
+                        Main.NewText(cdesc + "键值相同", Color.Red);
+                        cdesc = Language.GetTextValue(c.Description.Key);
+                    }
                     cdesc = font.CreateWrappedText(cdesc, width);
                     infos.Add(cdesc);
                     yOff.Add(CriterionOffset(font, cdesc));

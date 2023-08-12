@@ -5,7 +5,7 @@ Please bind shortcut keys before using
 [*]Use bindKey on an item to query all NPC shops and their indexes that sell this item
 [*]You can also lookup all shops and items of an NPC when you are chatting with it
 [*]Support for NPC slots located in the housing lookup UI panel
-[*]Right click on the NPC slot in the UI panel to lookup their shop
+[*]Click the NPC slot in the UI panel to lookup their shop
 [/list]
 There is a small button in the lower right corner of the UI panel
 Press and hold to change size of the panel

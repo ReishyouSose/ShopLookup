@@ -345,6 +345,8 @@ namespace ShopLookup.Content
                 string shopid = shopIndex[i];
                 index.Events.OnLeftClick += (evt) =>
                 {
+                    RegisterScroll(true, ref view);
+
                     ViewShop(npcType, shopid);
                 };
                 index.ReDraw = (sb) =>
@@ -458,7 +460,7 @@ namespace ShopLookup.Content
             view.Info.SetMargin(0);
             side.Register(view);
 
-            HorizontalScrollbar scroll = new()
+            HorizontalScrollbar scroll = new(62)
             {
                 UseScrollWheel = true,
             };
@@ -476,7 +478,8 @@ namespace ShopLookup.Content
                 {
                     ShopNPCSlot slot = new(shop.NpcType, 1f, TextureAssets.InventoryBack2.Value);
                     slot.Info.Left.Pixel = x + 5;
-                    slot.Events.OnRightClick += (evt) => ChangeNPC(slot.npcType); ;
+                    slot.Events.OnLeftClick += (evt) => ChangeNPC(slot.npcType);
+                    slot.Events.OnRightClick += (evt) => ChangeNPC(slot.npcType);
                     view.AddElement(slot);
                     x += 62;
                     NPC npc = new();
@@ -584,12 +587,11 @@ namespace ShopLookup.Content
                 view.Info.SetMargin(0);
                 bbg.Register(view);
 
-                VerticalScrollbar scroll = new()
+                VerticalScrollbar scroll = new(90)
                 {
                     UseScrollWheel = true,
                 };
                 scroll.Info.IsHidden = true;
-                scroll.Info.Left.Pixel -= 10;
                 view.SetVerticalScrollbar(scroll);
                 bbg.Register(scroll);
 
