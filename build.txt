@@ -1,6 +1,6 @@
-﻿displayName = Shop Lookup商店查询/Portable Shop随身商店
+﻿displayName = Shop Expand 商店扩展
 author = Reits
-version = 0.3.0
+version = 0.3.3
 side = Client
 hideCode = True
 hideResources = True

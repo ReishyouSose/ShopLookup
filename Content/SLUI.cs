@@ -215,19 +215,19 @@ namespace ShopLookup.Content
             }
             else
             {
-                try
+                string name = mods[FocusMod].inName;
+                if (ModLoader.GetMod(name).HasAsset("icon_small"))
                 {
-                    Texture2D tex = T2D(mods[FocusMod].inName + "/icon_small");
+                    Texture2D tex = T2D(name + "/icon_small");
                     if (tex != null)
                     {
                         noIcon = false;
                         return tex;
                     }
                 }
-                catch (Exception) { }
-                noIcon = true;
-                return T2D(AssetKey + "NoIcon");
             }
+            noIcon = true;
+            return T2D(AssetKey + "NoIcon");
         }
         public void ChangeItem(int type)
         {

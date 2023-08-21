@@ -10,7 +10,7 @@ namespace ShopLookup
         public Point size;
         public static ModKeybind Keybind { get; private set; }
         internal static Asset<Texture2D> coins;
-        internal static int[] coinCount ;
+        internal static int[] coinCount;
         internal static bool DrawCoins;
         public override void Load()
         {
@@ -39,7 +39,7 @@ namespace ShopLookup
                 ShopLookup.Ins.uis.Calculation();
             }
             ShopLookup.Ins.uis.Update(gt);
-            if (Keybind.JustPressed)
+            if (Keybind.JustPressed && !Terraria.GameInput.PlayerInput.WritingText)
             {
                 SLUI ui = ShopLookup.Ins.uis.Elements[SLUI.NmakeKey] as SLUI;
                 ref var visable = ref ui.Info.IsVisible;

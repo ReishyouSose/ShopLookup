@@ -34,18 +34,19 @@ namespace ShopLookup.UISupport.UIElements
             NPC npc = new();
             npc.SetDefaults(npcType);
             ModNPC mn = npc.ModNPC;
+            Mod mod = mn?.Mod;
             if (headIndex == -1 && mn != null)
             {
-                try
+                string path = mn.Texture + "_Head";
+                if (mod.HasAsset(path.Replace(mod.Name + "/", "")))
                 {
-                    head = T2D(mn.Texture + "_Head");
+                    head = T2D(path);
                 }
-                catch (Exception) { }
             }
             Permanent = !ExtraNPCInfo.NonTryGet(npcType, out conditions);
             npcName = npc.FullName;
             SourceModName = mn == null ? Language
-                .GetTextValue("Mods.ShopLookup.Vanilla") : npc.ModNPC.Mod.DisplayName;
+                .GetTextValue("Mods.ShopLookup.Vanilla") : mod.DisplayName;
         }
         public override void LoadEvents()
         {
@@ -61,18 +62,19 @@ namespace ShopLookup.UISupport.UIElements
             NPC npc = new();
             npc.SetDefaults(npcType);
             ModNPC mn = npc.ModNPC;
+            Mod mod = mn?.Mod;
             if (headIndex == -1 && mn != null)
             {
-                try
+                string path = mn.Texture + "_Head";
+                if (mod.HasAsset(path.Replace(mod.Name + "/", "")))
                 {
-                    head = T2D(mn.Texture + "_Head");
+                    head = T2D(path);
                 }
-                catch (Exception) { }
             }
             Permanent = !ExtraNPCInfo.NonTryGet(npcType, out conditions);
             npcName = npc.FullName;
             SourceModName = mn == null ? Language
-                .GetTextValue("Mods.ShopLookup.Vanilla") : npc.ModNPC.Mod.DisplayName;
+                .GetTextValue("Mods.ShopLookup.Vanilla") : mod.DisplayName;
         }
         public override void Update(GameTime gt)
         {
