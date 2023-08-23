@@ -2,9 +2,10 @@
 
 namespace ShopLookup.Content
 {
-    public class ShopItem : BaseUIElement
+    public class UIShopSlot : BaseUIElement
     {
-        public UIItemSlot slot;
+        public UIItemSlot itemSlot;
+        public UINPCSlot npcSlot;
         public UICurrency currency;
         public int npcType;
         public bool canBuy;
@@ -14,7 +15,10 @@ namespace ShopLookup.Content
         /// <summary>
         /// 生成条件是否满足
         /// </summary>
-        public bool Spawn { get; private set; }
+        public bool Spawn => conditions.All(x => x.IsMet());
+        /// <summary>
+        /// 非常驻NPC的生成条件
+        /// </summary>
         private readonly IEnumerable<Condition> conditions;
         public bool Buying { get; private set; }
         public bool Permanent { get; private set; }
@@ -22,52 +26,40 @@ namespace ShopLookup.Content
         {
             return Rectangle.Intersect(HitBox(), ParentElement.ParentElement.ParentElement.GetCanHitBox());
         }
-        public ShopItem(Entry entry, int npcType, bool permanent, IEnumerable<Condition> conditions)
+        public UIShopSlot(Entry entry, int npcType, bool npc, bool permanent, IEnumerable<Condition> conditions)
         {
             SetSize(80, 80);
-            slot = new(entry.Item)
+            itemSlot = new(entry.Item)
             {
                 CanPutInSlot = new(Item => false),
                 CanTakeOutSlot = new(Item => false),
             };
-            slot.SetCenter(0, 26, 0.5f);
+            itemSlot.SetCenter(0, 26, 0.5f);
+            itemSlot.Events.OnLeftDown += evt => CanBuyItem();
+            itemSlot.Events.OnRightDown += evt => CanBuyItem();
+            itemSlot.Events.OnLeftUp += evt => Buying = false;
+            itemSlot.Events.OnRightUp += evt => Buying = false;
+            itemSlot.Events.OnMouseOut += evt => Buying = false;
+            Register(itemSlot);
+            if (npc)
+            {
+                itemSlot.Info.IsHidden = true;
+                itemSlot.Info.IsSensitive = true;
+                itemSlot.hoverDisplay = false;
+                npcSlot = new(npcType);
+                npcSlot.SetCenter(0, 26, 0.5f);
+                Register(npcSlot);
+            }
+
             this.npcType = npcType;
             Permanent = permanent;
             this.conditions = conditions;
-            slot.Events.OnLeftClick += evt =>
-            {
-                if (!CanBuyItem()) return;
-                Item item = entry.Item;
-                Player p = Main.LocalPlayer;
-                ref Item i = ref Main.mouseItem;
-                if (i.type == ItemID.None)
-                {
-                    if (p.BuyItem(item.shopCustomPrice ?? item.value, item.shopSpecialCurrency))
-                    {
-                        i = new(item.type);
-                    }
-                    else Main.NewText(Language.GetTextValue(SLUI.LocalKey + "NoEnough"));
-                }
-            };
-            slot.Events.OnRightDown += evt =>
-            {
-                CanBuyItem(true);
-            };
-            slot.Events.OnRightUp += evt =>
-            {
-                Buying = false;
-            };
-            slot.Events.OnMouseOut += evt =>
-            {
-                Buying = false;
-            };
-            Register(slot);
 
             currency = new(entry);
-            currency.SetPos(0, 56);
+            currency.SetPos(0, 52);
             Register(currency);
         }
-        private bool CanBuyItem(bool right = false)
+        private bool CanBuyItem()
         {
             if (!ShopLookup.Portable) return false;
             if (!canBuy)
@@ -75,9 +67,9 @@ namespace ShopLookup.Content
                 Main.NewText(Language.GetTextValue(SLUI.LocalKey + "CantBuy"));
                 return false;
             }
-            if (NPC.FindFirstNPC(npcType) >= 0)
+            if (npcType == -1 || NPC.FindFirstNPC(npcType) >= 0)
             {
-                Buying = right;
+                Buying = true;
                 Main.playerInventory = true;
                 return true;
             }
@@ -85,9 +77,9 @@ namespace ShopLookup.Content
             {
                 if (!Permanent)
                 {
-                    if (conditions.All(x => x.IsMet()))
+                    if (Spawn)
                     {
-                        Buying = right;
+                        Buying = true;
                         Main.playerInventory = true;
                         return true;
                     }
@@ -109,7 +101,7 @@ namespace ShopLookup.Content
             base.Update(gt);
             if (Buying)
             {
-                Item item = slot.ContainedItem;
+                Item item = itemSlot.ContainedItem;
                 Player p = Main.LocalPlayer;
                 ref Item i = ref Main.mouseItem;
                 if (i.type == ItemID.None)
@@ -126,13 +118,14 @@ namespace ShopLookup.Content
                 }
                 else if (i.type == item.type)
                 {
-                    if ((buySpeed < 1 || buyTime % buySpeed == 0) && i.stack < i.maxStack)
+                    if ((buySpeed == 0 || (buyTime % buySpeed == 0 && buySpeed < 10)) && i.stack < i.maxStack)
                     {
                         for (int j = 0; j < buyStack; j++)
                         {
                             if (p.BuyItem(item.shopCustomPrice ?? item.value, item.shopSpecialCurrency))
                             {
                                 i.stack++;
+                                SoundCoins();
                                 if (i.stack == i.maxStack) return;
                             }
                             else
@@ -142,21 +135,28 @@ namespace ShopLookup.Content
                                 return;
                             }
                         }
-                        if (buySpeed > 1)
+                    }
+                    if (buySpeed > 10)
+                    {
+                        if (buyTime >= 20)
                         {
-                            if (buyTime >= buySpeed * 2)
-                            {
-                                buyTime = 0;
-                                buySpeed--;
-                            }
+                            buySpeed--;
                         }
-                        else
+                    }
+                    else if (buySpeed > 0)
+                    {
+                        if (buyTime >= buySpeed * 2)
                         {
-                            if (buyTime % 10 == 0)
-                            {
-                                buyStack++;
-                                buyTime = 0;
-                            }
+                            buyTime = 0;
+                            buySpeed--;
+                        }
+                    }
+                    else
+                    {
+                        if (buyTime % 10 == 0)
+                        {
+                            buyStack++;
+                            buyTime = 0;
                         }
                     }
                     buyTime++;

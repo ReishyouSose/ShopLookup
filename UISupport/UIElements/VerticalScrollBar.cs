@@ -12,16 +12,16 @@ namespace ShopLookup.UISupport.UIElements
         public int? WheelPixel;
         public float RealWheelValue
         {
-            get { return realWheelValue; }
+            get { return Math.Clamp(realWheelValue, 0, 1); }
             set { realWheelValue = Math.Clamp(value, 0, 1); }
         }
         private int whell = 0;
         private bool isMouseDown = false;
         private float alpha = 0f;
         private float waitToWheelValue = 0f;
-        public float WaitToWhellValue
+        public float WaitToWheelValue
         {
-            get => waitToWheelValue;
+            get => Math.Clamp(waitToWheelValue, 0, 1);
             set => waitToWheelValue = Math.Clamp(value, 0, 1);
         }
         private bool hide;
@@ -50,7 +50,7 @@ namespace ShopLookup.UISupport.UIElements
             Tex = T2D("ShopLookup/UISupport/Asset/VerticalScrollbar");
             Info.IsHidden = hide;
             WheelPixel = wheelPixel;
-            WheelValue = wheelValue;
+            WaitToWheelValue = wheelValue;
             this.hide = hide;
         }
 
@@ -108,20 +108,20 @@ namespace ShopLookup.UISupport.UIElements
             {
                 if (WheelPixel.HasValue)
                 {
-                    WheelValue -= WheelPixel.Value / ViewMovableY * Math.Sign(state.ScrollWheelValue - whell);
+                    WaitToWheelValue -= WheelPixel.Value / ViewMovableY * Math.Sign(state.ScrollWheelValue - whell);
                 }
-                else WheelValue -= (state.ScrollWheelValue - whell) / 6f / height;
+                else WaitToWheelValue -= (state.ScrollWheelValue - whell) / 6f / height;
                 whell = state.ScrollWheelValue;
             }
             if (isMouseDown && mouseY != Main.mouseY)
             {
-                WheelValue = (Main.mouseY - Info.Location.Y - 13f) / height;
+                WaitToWheelValue = (Main.mouseY - Info.Location.Y - 13f) / height;
                 mouseY = Main.mouseY;
             }
 
-            inner.Info.Top.Pixel = Math.Max(0, WheelValue * height);
-            RealWheelValue = Math.Clamp(WaitToWhellValue - RealWheelValue, -1, 1) / 6f + RealWheelValue;
-            if ((int)(WaitToWhellValue * 100) / 100f != (int)(RealWheelValue * 100) / 100f)
+            inner.Info.Top.Pixel = Math.Max(0, RealWheelValue * height);
+            RealWheelValue = Math.Clamp(WaitToWheelValue - RealWheelValue, -1, 1) / 6f + RealWheelValue;
+            if ((int)(WaitToWheelValue * 100) / 100f != (int)(RealWheelValue * 100) / 100f)
             {
                 Calculation();
             }

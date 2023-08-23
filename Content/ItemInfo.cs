@@ -13,6 +13,7 @@ namespace ShopLookup.Content
         public bool noCondition;
         private static readonly Color G = new(0, 230, 100, 255);
         private static readonly Color R = new(255, 50, 100, 255);
+        private static readonly Color Y = new(255, 165, 0, 255);
         public ItemInfo(string info, IEnumerable<Condition> cds, float width, DynamicSpriteFont font = null)
         {
             this.font = font ?? FontAssets.MouseText.Value;
@@ -75,7 +76,7 @@ namespace ShopLookup.Content
                 {
                     int count = infos.Count;
                     bool sell = true;
-                    ShopItem shopItem = parentChild.First(x => x is ShopItem) as ShopItem;
+                    UIShopSlot shopItem = parentChild.First(x => x is UIShopSlot) as UIShopSlot;
                     for (int i = 0; i < count; i++)
                     {
                         string text = infos[i];
@@ -96,11 +97,19 @@ namespace ShopLookup.Content
                                 }
                                 else
                                 {
-                                    if (cds[i - 1].IsMet()) c = Color.LightGreen;
+                                    Condition cd = cds[i - 1];
+                                    if (IgnoreCds(cd))
+                                    {
+                                        c = Y;
+                                    }
+                                    else if (cd.IsMet())
+                                    {
+                                        c = Color.LightGreen;
+                                    }
                                     else
                                     {
                                         c = R;
-                                        if (sell) sell = false;
+                                        sell = false;
                                     }
                                 }
                             }
@@ -137,46 +146,11 @@ namespace ShopLookup.Content
             }
             return Math.Max(line * space - space, 0);
         }
-        private static string Decription(string info, IEnumerable<Condition> cds, float width, out float height)
+        private static bool IgnoreCds(Condition c)
         {
-            string conditions = "";
-            var font = FontAssets.MouseText.Value;
-            height = 0;
-            int count = cds.Count();
-            if (count > 0)
-            {
-                int i = 1;
-                foreach (Condition c in cds)
-                {
-                    string cdesc = c.Description.Value;
-                    conditions += cdesc;
-                    /*if (c.Description.Key == cdesc)
-                    {
-
-                    }*/
-                    if (i == 1 && count > 1)
-                    {
-                        height = font.MeasureString(c.Description.Value).Y;
-                    }
-                    if (i < count) conditions += "\n";
-                    i++;
-                }
-                float oldH = font.MeasureString(conditions).Y;
-                conditions = font.CreateWrappedText(conditions, width);
-                float newH = font.MeasureString(conditions).Y;
-                if (height > 0)
-                {
-                    height = newH - height;
-                }
-                else
-                {
-                    if (newH > oldH) height = newH - oldH;
-                }
-
-                return info + "\n" + conditions;
-            }
-            //else return info + "\n" + Language.GetTextValue(LocalKey + "NoCondition");
-            return info + "\n" + conditions;
+            return c == Condition.HappyEnoughToSellPylons
+                || c == Condition.AnotherTownNPCNearby
+                || c == Condition.HappyEnough;
         }
     }
 }

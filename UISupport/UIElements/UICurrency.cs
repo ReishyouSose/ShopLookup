@@ -74,18 +74,12 @@
             }
             else
             {
+                float y = font.LineSpacing;
                 for (int i = 0; i < 4; i++)
                 {
                     string text = coins[i].ToString();
-                    Vector2 origin = font.MeasureString(text) / 2f;
-                    Vector2 pos = new(i switch
-                    {
-                        0 => 0.125f,
-                        1 => 0.375f,
-                        2 => 0.625f,
-                        3 => 0.875f,
-                        _ => 0
-                    } * rec.Width + rec.Left, center.Y + 4 * scale.Y);
+                    Vector2 origin = new(font.MeasureString(text).X / 2f, y / 2f);
+                    Vector2 pos = new((0.125f + 0.25f * i) * rec.Width + rec.Left, center.Y + 4 * scale.Y);
                     ChatManager.DrawColorCodedStringWithShadow(sb, font, text, pos, i switch
                     {
                         1 => Color.Gold,

@@ -8,20 +8,26 @@ namespace ShopLookup.UISupport.UIElements
         private UIImage inner;
         private float mouseX;
         private float wheelValue;
+        private float realWheelValue;
         public int? WheelPixel;
+        public float RealWheelValue
+        {
+            get { return Math.Clamp(realWheelValue, 0, 1); }
+            set { realWheelValue = Math.Clamp(value, 0, 1); }
+        }
         private int whell = 0;
         private bool isMouseDown = false;
         private float alpha = 0f;
         private float waitToWheelValue = 0f;
+        public float WaitToWheelValue
+        {
+            get => Math.Clamp(waitToWheelValue, 0, 1);
+            set => waitToWheelValue = Math.Clamp(value, 0, 1);
+        }
         private bool hide;
         public bool UseScrollWheel = false;
         public UIContainerPanel View { get; set; }
         public float ViewMovableX => View.MovableSize.X;
-        public float WheelValue
-        {
-            get { return wheelValue; }
-            set { waitToWheelValue = Math.Clamp(value, 0, 1); }
-        }
         public HorizontalScrollbar(int? wheelPixel = 52, float wheelValue = 0f, bool hide = false)
         {
             Info.Height.Set(20f, 0f);
@@ -33,7 +39,7 @@ namespace ShopLookup.UISupport.UIElements
             Info.IsSensitive = true;
             Tex = T2D("ShopLookup/UISupport/Asset/VerticalScrollbarInner");
             WheelPixel = wheelPixel;
-            WheelValue = wheelValue;
+            WaitToWheelValue = wheelValue;
             Info.IsHidden = hide;
             this.hide = hide;
         }
@@ -92,21 +98,20 @@ namespace ShopLookup.UISupport.UIElements
             {
                 if (WheelPixel.HasValue)
                 {
-                    WheelValue -= WheelPixel.Value / ViewMovableX * Math.Sign(state.ScrollWheelValue - whell);
+                    WaitToWheelValue -= WheelPixel.Value / ViewMovableX * Math.Sign(state.ScrollWheelValue - whell);
                 }
-                else WheelValue -= (state.ScrollWheelValue - whell) / 10f / width * 2;
+                else WaitToWheelValue -= (state.ScrollWheelValue - whell) / 10f / width;
                 whell = state.ScrollWheelValue;
             }
             if (isMouseDown && mouseX != Main.mouseX)
             {
-                WheelValue = (Main.mouseX - Info.Location.X - 13f) / width * 2;
+                WaitToWheelValue = (Main.mouseX - Info.Location.X - 13f) / width;
                 mouseX = Main.mouseX;
             }
 
-            inner.Info.Left.Pixel = width * WheelValue;
-            wheelValue += (waitToWheelValue - wheelValue) / 6f;
-
-            if (waitToWheelValue != wheelValue)
+            inner.Info.Left.Pixel = Math.Max(0, RealWheelValue * width);
+            RealWheelValue = Math.Clamp(WaitToWheelValue - RealWheelValue, -1, 1) / 6f + RealWheelValue;
+            if ((int)(WaitToWheelValue * 100) / 100f != (int)(RealWheelValue * 100) / 100f)
             {
                 Calculation();
             }

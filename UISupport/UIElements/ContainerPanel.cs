@@ -74,9 +74,9 @@ namespace ShopLookup.UISupport.UIElements
             {
                 PlayerInput.LockVanillaMouseScroll("VIScroll");
             }
-            if (_verticalScrollbar != null && verticalWhellValue != _verticalScrollbar.WheelValue)
+            if (_verticalScrollbar != null && verticalWhellValue != _verticalScrollbar.RealWheelValue)
             {
-                verticalWhellValue = _verticalScrollbar.WheelValue;
+                verticalWhellValue = _verticalScrollbar.RealWheelValue;
                 float maxY = MovableSize.Y;/* innerPanelMaxLocation.Y - _innerPanel.Info.TotalSize.Y;
                 if (maxY < innerPanelMinLocation.Y)
                 {
@@ -86,9 +86,9 @@ namespace ShopLookup.UISupport.UIElements
                 _innerPanel.Info.Top.Pixel = -MathHelper.Lerp(innerPanelMinLocation.Y, maxY, verticalWhellValue);
                 Calculation();
             }
-            if (_horizontalScrollbar != null && horizontalWhellValue != _horizontalScrollbar.WheelValue)
+            if (_horizontalScrollbar != null && horizontalWhellValue != _horizontalScrollbar.RealWheelValue)
             {
-                horizontalWhellValue = _horizontalScrollbar.WheelValue;
+                horizontalWhellValue = _horizontalScrollbar.RealWheelValue;
                 float maxX = MovableSize.X;/*innerPanelMaxLocation.X - _innerPanel.Info.TotalSize.X;
                 if (maxX < innerPanelMinLocation.X)
                 {

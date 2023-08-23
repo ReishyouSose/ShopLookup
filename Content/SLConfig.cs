@@ -7,10 +7,10 @@ namespace ShopLookup.Content
     {
         public override ConfigScope Mode => ConfigScope.ClientSide;
 
-        [DefaultValue(false)]
+        [DefaultValue(true)]
         public bool Portable;
 
-        [DefaultValue(false)]
+        [DefaultValue(true)]
         public bool PermanentTips;
         public override void OnChanged()
         {

@@ -4,7 +4,7 @@ using static Terraria.UI.Gamepad.UILinkPointNavigator;
 
 namespace ShopLookup.UISupport.UIElements
 {
-    public class ShopNPCSlot : BaseUIElement
+    public class UINPCSlot : BaseUIElement
     {
         public Texture2D bg;
         public float scale;
@@ -23,7 +23,7 @@ namespace ShopLookup.UISupport.UIElements
             }
             return base.GetCanHitBox();
         }
-        public ShopNPCSlot(int npcType, float scale = 1f, Texture2D bg = null)
+        public UINPCSlot(int npcType, float scale = 1f, Texture2D bg = null)
         {
             SetSize(52 * scale, 52 * scale);
             this.scale = scale;
@@ -106,7 +106,7 @@ namespace ShopLookup.UISupport.UIElements
                 Main.hoverItemName = npcName + "\n" + SourceModName;
                 if (!Permanent && (ShopLookup.Portable || ShopLookup.PermanentTips))
                 {
-                    Main.hoverItemName += "\n" + "非常驻NPC";
+                    Main.hoverItemName += "\n" + $"[c/FFA500:{Language.GetTextValue(SLUI.LocalKey+ "NonPermanent")}]";
                     foreach (Condition c in conditions)
                     {
                         Main.hoverItemName += "\n" + (c.IsMet() ?

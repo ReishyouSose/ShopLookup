@@ -226,18 +226,23 @@ namespace ShopLookup
             yield return (ItemID.SilverCoin, silver);
             yield return (ItemID.CopperCoin, copper);
         }
-        public static bool TryGetNPCShop(int npcType, out AbstractNPCShop shop)
+        public static bool HasShop(int npcType)
         {
-            shop = null;
             foreach (AbstractNPCShop nshop in NPCShopDatabase.AllShops)
             {
                 if (nshop.NpcType == npcType)
                 {
-                    shop = nshop;
                     return true;
                 }
             }
             return false;
+        }
+        /// <summary>
+        /// 播放拿起物品的音效
+        /// </summary>
+        public static void SoundCoins()
+        {
+            SoundEngine.PlaySound(SoundID.Coins);
         }
     }
 }

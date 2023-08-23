@@ -10,7 +10,7 @@ namespace ShopLookup.Content
         public static Texture2D LineTex => TextureAssets.MagicPixel.Value;
         public UIPanel bg;
         public UIItemSlot focusItem;
-        public ShopNPCSlot focusNPC;
+        public UINPCSlot focusNPC;
         public TextUIE indexText;
         public UIImage _switch;
         public UIBottom ItemBg, side, ShopBg, indexBg;
@@ -18,10 +18,10 @@ namespace ShopLookup.Content
         public bool firstLoad;
         private int FocusMod;
         private bool dragging;
-        private bool isOut;
+        private bool viewPylon;
         private Vector2 startPoint = Vector2.Zero;
         private static bool noIcon;
-        internal static List<int> pylons;
+        internal static List<Entry> pylons;
         internal static Dictionary<int, string> added;
         internal static List<(string name, string inName)> mods;
         internal static int modCount;
@@ -88,13 +88,26 @@ namespace ShopLookup.Content
             vLine.SetCenter(offset, 20 + 26);
             bg.Register(vLine);
 
-            side = new(-offset - 30 - 10 - 52, 52, 1);
+            side = new(-offset - 30 - (10 + 52) * 2, 52, 1);
             side.SetPos(offset + 10, 20);
             bg.Register(side);
             side.Calculation();
 
+            UIImage pylon = new(T2D(AssetKey + "Slot"));
+            pylon.SetPos(-20 - 52 - 10 - 52, 20, 1);
+            Main.instance.LoadItem(4951);
+            pylon.ReDraw = sb =>
+            {
+                pylon.DrawSelf(sb);
+                Texture2D tex = TextureAssets.Item[ItemID.TeleportationPylonVictory].Value;
+                float mult = pylon.Info.IsMouseHover ? 1f : 0.75f;
+                sb.Draw(tex, pylon.Center(), null, Color.White * mult, 0, tex.Size() / 2f, 0.75f, 0, 0);
+            };
+            pylon.Events.OnLeftClick += evt => LookupPylons();
+            pylon.Events.OnRightClick += evt => LookupPylons();
+            bg.Register(pylon);
+
             _switch = new(T2D(AssetKey + "Slot"));
-            _switch.Info.IsSensitive = true;
             _switch.SetPos(-20 - 52, 20, 1);
             _switch.ReDraw = (sb) =>
             {
@@ -115,6 +128,7 @@ namespace ShopLookup.Content
             };
             icon.SetCenter(0, 0, 0.5f, 0.5f);
             _switch.Register(icon);
+            _switch.Info.IsSensitive = true;
             _switch.Events.OnLeftClick += (evt) =>
             {
                 if (++FocusMod == modCount) FocusMod = 0;
@@ -163,8 +177,11 @@ namespace ShopLookup.Content
             };
             adjust.Events.OnLeftUp += (evt) =>
             {
-                dragging = false;
-                if (focusItem.Info.IsVisible && focusItem.ContainedItem.type > ItemID.None)
+                if (viewPylon)
+                {
+                    LookupPylons();
+                }
+                else if (focusItem.Info.IsVisible && focusItem.ContainedItem.type > ItemID.None)
                 {
                     LookupOne();
                 }
@@ -172,6 +189,7 @@ namespace ShopLookup.Content
                 {
                     LookupShop(focusNPC.npcType);
                 }
+                dragging = false;
             };
             adjust.Events.OnLeftDoubleClick += (evt) => dragging = false;
             bg.Register(adjust);
@@ -179,10 +197,6 @@ namespace ShopLookup.Content
         private static void Clamp(ref float value, float offset, float min, float max)
         {
             value = Math.Clamp(value + offset, min, max);
-        }
-        private static bool Out(float value, float origin, float min, float max)
-        {
-            return value > origin + max || value < origin + min;
         }
         public override void Update(GameTime gt)
         {
@@ -192,18 +206,30 @@ namespace ShopLookup.Content
                 Info.IsVisible = false;
             }
             Vector2 pos = Main.MouseScreen;
-            if (startPoint != pos && dragging)
+            if (dragging)
             {
-                if (!isOut)
+                static bool CanMove(float offset, float mouse, float origin) => (offset > 0 && mouse > origin) || (offset < 0 && mouse < origin);
+                if (startPoint.X != pos.X)
                 {
-                    var offset = pos - startPoint;
-                    if (Out(pos.X, bg.Left, 500, 1000)) offset.X = 0;
-                    if (Out(pos.Y, bg.Top, 360, 720)) offset.Y = 0;
-                    Clamp(ref bg.Info.Width.Pixel, offset.X, 500, 1000);
-                    Clamp(ref bg.Info.Height.Pixel, offset.Y, 360, 720);
-                    bg.Calculation();
+                    float right = bg.Left + bg.Width;
+                    float offset = pos.X - startPoint.X;
+                    if (CanMove(offset, pos.X, right))
+                    {
+                        Clamp(ref bg.Info.Width.Pixel, offset, 500, 1000);
+                        bg.Calculation();
+                    }
                 }
-                startPoint = Main.MouseScreen;
+                if (startPoint.Y != pos.Y)
+                {
+                    float bottom = bg.Top + bg.Height;
+                    float offset = pos.Y - startPoint.Y;
+                    if (CanMove(offset, pos.Y, bottom))
+                    {
+                        Clamp(ref bg.Info.Height.Pixel, offset, 360, 720);
+                        bg.Calculation();
+                    }
+                }
+                startPoint = pos;
             }
         }
         private Texture2D GetIcon()
@@ -229,21 +255,22 @@ namespace ShopLookup.Content
             noIcon = true;
             return T2D(AssetKey + "NoIcon");
         }
-        public void ChangeItem(int type)
+        public void ChangeItem(int type, bool lookup = true)
         {
             focusNPC.Info.IsVisible = false;
             ShopBg.Info.IsVisible = false;
             focusItem.Info.IsVisible = true;
             focusItem.ContainedItem = new(type);
-            LookupOne();
+            viewPylon = false;
+            if (lookup) LookupOne();
         }
         public void ChangeNPC(int type)
         {
             focusItem.Info.IsVisible = false;
             ShopBg.Info.IsVisible = true;
-
             focusNPC.Info.IsVisible = true;
             focusNPC.ChangeNPC(type);
+            viewPylon = false;
             LookupShop(type);
         }
         private void LookupOne()
@@ -269,37 +296,20 @@ namespace ShopLookup.Content
                 int count = 1;
                 foreach ((int type, string shopName, Entry entry) in shops)
                 {
-                    UIBottom bottom = new(0, 72, 1);
-                    bottom.Info.IsSensitive = true;
-                    bottom.SetPos(0, y);
-                    view.AddElement(bottom);
-
                     NPC npc = new();
                     npc.SetDefaults(type);
                     string info = npc.FullName + "  " + Language.GetTextValue(LocalKey + "Index") + " | " + GetShopLT(type, shopName);
-
-                    TextUIE condition = new(Decription(info, entry.Conditions, bottom.Width - 82, out float h), drawStyle: 2);
-                    condition.SetPos(82, 5, 0, 0.5f);
-                    bottom.Info.Height.Pixel += h;
-                    bottom.Calculation();
-                    bottom.Register(condition);
-
-                    UIImage vLine = new(LineTex, 2, bottom.Info.Height.Pixel - 20);
-                    vLine.SetCenter(72, 0, 0, 0.5f);
-                    bottom.Register(vLine);
-
-                    ShopNPCSlot slot = new(type, 1f);
-                    slot.SetPos(10, -26, 0, 0.5f);
-                    bottom.Register(slot);
+                    bool permanent = !ExtraNPCInfo.NonTryGet(type, out IEnumerable<Condition> conditions);
+                    RegisterInfo(y, info, entry, type, false, permanent, conditions, out float yoff);
 
                     if (count < shops.Count)
                     {
-                        y += h;
-                        UIImage hLine = new(LineTex, -40, 2, 1);
-                        hLine.SetPos(20, y + 72 - 1);
+                        y += yoff;
+                        UIImage hLine = new(LineTex, -40, 1, 1);
+                        hLine.SetPos(20, y + 79);
                         view.AddElement(hLine);
-                        y += 72;
                         count++;
+                        y += 90;
                     }
                 }
             }
@@ -346,7 +356,6 @@ namespace ShopLookup.Content
                 index.Events.OnLeftClick += (evt) =>
                 {
                     RegisterScroll(true, ref view);
-
                     ViewShop(npcType, shopid);
                 };
                 index.ReDraw = (sb) =>
@@ -393,42 +402,20 @@ namespace ShopLookup.Content
             {
                 if (shop.NpcType == npcType && shop.Name == shopName)
                 {
-                    float y = 10;
+                    float y = 0;
                     int count = 1;
                     List<Entry> entrys = new();
                     foreach (Entry entry in shop.ActiveEntries)
                     {
-                        if (pylons.Contains(entry.Item.type)) continue;
+                        if (pylons.Any(x => x.Item.type == entry.Item.type)) continue;
                         if (entry.Item.type == ItemID.None) continue;
                         entrys.Add(entry);
                     }
-                    //float pos = 0;
 
                     bool permanent = !ExtraNPCInfo.NonTryGet(npcType, out IEnumerable<Condition> conditions);
                     foreach (Entry entry in entrys)
                     {
-                        UIBottom bottom = new(0, 80, 1);
-                        bottom.SetPos(0, y);
-                        view.AddElement(bottom);
-
-                        Item item = entry.Item;
-                        string info = entry.Item.Name;
-
-                        ItemInfo itemInfo = new(info, entry.Conditions, bottom.Width - 120);
-                        itemInfo.SetPos(100, -itemInfo.Height / 2f, 0, 0.5f);
-                        int yoff = Math.Max(80, itemInfo.Height + 20) - 80;
-                        bottom.Info.Height.Pixel += yoff;
-                        bottom.Calculation();
-                        bottom.Info.IsSensitive = true;
-                        bottom.Register(itemInfo);
-                        ShopItem shopitem = new(entry, npcType, permanent, conditions);
-                        shopitem.SetPos(0, -40, 0, 0.5f);
-                        bottom.Register(shopitem);
-
-                        UIImage vLine = new(LineTex, 2, bottom.Info.Height.Pixel - 20);
-                        vLine.SetCenter(90, -5, 0, 0.5f);
-                        bottom.Register(vLine);
-
+                        RegisterInfo(y, entry.Item.Name, entry, npcType, false, permanent, conditions, out float yoff);
                         if (count < entrys.Count)
                         {
                             y += yoff;
@@ -449,7 +436,7 @@ namespace ShopLookup.Content
                 pylons = new();
                 foreach (Entry entry in NPCShopDatabase.GetPylonEntries())
                 {
-                    pylons.Add(entry.Item.type);
+                    pylons.Add(entry);
                 }
             }
 
@@ -476,7 +463,7 @@ namespace ShopLookup.Content
             {
                 if (!added.ContainsKey(shop.NpcType))
                 {
-                    ShopNPCSlot slot = new(shop.NpcType, 1f, TextureAssets.InventoryBack2.Value);
+                    UINPCSlot slot = new(shop.NpcType, 1f, TextureAssets.InventoryBack2.Value);
                     slot.Info.Left.Pixel = x + 5;
                     slot.Events.OnLeftClick += (evt) => ChangeNPC(slot.npcType);
                     slot.Events.OnRightClick += (evt) => ChangeNPC(slot.npcType);
@@ -525,53 +512,13 @@ namespace ShopLookup.Content
             {
                 if (FocusMod == 0 || modName == mods[FocusMod].name)
                 {
-                    ShopNPCSlot slot = new(npcType, 1f, TextureAssets.InventoryBack2.Value);
+                    UINPCSlot slot = new(npcType, 1f, TextureAssets.InventoryBack2.Value);
                     slot.Info.Left.Pixel = x + 5;
                     slot.Events.OnRightClick += (evt) => ChangeNPC(slot.npcType);
                     view.AddElement(slot);
                     x += 62;
                 }
             }
-        }
-        private static string Decription(string info, IEnumerable<Condition> cds, float width, out float height)
-        {
-            string conditions = "";
-            var font = FontAssets.MouseText.Value;
-            height = 0;
-            int count = cds.Count();
-            if (count > 0)
-            {
-                int i = 1;
-                foreach (Condition c in cds)
-                {
-                    string cdesc = c.Description.Value;
-                    conditions += cdesc;
-                    /*if (c.Description.Key == cdesc)
-                    {
-
-                    }*/
-                    if (i == 1 && count > 1)
-                    {
-                        height = font.MeasureString(c.Description.Value).Y;
-                    }
-                    if (i < count) conditions += "\n";
-                    i++;
-                }
-                float oldH = font.MeasureString(conditions).Y;
-                conditions = font.CreateWrappedText(conditions, width);
-                float newH = font.MeasureString(conditions).Y;
-                if (height > 0)
-                {
-                    height = newH - height;
-                }
-                else
-                {
-                    if (newH > oldH) height = newH - oldH;
-                }
-
-                return info + "\n" + conditions;
-            }
-            else return info + "\n" + Language.GetTextValue(LocalKey + "NoCondition");
         }
         private UIContainerPanel RegisterScroll(bool npc, ref UIContainerPanel view)
         {
@@ -582,8 +529,9 @@ namespace ShopLookup.Content
                 bbg.SetPos(0, 30);
                 ItemBg.Register(bbg);
 
-                this.view = new();
-                view.SetSize(0, 0, 1, 1);
+                view = new();
+                view.Info.Top.Pixel += 10;
+                view.SetSize(0, -20, 1, 1);
                 view.Info.SetMargin(0);
                 bbg.Register(view);
 
@@ -600,8 +548,8 @@ namespace ShopLookup.Content
             else
             {
                 view = new();
-                view.Info.Top.Pixel = 10;
-                view.SetSize(0, -30, 1, 1);
+                view.Info.Top.Pixel += 10;
+                view.SetSize(0, -20, 1, 1);
                 view.Info.SetMargin(0);
                 ItemBg.Register(view);
 
@@ -610,10 +558,53 @@ namespace ShopLookup.Content
                     UseScrollWheel = true,
                 };
                 scroll.Info.IsHidden = true;
-                scroll.Info.Left.Pixel -= 10;
                 view.SetVerticalScrollbar(scroll);
                 ItemBg.Register(scroll);
                 return null;
+            }
+        }
+        private void RegisterInfo(float y, string info, Entry entry, int npcType, bool npc, bool permanent, IEnumerable<Condition> conditions, out float yoff)
+        {
+            UIBottom bottom = new(0, 80, 1);
+            bottom.SetPos(0, y);
+            bottom.Info.IsSensitive = true;
+            view.AddElement(bottom);
+
+            ItemInfo itemInfo = new(info, entry.Conditions, bottom.Width - 120);
+            itemInfo.SetPos(100, -itemInfo.Height / 2f, 0, 0.5f);
+            yoff = Math.Max(80, itemInfo.Height + 20) - 80;
+            bottom.Info.Height.Pixel += yoff;
+            bottom.Calculation();
+            bottom.Register(itemInfo);
+
+            UIShopSlot shopitem = new(entry, npcType, npc, permanent, conditions);
+            shopitem.SetPos(0, -40, 0, 0.5f);
+            bottom.Register(shopitem);
+
+            UIImage vLine = new(LineTex, 2, bottom.Info.Height.Pixel - 20);
+            vLine.SetCenter(90, -5, 0, 0.5f);
+            bottom.Register(vLine);
+        }
+        private void LookupPylons()
+        {
+            RegisterScroll(false, ref view);
+            ChangeItem(ItemID.TeleportationPylonVictory, false);
+            viewPylon = true;
+            ShopBg.Info.IsVisible = false;
+            float y = 0;
+            int count = 1;
+            foreach (Entry pylon in pylons)
+            {
+                RegisterInfo(y, pylon.Item.Name, pylon, -1, false, false, null, out float yoff);
+                if (count < pylons.Count)
+                {
+                    y += yoff;
+                    UIImage hLine = new(LineTex, -40, 1, 1);
+                    hLine.SetPos(20, y + 79);
+                    view.AddElement(hLine);
+                    count++;
+                    y += 90;
+                }
             }
         }
     }

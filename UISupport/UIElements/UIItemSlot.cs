@@ -23,6 +23,10 @@ namespace ShopLookup.UISupport.UIElements
         /// </summary>
         public bool Infinity;
         /// <summary>
+        /// 悬浮是否显示信息
+        /// </summary>
+        public bool hoverDisplay = true;
+        /// <summary>
         /// 框内物品
         /// </summary>
         public Item ContainedItem { get; set; }
@@ -188,7 +192,7 @@ namespace ShopLookup.UISupport.UIElements
             //float scale = Info.Size.X / 52f;
             DynamicSpriteFont font = FontAssets.MouseText.Value;
             //调用原版的介绍绘制
-            if (Info.IsMouseHover && ContainedItem != null && ContainedItem.type != ItemID.None)
+            if (Info.IsMouseHover && ContainedItem != null && ContainedItem.type != ItemID.None && hoverDisplay)
             {
                 Main.hoverItemName = ContainedItem.Name;
                 Main.HoverItem = ContainedItem.Clone();

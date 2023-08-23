@@ -21,6 +21,8 @@ When certain conditions are met, you can [b] left click (purchase single) / righ
 [*][b]Specially, non-Permanent NPCs like the Traveling Merchant/Skeleton Merchant,
 as long as their generation conditions are met, they don't need to visit[/b]
 [/list]
+A dedicated pylon shop has been added (Note that the Universal Pylon is still available in the Zoologist's shop).
+You can buy a pylon in the corresponding environment (some conditions will be enforced and highlighted in orange).
 [hr][/hr]
 [h1][b]Written to other Mod authors[/b][/h1]
 If your mod adds a non-Permanent NPC like the Traveling Merchant, then you can visit the mod homepage through the game,

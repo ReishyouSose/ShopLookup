@@ -479,7 +479,7 @@ namespace ShopLookup.UISupport.UIElements
                 sb.End();
                 sb.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend, SamplerState.PointClamp,
                     DepthStencilState.None, overflowHiddenRasterizerState, null);
-                MiscHelper.DrawRec(sb, Info.HitBox, 2f, DrawRec[0].Value, false);
+                MiscHelper.DrawRec(sb, Info.HitBox, 2f, DrawRec[1].Value, false);
                 DrawMouse(sb);
                 sb.End();
                 sb.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend, SamplerState.PointClamp,
