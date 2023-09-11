@@ -13,6 +13,8 @@ NoIcon: This mod doesn't have a icon_small pngfile
 Travel: Need two town NPCs in the world
 NonPermanent: Non-Permanent NPC
 NoSpawn: Not fulfill the spawn conditions of this Non-Permanent NPC
+UnknowCds: Unknown conditions, ignored
+EmptyShop: Empty shop
 
 Configs: {
 	SLConfig: {

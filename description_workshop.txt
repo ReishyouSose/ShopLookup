@@ -30,5 +30,5 @@ Ui面板的右下角有一个小按钮，按住拖动以改变面板大小
 无需[AutoloadHead]，这个Mod可以找到它
 你还可以给商店索引添加本地化
 [hr][/hr]
-Discord：[url=store.steampowered.com] https://discord.gg/fjFpgBkRBZ [/url]
+Discord：[url=https://discord.gg/fjFpgBkRBZ] [/url]
 QQ群：574904188

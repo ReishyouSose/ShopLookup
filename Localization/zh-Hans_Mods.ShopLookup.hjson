@@ -13,6 +13,8 @@ NoIcon: 这个Mod没有icon_small贴图文件
 Travel: 需要世界上有两个城镇NPC
 NonPermanent: 非常驻NPC
 NoSpawn: 不满足这个非常驻NPC的生成条件
+UnknowCds: 未知条件，已忽略
+EmptyShop: 空商店
 
 Configs: {
 	SLConfig: {

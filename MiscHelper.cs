@@ -244,5 +244,22 @@ namespace ShopLookup
         {
             SoundEngine.PlaySound(SoundID.Coins);
         }
+        public static Vector4 ToVector4(this Rectangle rec, bool ToShader = true)
+        {
+            float x = rec.X;
+            float y = rec.Y;
+            float w = rec.Width;
+            float h = rec.Height;
+            if (ToShader)
+            {
+                int rx = Main.screenWidth;
+                int ry = Main.screenHeight;
+                x = Utils.GetLerpValue(0, rx, x, true);
+                y = Utils.GetLerpValue(0, ry, y, true);
+                w = Utils.GetLerpValue(0, rx, w, true);
+                h = Utils.GetLerpValue(0, ry, h, true);
+            }
+            return new Vector4(x, y, w, h);
+        }
     }
 }

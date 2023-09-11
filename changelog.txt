@@ -1,0 +1,2 @@
+﻿Detailed changelog: https://github.com/ReishyouSose/ShopLookup/blob/master/ChangeLog-en.md
+详细更新日志: https://github.com/ReishyouSose/ShopLookup/blob/master/ChangeLog.md

@@ -1,4 +1,4 @@
-﻿namespace ShopLookup.UISupport.UIElements
+﻿namespace ShopLookup.Content
 {
     public class UICurrency : BaseUIElement
     {

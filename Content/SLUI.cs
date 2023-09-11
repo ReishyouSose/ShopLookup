@@ -342,6 +342,7 @@ namespace ShopLookup.Content
             HorizontalScrollbar scroll = new();
             scroll.Info.IsHidden = true;
             scroll.Info.Top.Pixel += 11;
+            scroll.UseScrollWheel = true;
             indexView.SetHorizontalScrollbar(scroll);
             indexBg.Register(scroll);
 
@@ -411,7 +412,13 @@ namespace ShopLookup.Content
                         if (entry.Item.type == ItemID.None) continue;
                         entrys.Add(entry);
                     }
-
+                    if (!entrys.Any())
+                    {
+                        TextUIE empty = new(Language.GetTextValue(LocalKey + "EmptyShop"));
+                        empty.SetCenter(0, 0, 0.5f, 0.5f);
+                        view.Register(empty);
+                        return;
+                    }
                     bool permanent = !ExtraNPCInfo.NonTryGet(npcType, out IEnumerable<Condition> conditions);
                     foreach (Entry entry in entrys)
                     {
@@ -514,6 +521,7 @@ namespace ShopLookup.Content
                 {
                     UINPCSlot slot = new(npcType, 1f, TextureAssets.InventoryBack2.Value);
                     slot.Info.Left.Pixel = x + 5;
+                    slot.Events.OnLeftClick += (evt) => ChangeNPC(slot.npcType);
                     slot.Events.OnRightClick += (evt) => ChangeNPC(slot.npcType);
                     view.AddElement(slot);
                     x += 62;

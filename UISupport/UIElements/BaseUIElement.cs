@@ -41,13 +41,13 @@ namespace ShopLookup.UISupport.UIElements
             /// <returns></returns>
             public float GetPixelBaseParent(float pixel)
             {
-                return Percent * pixel + Pixel;
+                return (Percent * pixel) + Pixel;
             }
 
 
             public static PositionStyle operator +(PositionStyle ps1, PositionStyle ps2)
             {
-                var output = ps1;
+                PositionStyle output = ps1;
                 output.Pixel += ps2.Pixel;
                 output.Percent += ps2.Percent;
                 return output;
@@ -55,7 +55,7 @@ namespace ShopLookup.UISupport.UIElements
 
             public static PositionStyle operator -(PositionStyle ps1, PositionStyle ps2)
             {
-                var output = ps1;
+                PositionStyle output = ps1;
                 output.Pixel -= ps2.Pixel;
                 output.Percent -= ps2.Percent;
                 return output;
@@ -63,7 +63,7 @@ namespace ShopLookup.UISupport.UIElements
 
             public static PositionStyle operator *(PositionStyle ps1, float ps2)
             {
-                var output = ps1;
+                PositionStyle output = ps1;
                 output.Pixel *= ps2;
                 output.Percent *= ps2;
                 return output;
@@ -71,7 +71,7 @@ namespace ShopLookup.UISupport.UIElements
 
             public static PositionStyle operator /(PositionStyle ps1, float ps2)
             {
-                var output = ps1;
+                PositionStyle output = ps1;
                 output.Pixel /= ps2;
                 output.Percent /= ps2;
                 return output;
@@ -127,6 +127,8 @@ namespace ShopLookup.UISupport.UIElements
             /// 下边距
             /// </summary>
             public PositionStyle ButtomMargin = PositionStyle.Empty;
+
+            public bool NeedResetSpb = false;
 
             /// <summary>
             /// 是否隐藏溢出
@@ -212,6 +214,8 @@ namespace ShopLookup.UISupport.UIElements
         /// </summary>
         public class ElementEvents
         {
+            public Action<BaseUIElement> OnUpdate;
+
             /// <summary>
             /// 被鼠标点击的委托
             /// </summary>
@@ -381,7 +385,7 @@ namespace ShopLookup.UISupport.UIElements
         {
             Calculation();
             defInfo = Info;
-            foreach (var uie in ChildrenElements)
+            foreach (BaseUIElement uie in ChildrenElements)
             {
                 uie.PostInitialization();
             }
@@ -402,9 +406,16 @@ namespace ShopLookup.UISupport.UIElements
         /// <param name="gt"></param>
         public virtual void Update(GameTime gt)
         {
-            ChildrenElements.ForEach(child => { if (child != null && child.IsVisible) { child.Update(gt); } });
+            ChildrenElements.ForEach(child =>
+            {
+                if (child != null && child.IsVisible)
+                {
+                    child.Update(gt);
+                    child.Events.OnUpdate?.Invoke(child);
+                }
+            });
+            Events.OnUpdate?.Invoke(this);
         }
-
         /// <summary>
         /// 绘制
         /// </summary>
@@ -412,7 +423,7 @@ namespace ShopLookup.UISupport.UIElements
         public virtual void Draw(SpriteBatch sb)
         {
             //声明光栅化状态，剔除状态为不剔除，开启剪切测试
-            var overflowHiddenRasterizerState = new RasterizerState
+            RasterizerState overflowHiddenRasterizerState = new()
             {
                 CullMode = CullMode.None,
                 ScissorTestEnable = true
@@ -421,27 +432,32 @@ namespace ShopLookup.UISupport.UIElements
             if (IsVisible)
             {
                 //关闭画笔
-                sb.End();
-                //启用画笔，传参：延迟绘制（纹理合批优化），alpha颜色混合模式，各向异性采样，不启用深度模式，UI大小矩阵
-                sb.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend, SamplerState.AnisotropicClamp,
-                    DepthStencilState.None, overflowHiddenRasterizerState, null, Main.UIScaleMatrix);
-                //绘制自己，如果不隐藏UI部件
-                if (ReDraw == null)
+                if (Info.NeedResetSpb)
                 {
-                    if (!Info.IsHidden)
-                    {
-                        DrawSelf(sb);
-                    }
+                    sb.End();
+                    //启用画笔，传参：延迟绘制（纹理合批优化），alpha颜色混合模式，各向异性采样，不启用深度模式，UI大小矩阵
+                    sb.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend, SamplerState.AnisotropicClamp,
+                        DepthStencilState.None, overflowHiddenRasterizerState, null, Main.UIScaleMatrix);
                 }
-                else
+                //绘制自己，如果不隐藏UI部件
+                if (!Info.IsHidden)
                 {
-                    ReDraw(sb);
+                    if (ReDraw == null) DrawSelf(sb);
+                    else ReDraw(sb);
+                    if (DrawRec[0].HasValue)
+                    {
+                        MiscHelper.DrawRec(sb, Info.HitBox.ScaleRec(Main.UIScaleMatrix), 2f, DrawRec[0].Value, false);
+                    }
+                    if (DrawRec[1].HasValue)
+                    {
+                        MiscHelper.DrawRec(sb, Info.HitBox, 2f, DrawRec[0].Value, false);
+                    }
                 }
             }
             //设定gd是画笔绑定的图像设备
-            var gd = sb.GraphicsDevice;
+            GraphicsDevice gd = sb.GraphicsDevice;
             //储存绘制原剪切矩形
-            var scissorRectangle = gd.ScissorRectangle;
+            Rectangle scissorRectangle = gd.ScissorRectangle;
             //如果启用溢出隐藏
             if (Info.HiddenOverflow)
             {
@@ -457,35 +473,6 @@ namespace ShopLookup.UISupport.UIElements
             }
             //绘制子元素
             DrawChildren(sb);
-            static void DrawMouse(SpriteBatch sb)
-            {
-                ChatManager.DrawColorCodedStringWithShadow(sb, FontAssets.MouseText.Value, "+",
-                    Main.MouseScreen, Color.Red, 0, Vector2.Zero, Vector2.One);
-            }
-            if (DrawRec[0].HasValue)
-            {
-                sb.End();
-                sb.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend, SamplerState.PointClamp,
-                    DepthStencilState.None, overflowHiddenRasterizerState, null);
-                MiscHelper.DrawRec(sb, Info.HitBox.ScaleRec(Main.UIScaleMatrix), 2f, DrawRec[0].Value, false);
-                DrawMouse(sb);
-                sb.End();
-                sb.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend, SamplerState.PointClamp,
-                    DepthStencilState.None, overflowHiddenRasterizerState, null, Main.UIScaleMatrix);
-            }
-
-            if (DrawRec[1].HasValue)
-            {
-                sb.End();
-                sb.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend, SamplerState.PointClamp,
-                    DepthStencilState.None, overflowHiddenRasterizerState, null);
-                MiscHelper.DrawRec(sb, Info.HitBox, 2f, DrawRec[1].Value, false);
-                DrawMouse(sb);
-                sb.End();
-                sb.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend, SamplerState.PointClamp,
-                    DepthStencilState.None, overflowHiddenRasterizerState, null, Main.UIScaleMatrix);
-            }
-
             //如果启用溢出隐藏
             if (Info.HiddenOverflow)
             {
@@ -515,7 +502,7 @@ namespace ShopLookup.UISupport.UIElements
         /// <param name="sb">画笔</param>
         public virtual void DrawChildren(SpriteBatch sb)
         {
-            ChildrenElements.ForEach(child => { if (child != null && child.IsVisible) { child.Draw(sb); } });
+            ChildrenElements.ForEach(child => { if (child != null && child.IsVisible) child.Draw(sb); });
         }
 
         /// <summary>
@@ -661,16 +648,16 @@ namespace ShopLookup.UISupport.UIElements
             action(this);
             ChildrenElements.ForEach(child => action(child));
         }
-
+        public Func<Rectangle> overrideGetCanHitBox;
         /// <summary>
         /// 获取被父部件裁切过的碰撞箱
         /// </summary>
         /// <returns>被父部件裁切过的碰撞箱</returns>
         public virtual Rectangle GetCanHitBox()
         {
-            return ParentElement == null
+            return overrideGetCanHitBox != null ? overrideGetCanHitBox.Invoke() : (ParentElement == null
                 ? Rectangle.Intersect(new Rectangle(0, 0, Main.screenWidth, Main.screenHeight), HitBox())
-                : Rectangle.Intersect(Rectangle.Intersect(HitBox(), ParentElement.HitBox()), ParentElement.GetCanHitBox());
+                : Rectangle.Intersect(HitBox(), ParentElement.GetCanHitBox()));
         }
 
         /// <summary>
@@ -679,7 +666,7 @@ namespace ShopLookup.UISupport.UIElements
         /// <returns>如果有则返回true，否则返回false</returns>
         public bool GetParentElementIsHiddenOverflow()
         {
-            return Info.HiddenOverflow || ParentElement != null && ParentElement.GetParentElementIsHiddenOverflow();
+            return Info.HiddenOverflow || (ParentElement != null && ParentElement.GetParentElementIsHiddenOverflow());
         }
         public Vector2 Pos(bool total = true) => HitBox(total).TopLeft();
         public Vector2 Center() => HitBox().Center();
@@ -687,6 +674,14 @@ namespace ShopLookup.UISupport.UIElements
         public int Height => HitBox().Height;
         public int Left => HitBox().Left;
         public int Top => HitBox().Top;
+        public int Right => HitBox().Right;
+        public int Bottom => HitBox().Bottom;
+        public int InnerWidth => HitBox(false).Width;
+        public int InnerHeight => HitBox(false).Height;
+        public int InnerLeft => HitBox(false).Left;
+        public int InnerTop => HitBox(false).Top;
+        public int InnerRight => HitBox(false).Right;
+        public int InnerBottom => HitBox(false).Bottom;
 
         public void SetPos(float x, float y, float Xpercent = 0, float Ypercent = 0)
         {
@@ -697,8 +692,8 @@ namespace ShopLookup.UISupport.UIElements
         public void SetPos(Vector2 pos) => SetPos(pos.X, pos.Y);
         public void SetCenter(float x, float y, float Xpercent = 0, float Ypercent = 0)
         {
-            Info.Left.Set(x - Info.Width.Pixel / 2f, Xpercent);
-            Info.Top.Set(y - Info.Height.Pixel / 2f, Ypercent);
+            Info.Left.Set(x - (Info.Width.Pixel / 2f), Xpercent);
+            Info.Top.Set(y - (Info.Height.Pixel / 2f), Ypercent);
             Calculation();
         }
         public void SetCenter(Vector2 pos) => SetCenter(pos.X, pos.Y);
@@ -719,7 +714,7 @@ namespace ShopLookup.UISupport.UIElements
         {
             Info.Left = defInfo.Left;
             Info.Top = defInfo.Top;
-            foreach (var uie in ChildrenElements)
+            foreach (BaseUIElement uie in ChildrenElements)
             {
                 uie.ResetPos();
             }
@@ -727,7 +722,7 @@ namespace ShopLookup.UISupport.UIElements
         public void ResetState()
         {
             Info = defInfo;
-            foreach (var uie in ChildrenElements)
+            foreach (BaseUIElement uie in ChildrenElements)
             {
                 uie.ResetState();
             }
@@ -740,7 +735,6 @@ namespace ShopLookup.UISupport.UIElements
         public static void DrawStr(SpriteBatch sb, DynamicSpriteFont font, string text, Vector2 pos, Vector2 origin = default, Vector2 scale = default, Color? color = null)
         {
             sb.DrawString(font, text, pos, color ?? Color.White, 0, origin, scale, 0, 0);
-
         }
     }
 }

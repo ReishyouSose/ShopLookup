@@ -31,5 +31,5 @@ The initial loading will look for all NPCs head texture, you can add texture fil
 No need for [AutoloadHead], this mod can finds it
 You can also add localization to the store index
 [hr][/hr]
-Discord: [url=store.steampowered.com] https://discord.gg/fjFpgBkRBZ [/url]
+Discord: [url=https://discord.gg/fjFpgBkRBZ] [/url]
 QQ group: 574904188

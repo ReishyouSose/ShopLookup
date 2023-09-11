@@ -1,9 +1,11 @@
-﻿using Terraria.GameInput;
+﻿using ShopLookup.Content;
+using Terraria.GameInput;
 
 namespace ShopLookup.UISupport.UIElements
 {
     public class UIContainerPanel : BaseUIElement
     {
+        public static Effect eff;
         private class InnerPanel : BaseUIElement
         {
             public override Rectangle HiddenOverflowRectangle => ParentElement.HiddenOverflowRectangle;
@@ -38,22 +40,29 @@ namespace ShopLookup.UISupport.UIElements
             Info.HiddenOverflow = true;
             Info.Width.Percent = 1f;
             Info.Height.Percent = 1f;
-            Info.SetMargin(4f);
             if (_innerPanel == null)
             {
                 _innerPanel = new InnerPanel();
                 Register(_innerPanel);
             }
+            //eff ??= ModContent.Request<Effect>(SLUI.AssetKey + "AddColor", ReLogic.Content.AssetRequestMode.ImmediateLoad).Value;
+            eff ??= ModContent.Request<Effect>(SLUI.AssetKey + "InvisibleBlur", ReLogic.Content.AssetRequestMode.ImmediateLoad).Value;
         }
         public void SetVerticalScrollbar(VerticalScrollbar scrollbar)
         {
             _verticalScrollbar = scrollbar;
+            /*Info.TopMargin.Pixel = 10;
+            Info.ButtomMargin.Pixel = 10;
+            Calculation();*/
             scrollbar.View = this;
         }
 
         public void SetHorizontalScrollbar(HorizontalScrollbar scrollbar)
         {
             _horizontalScrollbar = scrollbar;
+            /*Info.LeftMargin.Pixel = 10;
+            Info.RightMargin.Pixel = 10;
+            Calculation();*/
             scrollbar.View = this;
         }
 
@@ -162,6 +171,40 @@ namespace ShopLookup.UISupport.UIElements
             base.Calculation();
             CalculationInnerPanelSize();
             _innerPanel.Calculation();
+        }
+        public override void DrawChildren(SpriteBatch sb)
+        {
+            /*if (InnerUIE.Count > 0)
+            {
+                RasterizerState overflowHiddenRasterizerState = new()
+                {
+                    CullMode = CullMode.None,
+                    ScissorTestEnable = true
+                };
+                GraphicsDevice gd = sb.GraphicsDevice;
+                var r = sb.GraphicsDevice.GetRenderTargets();
+
+                sb.End();
+                gd.SetRenderTarget(SLUISys.render);
+                gd.Clear(Color.Transparent);
+                sb.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend, SamplerState.AnisotropicClamp,
+                    DepthStencilState.None, overflowHiddenRasterizerState, null, Main.UIScaleMatrix);
+                base.DrawChildren(sb);
+                sb.End();
+
+                gd.SetRenderTargets(Main.screenTarget);
+                sb.Begin(SpriteSortMode.Immediate, BlendState.AlphaBlend);
+                eff.Parameters["hitbox"].SetValue(HitBox().ToVector4());
+                eff.Parameters["inner"].SetValue(HitBox(false).ToVector4());
+                eff.CurrentTechnique.Passes[0].Apply();
+                sb.Draw(SLUISys.render, Vector2.Zero, Color.White);
+
+                sb.End();
+                sb.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend, SamplerState.AnisotropicClamp,
+                    DepthStencilState.None, overflowHiddenRasterizerState, null, Main.UIScaleMatrix);
+                return;
+            }*/
+            base.DrawChildren(sb);
         }
     }
 }

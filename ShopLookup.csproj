@@ -14,10 +14,12 @@
     <None Remove="UISupport\UIElements\New\**" />
   </ItemGroup>
   <ItemGroup>
+    <None Remove="changelog.txt" />
     <None Remove="description_workshop.txt" />
     <None Remove="description_workshop_en.txt" />
     <None Remove="icon_workshop.png" />
     <None Remove="Localization\zh-Hans_Mods.ShopLookup.hjson" />
+    <None Remove="UISupport\Asset\ScrollbarInner.png" />
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="tModLoader.CodeAssist" Version="0.1.*" />

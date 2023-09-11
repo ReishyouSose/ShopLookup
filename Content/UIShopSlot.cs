@@ -22,10 +22,6 @@ namespace ShopLookup.Content
         private readonly IEnumerable<Condition> conditions;
         public bool Buying { get; private set; }
         public bool Permanent { get; private set; }
-        public override Rectangle GetCanHitBox()
-        {
-            return Rectangle.Intersect(HitBox(), ParentElement.ParentElement.ParentElement.GetCanHitBox());
-        }
         public UIShopSlot(Entry entry, int npcType, bool npc, bool permanent, IEnumerable<Condition> conditions)
         {
             SetSize(80, 80);

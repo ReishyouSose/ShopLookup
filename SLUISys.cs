@@ -11,8 +11,11 @@ namespace ShopLookup
         internal static Asset<Texture2D> coins;
         internal static int[] coinCount;
         internal static bool DrawCoins;
+        internal static RenderTarget2D render;
         public override void Load()
         {
+            Main.QueueMainThreadAction(() => render ??= new RenderTarget2D(Main.graphics.GraphicsDevice, Main.screenWidth, Main.screenHeight));
+            Main.OnResolutionChanged += x => render = new RenderTarget2D(Main.graphics.GraphicsDevice, Main.screenWidth, Main.screenHeight);
             Keybind = KeybindLoader.RegisterKeybind(Mod, Mod.Name, "L");
             if (!Main.dedServ)
             {
@@ -55,7 +58,7 @@ namespace ShopLookup
                            Vector2 pos = Main.MouseScreen + Vector2.One * 16;
                            sb.Draw(coins.Value, pos, null, Color.White);
                            Vector2 center = pos + new Vector2(3 + 24 + 12 + 8, 22);
-                               var font = FontAssets.MouseText.Value;
+                           var font = FontAssets.MouseText.Value;
                            float y = font.LineSpacing;
                            for (int i = 0; i < 4; i++)
                            {

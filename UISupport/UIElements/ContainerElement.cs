@@ -15,6 +15,7 @@
             Info.Height.Set(0f, 1f);
             Info.CanBeInteract = false;
             Info.IsVisible = true;
+            Info.NeedResetSpb = true;
         }
     }
 }

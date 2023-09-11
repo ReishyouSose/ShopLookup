@@ -5,6 +5,7 @@ namespace ShopLookup.Content
 {
     public class ItemInfo : BaseUIElement
     {
+        private readonly static Condition None = new("", () => true);
         public List<string> infos;
         public List<float> yOff;
         public Condition[] cds;
@@ -25,6 +26,13 @@ namespace ShopLookup.Content
             {
                 foreach (Condition c in cds)
                 {
+                    if (c.Description.Key == "" || c.Description.Value == "")
+                    {
+                        string no = Language.GetTextValue("Mods.ShopLookup.UnknowCds");
+                        infos.Add(no);
+                        yOff.Add(font.MeasureString(no).Y);
+                        break;
+                    }
                     string cdesc = c.Description.Value;
                     /*if (cdesc == c.Description.Key)
                     {
@@ -59,10 +67,6 @@ namespace ShopLookup.Content
         public override void Update(GameTime gt)
         {
             base.Update(gt);
-        }
-        public override Rectangle GetCanHitBox()
-        {
-            return Rectangle.Intersect(ParentElement.HitBox(), ParentElement.ParentElement.ParentElement.GetCanHitBox());
         }
         public override void DrawSelf(SpriteBatch sb)
         {
@@ -148,7 +152,8 @@ namespace ShopLookup.Content
         }
         private static bool IgnoreCds(Condition c)
         {
-            return c == Condition.HappyEnoughToSellPylons
+            return c.Description.Key == "" || c.Description.Value == ""
+                || c == Condition.HappyEnoughToSellPylons
                 || c == Condition.AnotherTownNPCNearby
                 || c == Condition.HappyEnough;
         }
