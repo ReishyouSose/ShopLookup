@@ -1,4 +1,4 @@
-﻿<h1 align="center">Changelog</h1>
+﻿<h1 align="center">Change Log</h1>
 
 <div align="center">
 
