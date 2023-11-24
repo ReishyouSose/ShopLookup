@@ -6,6 +6,8 @@
 
 </div>
 
+# v0.3.8
+The sell conditions for permanent NPCs are modified to ensure that the corresponding NPC is alive or has visited before.
 # v0.3.7
 Fixed the bug where the shop index overflowed and couldn't be interacted with.
 # v0.3.6

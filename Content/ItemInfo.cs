@@ -76,7 +76,7 @@ namespace ShopLookup.Content
             if (portable || ShopLookup.PermanentTips)
             {
                 var parentChild = ParentElement.ChildrenElements;
-                if (Info.IsMouseHover)
+                if (Info.IsMouseHover || ParentElement.Info.IsMouseHover)
                 {
                     int count = infos.Count;
                     bool sell = true;

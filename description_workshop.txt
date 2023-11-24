@@ -14,7 +14,7 @@ Ui面板的右下角有一个小按钮，按住拖动以改变面板大小
 需要在设置中开启该功能
 当满足特定条件时就能在UI中[b]左击（购买单个）/右击长按（连续购买）[/b]
 [list]
-[*]世界上有对应NPC造访
+[*]世界上有对应NPC造访或来访过
 [*]满足了对应物品的售卖条件
 [*]当然，还要有足够的货币
 [*][b]特别的，类似旅商/骷髅商人这种非常驻NPC，
@@ -31,4 +31,5 @@ Ui面板的右下角有一个小按钮，按住拖动以改变面板大小
 你还可以给商店索引添加本地化
 [hr][/hr]
 Discord：[url=https://discord.gg/fjFpgBkRBZ] [/url]
+详细更新日志：[url=https://github.com/ReishyouSose/ShopLookup/blob/master/ChangeLog.md] [/url]
 QQ群：574904188

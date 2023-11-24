@@ -5,12 +5,16 @@ namespace ShopLookup.Content
 {
     public class SLPlayer : ModPlayer
     {
+        public override void OnEnterWorld()
+        {
+            VisitedNPCSys.CheckActiveTownNPC();
+        }
         public override void ProcessTriggers(TriggersSet triggersSet)
         {
             //&& !Terraria.GameInput.PlayerInput.WritingText
             if (SLUISys.Keybind.JustPressed)
             {
-                SLUI ui = ShopLookup.Ins.uis.Elements[SLUI.NmakeKey] as SLUI;
+                SLUI ui = ShopLookup.Ins.uis.Elements[SLUI.NameKey] as SLUI;
                 ref var visable = ref ui.Info.IsVisible;
                 if (!ui.firstLoad)
                 {

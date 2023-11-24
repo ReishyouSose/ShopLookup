@@ -15,7 +15,7 @@ Buy items from the NPC shop anytime, anywhere if the conditions are met!
 This feature needs to be turned on in the Mod settings
 When certain conditions are met, you can [b] left click (purchase single) / right click and long press (continuous purchase) in the UI[/b]
 [list]
-[*]There are corresponding NPC visits in the world
+[*]There are corresponding NPC visits in the world or has visited before
 [*]Meet the sell conditions of the corresponding items
 [*]Of course, you must have enough currency
 [*][b]Specially, non-Permanent NPCs like the Traveling Merchant/Skeleton Merchant,
@@ -32,4 +32,5 @@ No need for [AutoloadHead], this mod can finds it
 You can also add localization to the store index
 [hr][/hr]
 Discord: [url=https://discord.gg/fjFpgBkRBZ] [/url]
+Detailed changelog: [url=https://github.com/ReishyouSose/ShopLookup/blob/master/ChangeLog-en.md] [/url]
 QQ group: 574904188

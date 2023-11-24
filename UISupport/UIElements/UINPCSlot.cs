@@ -83,7 +83,8 @@ namespace ShopLookup.UISupport.UIElements
         public override void DrawSelf(SpriteBatch sb)
         {
             var rec = HitBox();
-            sb.Draw(bg, rec.TopLeft(), null, Color.White);
+            Texture2D tempBg = Permanent ? bg : (conditions.All(x => x.IsMet()) ? TextureAssets.InventoryBack3 : TextureAssets.InventoryBack2).Value;
+            sb.Draw(tempBg, rec.TopLeft(), null, Color.White);
             Texture2D head;
             if (headIndex != -1)
             {
@@ -106,7 +107,7 @@ namespace ShopLookup.UISupport.UIElements
                 Main.hoverItemName = npcName + "\n" + SourceModName;
                 if (!Permanent && (ShopLookup.Portable || ShopLookup.PermanentTips))
                 {
-                    Main.hoverItemName += "\n" + $"[c/FFA500:{Language.GetTextValue(SLUI.LocalKey+ "NonPermanent")}]";
+                    Main.hoverItemName += "\n" + $"[c/FFA500:{Language.GetTextValue(SLUI.LocalKey + "NonPermanent")}]";
                     foreach (Condition c in conditions)
                     {
                         Main.hoverItemName += "\n" + (c.IsMet() ?

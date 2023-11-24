@@ -1,11 +1,12 @@
-﻿using Terraria.Localization;
+﻿using ReLogic.Content;
+using Terraria.Localization;
 
 namespace ShopLookup.Content
 {
     public class SLUI : ContainerElement
     {
         public const string LocalKey = "Mods.ShopLookup.";
-        public const string NmakeKey = "ShopLookup.Content.SLUI";
+        public const string NameKey = "ShopLookup.Content.SLUI";
         public const string AssetKey = "ShopLookup/UISupport/Asset/";
         public static Texture2D LineTex => TextureAssets.MagicPixel.Value;
         public UIPanel bg;
@@ -230,6 +231,10 @@ namespace ShopLookup.Content
                     }
                 }
                 startPoint = pos;
+            }
+            if (focusNPC.IsVisible)
+            {
+                focusNPC.bg = (VisitedNPCSys.Contains(focusNPC.npcType) ? TextureAssets.InventoryBack3 : TextureAssets.InventoryBack2).Value;
             }
         }
         private Texture2D GetIcon()
@@ -470,7 +475,9 @@ namespace ShopLookup.Content
             {
                 if (!added.ContainsKey(shop.NpcType))
                 {
-                    UINPCSlot slot = new(shop.NpcType, 1f, TextureAssets.InventoryBack2.Value);
+                    int type = shop.NpcType;
+                    Asset<Texture2D> slotBg = VisitedNPCSys.Contains(type) ? TextureAssets.InventoryBack3 : TextureAssets.InventoryBack2;
+                    UINPCSlot slot = new(type, 1f, (ExtraNPCInfo.NonTryGet(type, out _) ? TextureAssets.InventoryBack14 : slotBg).Value);
                     slot.Info.Left.Pixel = x + 5;
                     slot.Events.OnLeftClick += (evt) => ChangeNPC(slot.npcType);
                     slot.Events.OnRightClick += (evt) => ChangeNPC(slot.npcType);

@@ -76,7 +76,7 @@ namespace ShopLookup
         }
         public override void PreSaveAndQuit()
         {
-            SLUI ui = ShopLookup.Ins.uis.Elements[SLUI.NmakeKey] as SLUI;
+            SLUI ui = ShopLookup.Ins.uis.Elements[SLUI.NameKey] as SLUI;
             ui.Info.IsVisible = false;
             ui.firstLoad = false;
         }

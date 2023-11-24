@@ -63,7 +63,7 @@ namespace ShopLookup.Content
                 Main.NewText(Language.GetTextValue(SLUI.LocalKey + "CantBuy"));
                 return false;
             }
-            if (npcType == -1 || NPC.FindFirstNPC(npcType) >= 0)
+            if (npcType == -1 || VisitedNPCSys.Contains(npcType) || NPC.FindFirstNPC(npcType) >= 0)
             {
                 Buying = true;
                 Main.playerInventory = true;
@@ -116,12 +116,12 @@ namespace ShopLookup.Content
                 {
                     if ((buySpeed == 0 || (buyTime % buySpeed == 0 && buySpeed < 10)) && i.stack < i.maxStack)
                     {
+                        SoundCoins();
                         for (int j = 0; j < buyStack; j++)
                         {
                             if (p.BuyItem(item.shopCustomPrice ?? item.value, item.shopSpecialCurrency))
                             {
                                 i.stack++;
-                                SoundCoins();
                                 if (i.stack == i.maxStack) return;
                             }
                             else
