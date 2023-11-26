@@ -5,8 +5,8 @@ namespace ShopLookup.Content
 {
     public class VisitedNPCSys : ModSystem
     {
-        internal static HashSet<int> visited_Vanilla;
-        internal static HashSet<string> visited_Mod;
+        internal static HashSet<int> visited_Vanilla = new();
+        internal static HashSet<string> visited_Mod = new();
         internal static HashSet<int> visited_ModType;
         public static bool TryAdd(int type)
         {
@@ -33,8 +33,8 @@ namespace ShopLookup.Content
         public static bool Contains(int type) => visited_Vanilla.Contains(type) || visited_ModType.Contains(type);
         public static void CheckActiveTownNPC()
         {
-            visited_Vanilla ??= new();
-            visited_Mod ??= new();
+            visited_Vanilla = new();
+            visited_Mod = new();
             foreach (NPC npc in Main.npc)
             {
                 if (npc.active && npc.townNPC)
@@ -73,6 +73,7 @@ namespace ShopLookup.Content
     {
         public override void OnSpawn(NPC npc, IEntitySource source)
         {
+            if (Main.gameMenu) return;
             if (npc.active && npc.townNPC)
             {
                 if (npc.type < NPCID.Count) VisitedNPCSys.TryAdd(npc.type);
@@ -80,6 +81,7 @@ namespace ShopLookup.Content
 
                 if (ExtraNPCInfo.NonTryGet(npc.type, out _)) return;
                 SLUI ui = ShopLookup.Ins.uis.Elements[SLUI.NameKey] as SLUI;
+                if (!ui.firstLoad) return;
                 UIContainerPanel npcs = (UIContainerPanel)ui.side.ChildrenElements.First(x => x is UIContainerPanel);
                 foreach (UINPCSlot slot in npcs.InnerUIE.Cast<UINPCSlot>())
                 {
