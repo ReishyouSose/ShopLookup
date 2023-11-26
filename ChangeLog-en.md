@@ -6,7 +6,7 @@
 
 </div>
 
-# v0.3.9
+# v0.4.0
 Fixed some bug
 # v0.3.8
 The sell conditions for permanent NPCs are modified to ensure that the corresponding NPC is alive or has visited before.

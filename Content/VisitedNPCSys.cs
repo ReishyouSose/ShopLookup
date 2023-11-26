@@ -5,8 +5,8 @@ namespace ShopLookup.Content
 {
     public class VisitedNPCSys : ModSystem
     {
-        internal static HashSet<int> visited_Vanilla = new();
-        internal static HashSet<string> visited_Mod = new();
+        internal static HashSet<int> visited_Vanilla;
+        internal static HashSet<string> visited_Mod;
         internal static HashSet<int> visited_ModType;
         public static bool TryAdd(int type)
         {
@@ -33,8 +33,6 @@ namespace ShopLookup.Content
         public static bool Contains(int type) => visited_Vanilla.Contains(type) || visited_ModType.Contains(type);
         public static void CheckActiveTownNPC()
         {
-            visited_Vanilla = new();
-            visited_Mod = new();
             foreach (NPC npc in Main.npc)
             {
                 if (npc.active && npc.townNPC)
@@ -52,20 +50,31 @@ namespace ShopLookup.Content
             }
 
         }
+        public override void Load()
+        {
+            visited_Vanilla = new();
+            visited_Mod = new();
+        }
         public override void SaveWorldData(TagCompound tag)
         {
-            if (visited_Vanilla != null && visited_Vanilla.Count > 0)
-                tag["visited_Vanilla"] = visited_Vanilla.ToArray();
-            if (visited_Mod != null && visited_Mod.Count > 0)
-                tag["visited_Mod"] = visited_Mod.ToArray();
+            if (visited_Vanilla.Any())
+                tag["visited_Vanilla"] = visited_Vanilla.ToList();
+            if (visited_Mod.Any())
+                tag["visited_Mod"] = visited_Mod.ToList();
         }
 
         public override void LoadWorldData(TagCompound tag)
         {
-            if (tag.TryGet("visited_Vanilla", out int[] vanilla))
+            if(tag.TryGet("visited_Vanilla", out List<int> vanilla))
                 visited_Vanilla = vanilla.ToHashSet();
-            if (tag.TryGet("visited_Mod", out string[] modNPCs))
+            if (tag.TryGet("visited_Mod", out List<string> modNPCs))
                 visited_Mod = modNPCs.ToHashSet();
+        }
+        public override void PreSaveAndQuit()
+        {
+            visited_Vanilla.Clear();
+            visited_Mod.Clear();
+            visited_ModType.Clear();
         }
     }
 
