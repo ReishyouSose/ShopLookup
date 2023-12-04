@@ -33,13 +33,7 @@ namespace ShopLookup.Content
                         yOff.Add(font.MeasureString(no).Y);
                         break;
                     }
-                    string cdesc = c.Description.Value;
-                    /*if (cdesc == c.Description.Key)
-                    {
-                        Main.NewText(cdesc + "键值相同", Color.Red);
-                        cdesc = Language.GetTextValue(c.Description.Key);
-                    }*/
-                    cdesc = font.CreateWrappedText(cdesc, width);
+                    string cdesc = font.CreateWrappedText(c.Description.Value, width);
                     infos.Add(cdesc);
                     yOff.Add(CriterionOffset(font, cdesc));
                 }
@@ -72,8 +66,7 @@ namespace ShopLookup.Content
         {
             Rectangle hitbox = HitBox();
             Vector2 drawPos = hitbox.TopLeft();
-            bool portable = ShopLookup.Portable;
-            if (portable || ShopLookup.PermanentTips)
+            if (ShopLookup.Portable || ShopLookup.PermanentTips)
             {
                 var parentChild = ParentElement.ChildrenElements;
                 if (Info.IsMouseHover || ParentElement.Info.IsMouseHover)
@@ -152,7 +145,7 @@ namespace ShopLookup.Content
         }
         private static bool IgnoreCds(Condition c)
         {
-            return c.Description.Key == "" || c.Description.Value == ""
+            return (ShopLookup.IgnoreUnknowCds && (c.Description.Key == "" || c.Description.Value == ""))
                 || c == Condition.HappyEnoughToSellPylons
                 || c == Condition.AnotherTownNPCNearby
                 || c == Condition.HappyEnough;

@@ -9,6 +9,7 @@ namespace ShopLookup
         internal static ShopLookup Ins;
         internal static bool Portable;
         internal static bool PermanentTips;
+        internal static bool IgnoreUnknowCds;
 
         public UISystem uis;
         public ShopLookup()

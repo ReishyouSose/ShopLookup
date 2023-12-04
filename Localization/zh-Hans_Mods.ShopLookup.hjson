@@ -13,7 +13,7 @@ NoIcon: 这个Mod没有icon_small贴图文件
 Travel: 需要世界上有两个城镇NPC
 NonPermanent: 非常驻NPC
 NoSpawn: 不满足这个非常驻NPC的生成条件
-UnknowCds: 未知条件，已忽略
+UnknowCds: 未知条件，可在设置中启用忽略
 EmptyShop: 空商店
 
 Configs: {
@@ -47,6 +47,15 @@ Configs: {
 				当鼠标悬浮在信息栏上时
 				已达成的售卖条件会被高亮为绿色
 				反之为红色
+				'''
+		}
+
+		IgnoreUnknowCds: {
+			Label: 忽略不明购买条件
+			Tooltip:
+				'''
+				如果启用，玩家可能可以获取超出当前时期的素材
+				请谨慎使用
 				'''
 		}
 	}

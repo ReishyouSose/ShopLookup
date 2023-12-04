@@ -13,7 +13,7 @@ NoIcon: This mod doesn't have a icon_small pngfile
 Travel: Need two town NPCs in the world
 NonPermanent: Non-Permanent NPC
 NoSpawn: Not fulfill the spawn conditions of this Non-Permanent NPC
-UnknowCds: Unknown conditions, ignored
+UnknowCds: Unknown condition, ignore can be enabled in ModConfig
 EmptyShop: Empty shop
 
 Configs: {
@@ -47,6 +47,15 @@ Configs: {
 				When the mouse hovers over the information slot
 				the sell conditions that have been reached will be highlighted in green
 				otherwise it will be red
+				'''
+		}
+
+		IgnoreUnknowCds: {
+			Label: Ignore unknow buy conditions
+			Tooltip:
+				'''
+				If enab1e, players may be able to obtain items beyond the progress
+				Please use with caution
 				'''
 		}
 	}

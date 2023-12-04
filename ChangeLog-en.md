@@ -6,8 +6,10 @@
 
 </div>
 
+# v0.4.1
+It is now possible to manually set whether to ignore buy conditions with unclear descriptions.
 # v0.4.0
-Fixed some bug
+Fixed some bug.
 # v0.3.8
 The sell conditions for permanent NPCs are modified to ensure that the corresponding NPC is alive or has visited before.
 # v0.3.7

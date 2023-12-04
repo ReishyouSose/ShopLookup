@@ -12,10 +12,14 @@ namespace ShopLookup.Content
 
         [DefaultValue(true)]
         public bool PermanentTips;
+
+        [DefaultValue(false)]
+        public bool IgnoreUnknowCds;
         public override void OnChanged()
         {
             ShopLookup.Portable = Portable;
             ShopLookup.PermanentTips = PermanentTips;
+            ShopLookup.IgnoreUnknowCds = IgnoreUnknowCds;
         }
     }
 }
