@@ -10,11 +10,16 @@ namespace ShopLookup
         internal static bool Portable;
         internal static bool PermanentTips;
         internal static bool IgnoreUnknowCds;
+        internal static bool EnableQoT;
 
         public UISystem uis;
         public ShopLookup()
         {
             Ins = this;
+        }
+        public override void PostSetupContent()
+        {
+            EnableQoT = ModLoader.HasMod("ImproveGame");
         }
         public override object Call(params object[] args)
         {

@@ -1,4 +1,5 @@
 ﻿using Terraria.GameInput;
+using Terraria.ModLoader.IO;
 using static Terraria.UI.Gamepad.UILinkPointNavigator;
 
 namespace ShopLookup.Content
@@ -16,6 +17,7 @@ namespace ShopLookup.Content
             {
                 SLUI ui = ShopLookup.Ins.uis.Elements[SLUI.NameKey] as SLUI;
                 ref var visable = ref ui.Info.IsVisible;
+                //ui.firstLoad = false;
                 if (!ui.firstLoad)
                 {
                     ui.RemoveAll();

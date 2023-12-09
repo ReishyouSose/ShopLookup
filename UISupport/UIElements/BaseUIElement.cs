@@ -505,6 +505,11 @@ namespace ShopLookup.UISupport.UIElements
             ChildrenElements.ForEach(child => { if (child != null && child.IsVisible) child.Draw(sb); });
         }
 
+        public static void Draw(SpriteBatch sb, Texture2D Tex, Vector2 pos, Rectangle? coord,
+             Vector2 origin, Vector2? scale = null, Color? color = null)
+        {
+            sb.Draw(Tex, pos, coord, color ?? Color.White, 0, origin, scale ?? Vector2.One, 0, 0);
+        }
         /// <summary>
         /// 添加子元素
         /// </summary>

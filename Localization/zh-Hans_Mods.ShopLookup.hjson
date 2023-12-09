@@ -16,6 +16,16 @@ NoSpawn: 不满足这个非常驻NPC的生成条件
 UnknowCds: 未知条件，可在设置中启用忽略
 EmptyShop: 空商店
 
+SpeicalShop: {
+	Label: 特殊商店
+	Pylon: 晶塔商店
+
+	QoT: {
+		Enable: 更好的体验
+		Disable: 需要启用模组：更好的体验（QoT）
+	}
+}
+
 Configs: {
 	SLConfig: {
 		DisplayName: 模组配置

@@ -6,6 +6,8 @@
 
 </div>
 
+# v0.4.2
+Added special shop menu, content linked with Mod "Quality of Terraria"
 # v0.4.1
 It is now possible to manually set whether to ignore buy conditions with unclear descriptions.
 # v0.4.0

@@ -5,6 +5,11 @@ namespace ShopLookup.Content
 {
     public class SLUI : ContainerElement
     {
+        private enum ViewType
+        {
+            None, Item, NPC, Pylon, QoT
+        }
+
         public const string LocalKey = "Mods.ShopLookup.";
         public const string NameKey = "ShopLookup.Content.SLUI";
         public const string AssetKey = "ShopLookup/UISupport/Asset/";
@@ -16,10 +21,11 @@ namespace ShopLookup.Content
         public UIImage _switch;
         public UIBottom ItemBg, side, ShopBg, indexBg;
         public UIContainerPanel view, indexView;
+        public UISideBar speicalShops;
         public bool firstLoad;
+        private ViewType viewType;
         private int FocusMod;
         private bool dragging;
-        private bool viewPylon;
         private Vector2 startPoint = Vector2.Zero;
         private static bool noIcon;
         internal static List<Entry> pylons;
@@ -89,24 +95,12 @@ namespace ShopLookup.Content
             vLine.SetCenter(offset, 20 + 26);
             bg.Register(vLine);
 
-            side = new(-offset - 30 - (10 + 52) * 2, 52, 1);
+            side = new(-offset - 30 - (10 + 52) * 1, 52, 1);
             side.SetPos(offset + 10, 20);
             bg.Register(side);
             side.Calculation();
 
-            UIImage pylon = new(T2D(AssetKey + "Slot"));
-            pylon.SetPos(-20 - 52 - 10 - 52, 20, 1);
-            Main.instance.LoadItem(4951);
-            pylon.ReDraw = sb =>
-            {
-                pylon.DrawSelf(sb);
-                Texture2D tex = TextureAssets.Item[ItemID.TeleportationPylonVictory].Value;
-                float mult = pylon.Info.IsMouseHover ? 1f : 0.75f;
-                sb.Draw(tex, pylon.Center(), null, Color.White * mult, 0, tex.Size() / 2f, 0.75f, 0, 0);
-            };
-            pylon.Events.OnLeftClick += evt => LookupPylons();
-            pylon.Events.OnRightClick += evt => LookupPylons();
-            bg.Register(pylon);
+            LoadSpeicalShop();
 
             _switch = new(T2D(AssetKey + "Slot"));
             _switch.SetPos(-20 - 52, 20, 1);
@@ -178,17 +172,13 @@ namespace ShopLookup.Content
             };
             adjust.Events.OnLeftUp += (evt) =>
             {
-                if (viewPylon)
+                switch (viewType)
                 {
-                    LookupPylons();
-                }
-                else if (focusItem.Info.IsVisible && focusItem.ContainedItem.type > ItemID.None)
-                {
-                    LookupOne();
-                }
-                else if (focusNPC.Info.IsVisible)
-                {
-                    LookupShop(focusNPC.npcType);
+                    case ViewType.Item: LookupOne(); break;
+                    case ViewType.NPC: LookupShop(focusNPC.npcType); break;
+                    case ViewType.Pylon: LookupPylons(); break;
+                    case ViewType.QoT: LookupQoTShop(); break;
+                    default: break;
                 }
                 dragging = false;
             };
@@ -266,8 +256,11 @@ namespace ShopLookup.Content
             ShopBg.Info.IsVisible = false;
             focusItem.Info.IsVisible = true;
             focusItem.ContainedItem = new(type);
-            viewPylon = false;
-            if (lookup) LookupOne();
+            if (lookup)
+            {
+                viewType = ViewType.Item;
+                LookupOne();
+            }
         }
         public void ChangeNPC(int type)
         {
@@ -275,7 +268,7 @@ namespace ShopLookup.Content
             ShopBg.Info.IsVisible = true;
             focusNPC.Info.IsVisible = true;
             focusNPC.ChangeNPC(type);
-            viewPylon = false;
+            viewType = ViewType.NPC;
             LookupShop(type);
         }
         private void LookupOne()
@@ -568,7 +561,7 @@ namespace ShopLookup.Content
                 view.Info.SetMargin(0);
                 ItemBg.Register(view);
 
-                VerticalScrollbar scroll = new()
+                VerticalScrollbar scroll = new(90)
                 {
                     UseScrollWheel = true,
                 };
@@ -604,7 +597,7 @@ namespace ShopLookup.Content
         {
             RegisterScroll(false, ref view);
             ChangeItem(ItemID.TeleportationPylonVictory, false);
-            viewPylon = true;
+            viewType = ViewType.Pylon;
             ShopBg.Info.IsVisible = false;
             float y = 0;
             int count = 1;
@@ -621,6 +614,89 @@ namespace ShopLookup.Content
                     y += 90;
                 }
             }
+        }
+        private void LookupQoTShop()
+        {
+            RegisterScroll(false, ref view);
+            ChangeItem(ItemID.None, false);
+            viewType = ViewType.QoT;
+            if (ShopLookup.EnableQoT)
+            {
+                ShopBg.Info.IsVisible = false;
+                float y = 0;
+                int count = 1;
+                foreach (Entry entry in SpeicalShops.GetQoTItems(out int amount))
+                {
+                    RegisterInfo(y, entry.Item.Name, entry, -1, false, false, null, out float yoff);
+                    if (count < amount)
+                    {
+                        y += yoff;
+                        UIImage hLine = new(LineTex, -40, 1, 1);
+                        hLine.SetPos(20, y + 79);
+                        view.AddElement(hLine);
+                        count++;
+                        y += 90;
+                    }
+                }
+            }
+        }
+        private void LoadSpeicalShop()
+        {
+            speicalShops = new(default, 56 + 20, bg.Height / 2f, 2);
+            speicalShops.Info.Top.Percent = 0.5f;
+            speicalShops.SetCenter(-speicalShops.Width / 2f, 0, 0, 0.5f);
+            speicalShops.hoverText = Language.GetTextValue(LocalKey + "SpeicalShop.Label");
+            bg.Register(speicalShops);
+
+            List<BaseUIElement> speical = new();
+
+            Texture2D slot = T2D(AssetKey + "Slot");
+
+            UIImage pylon = new(slot);
+            //pylon.SetPos(-20 - 52 - 10 - 52, 20, 1);
+            Main.instance.LoadItem(4951);
+            pylon.ReDraw = sb =>
+            {
+                pylon.DrawSelf(sb);
+                Texture2D tex = TextureAssets.Item[ItemID.TeleportationPylonVictory].Value;
+                float mult = 0.75f;
+                if (pylon.Info.IsMouseHover)
+                {
+                    mult = 1;
+                    Main.hoverItemName += Language.GetTextValue(LocalKey + "SpeicalShop.Pylon");
+                }
+                sb.Draw(tex, pylon.Center(), null, Color.White * mult, 0, tex.Size() / 2f, 0.75f, 0, 0);
+            };
+            pylon.Events.OnLeftClick += evt => LookupPylons();
+            pylon.Events.OnRightClick += evt => LookupPylons();
+            pylon.SetCenter(0, 0, 0.53f, 0.3f);
+            speical.Add(pylon);
+
+            UIImage qotbg = new(slot);
+            qotbg.SetCenter(0, 0, 0.53f, 0.7f);
+            qotbg.Info.IsSensitive = true;
+            qotbg.ReDraw = sb =>
+            {
+                qotbg.DrawSelf(sb);
+                if (qotbg.Info.IsMouseHover)
+                {
+                    Main.hoverItemName += Language.GetTextValue(LocalKey + $"SpeicalShop.QoT.{(ShopLookup.EnableQoT ? "Enable" : "Disable")}");
+                }
+            };
+            qotbg.Events.OnLeftClick += evt => LookupQoTShop();
+            qotbg.Events.OnRightClick += evt => LookupQoTShop();
+            UIImage qot = new(T2D(AssetKey + "QoT"));
+            qot.SetCenter(0, 0, 0.5f, 0.5f);
+            qot.ReDraw = sb =>
+            {
+                float mult = qotbg.Info.IsMouseHover ? 1f : 0.75f;
+                Texture2D tex = qot.Tex;
+                sb.Draw(tex, qot.Center(), null, Color.White * mult, 0, tex.Size() / 2f, 1f, 0, 0);
+            };
+            qotbg.Register(qot);
+            speical.Add(qotbg);
+
+            speicalShops.SetChildrenList(speical, false);
         }
     }
 }
