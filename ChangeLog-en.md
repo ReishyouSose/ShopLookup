@@ -6,6 +6,8 @@
 
 </div>
 
+# v0.4.3
+Change the adjust for visited NPC
 # v0.4.2
 Added special shop menu, content linked with Mod "Quality of Terraria"
 # v0.4.1
