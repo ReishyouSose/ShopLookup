@@ -16,9 +16,14 @@ NoSpawn: 不满足这个非常驻NPC的生成条件
 UnknowCds: 未知条件，可在设置中启用忽略
 EmptyShop: 空商店
 
-SpeicalShop: {
+SpecialShop: {
 	Label: 特殊商店
 	Pylon: 晶塔商店
+
+	Convenient: {
+		Label: 便捷商店
+		Description: 出售一些莫名其妙难以获得的物品
+	}
 
 	QoT: {
 		Enable: 更好的体验

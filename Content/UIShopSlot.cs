@@ -10,8 +10,9 @@ namespace ShopLookup.Content
         public int npcType;
         public bool canBuy;
         private int buyTime;
-        private int buySpeed = 10;
-        private int buyStack = 1;
+        private int buySpeed;
+        private int buyStack;
+        private int firstCD;
         /// <summary>
         /// 生成条件是否满足
         /// </summary>
@@ -33,9 +34,9 @@ namespace ShopLookup.Content
             itemSlot.SetCenter(0, 26, 0.5f);
             itemSlot.Events.OnLeftDown += evt => CanBuyItem();
             itemSlot.Events.OnRightDown += evt => CanBuyItem();
-            itemSlot.Events.OnLeftUp += evt => Buying = false;
-            itemSlot.Events.OnRightUp += evt => Buying = false;
-            itemSlot.Events.OnMouseOut += evt => Buying = false;
+            itemSlot.Events.OnLeftUp += evt => Reset(false);
+            itemSlot.Events.OnRightUp += evt => Reset(false);
+            itemSlot.Events.OnMouseOut += evt => Reset(false);
             Register(itemSlot);
             if (npc)
             {
@@ -58,6 +59,8 @@ namespace ShopLookup.Content
         private bool CanBuyItem()
         {
             if (!ShopLookup.Portable) return false;
+            int type = Main.mouseItem.type;
+            if (type > 0 && type != itemSlot.ContainedItem.type) return false;
             if (!canBuy)
             {
                 Main.NewText(Language.GetTextValue(SLUI.LocalKey + "CantBuy"));
@@ -65,7 +68,7 @@ namespace ShopLookup.Content
             }
             if (npcType == -1 || VisitedNPCSys.Contains(npcType) || NPC.FindFirstNPC(npcType) >= 0)
             {
-                Buying = true;
+                Reset(true);
                 Main.playerInventory = true;
                 return true;
             }
@@ -75,7 +78,7 @@ namespace ShopLookup.Content
                 {
                     if (Spawn)
                     {
-                        Buying = true;
+                        Reset(true);
                         Main.playerInventory = true;
                         return true;
                     }
@@ -100,70 +103,58 @@ namespace ShopLookup.Content
                 Item item = itemSlot.ContainedItem;
                 Player p = Main.LocalPlayer;
                 ref Item i = ref Main.mouseItem;
-                if (i.type == ItemID.None)
+                if ((buySpeed == 0 || buyTime % buySpeed == 0) && i.stack < item.maxStack && firstCD <= 0)
                 {
-                    if (p.BuyItem(item.shopCustomPrice ?? item.value, item.shopSpecialCurrency))
+                    if (firstCD == -1) firstCD = 30;
+                    SoundCoins();
+                    for (int j = 0; j < buyStack; j++)
                     {
-                        i = new(item.type);
-                    }
-                    else
-                    {
-                        Buying = false;
-                        Main.NewText(Language.GetTextValue(SLUI.LocalKey + "NoEnough"));
-                    }
-                }
-                else if (i.type == item.type)
-                {
-                    if ((buySpeed == 0 || (buyTime % buySpeed == 0 && buySpeed < 10)) && i.stack < i.maxStack)
-                    {
-                        SoundCoins();
-                        for (int j = 0; j < buyStack; j++)
+                        if (p.BuyItem(item.shopCustomPrice ?? item.value, item.shopSpecialCurrency))
                         {
-                            if (p.BuyItem(item.shopCustomPrice ?? item.value, item.shopSpecialCurrency))
+                            if (i.type == ItemID.None) i = new(item.type);
+                            else i.stack++;
+
+                            if (i.stack == i.maxStack)
                             {
-                                i.stack++;
-                                if (i.stack == i.maxStack) return;
-                            }
-                            else
-                            {
-                                Buying = false;
-                                Main.NewText(Language.GetTextValue(SLUI.LocalKey + "NoEnough"));
+                                Reset(false);
                                 return;
                             }
                         }
-                    }
-                    if (buySpeed > 10)
-                    {
-                        if (buyTime >= 20)
+                        else
                         {
-                            buySpeed--;
+                            Reset(false);
+                            Main.NewText(Language.GetTextValue(SLUI.LocalKey + "NoEnough"));
+                            return;
                         }
                     }
-                    else if (buySpeed > 0)
-                    {
-                        if (buyTime >= buySpeed * 2)
-                        {
-                            buyTime = 0;
-                            buySpeed--;
-                        }
-                    }
-                    else
-                    {
-                        if (buyTime % 10 == 0)
-                        {
-                            buyStack++;
-                            buyTime = 0;
-                        }
-                    }
-                    buyTime++;
                 }
+                if (buySpeed > 0)
+                {
+                    if (buyTime >= buySpeed * 2)
+                    {
+                        buyTime = 0;
+                        buySpeed--;
+                    }
+                }
+                else
+                {
+                    if (buyTime % 10 == 0)
+                    {
+                        buyStack++;
+                        buyTime = 0;
+                    }
+                }
+                if (firstCD > 0) firstCD--;
+                buyTime++;
             }
-            else
-            {
-                buyTime = 0;
-                buySpeed = 10;
-                buyStack = 1;
-            }
+        }
+        private void Reset(bool buying)
+        {
+            Buying = buying;
+            buyTime = 0;
+            buySpeed = 10;
+            buyStack = 1;
+            firstCD = -1;
         }
     }
 }

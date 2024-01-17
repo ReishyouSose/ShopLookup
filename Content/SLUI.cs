@@ -7,7 +7,7 @@ namespace ShopLookup.Content
     {
         private enum ViewType
         {
-            None, Item, NPC, Pylon, QoT
+            None, Item, NPC, Pylon, Vanilla, QoT
         }
 
         public const string LocalKey = "Mods.ShopLookup.";
@@ -112,8 +112,8 @@ namespace ShopLookup.Content
                     Main.hoverItemName = Language.GetText(LocalKey + "Filter")
                     .WithFormatArgs(mods[FocusMod].name).Value
                     + "\n" + $"[{FocusMod + 1}/{modCount}]"
-                    + "\n" + Language.GetTextValue(LocalKey + "Switch");
-                    if (noIcon) Main.hoverItemName += "\n" + Language.GetTextValue(LocalKey + "NoIcon");
+                    + "\n" + GTV("Switch");
+                    if (noIcon) Main.hoverItemName += "\n" + GTV("NoIcon");
                 }
             };
 
@@ -146,7 +146,7 @@ namespace ShopLookup.Content
             ShopBg.SetPos(0, 20 + 52 + 10);
             bg.Register(ShopBg);
 
-            indexText = new(Language.GetTextValue(LocalKey + "Index"));
+            indexText = new(GTV("Index"));
             indexText.SetPos(20 + 26, indexText.TextSize.Y / 2f + 6);
             ShopBg.Register(indexText);
 
@@ -288,6 +288,25 @@ namespace ShopLookup.Content
                     }
                 }
             }
+            foreach (Entry entry in SpeicalShops.GetVanillaShop(out _))
+            {
+                if (entry.Item.type == itemid)
+                {
+                    shops.Add((-1, GTV("SpecialShop.Convenient.Label"), entry));
+                    break;
+                }
+            }
+            if (ShopLookup.EnableQoT)
+            {
+                foreach (Entry entry in SpeicalShops.GetQoTItems(out _))
+                {
+                    if (entry.Item.type == itemid)
+                    {
+                        shops.Add((-1, GTV("SpecialShop.QoT.Enable"), entry));
+                        break;
+                    }
+                }
+            }
             if (shops.Any())
             {
                 float y = 0;
@@ -296,14 +315,14 @@ namespace ShopLookup.Content
                 {
                     NPC npc = new();
                     npc.SetDefaults(type);
-                    string info = npc.FullName + "  " + Language.GetTextValue(LocalKey + "Index") + " | " + GetShopLT(type, shopName);
+                    string info = npc.FullName + "  " + GTV("Index") + " | " + GetShopLT(type, shopName);
                     bool permanent = !ExtraNPCInfo.NonTryGet(type, out IEnumerable<Condition> conditions);
                     RegisterInfo(y, info, entry, type, false, permanent, conditions, out float yoff);
 
                     if (count < shops.Count)
                     {
                         y += yoff;
-                        UIImage hLine = new(LineTex, -40, 1, 1);
+                        UIImage hLine = new(LineTex, -40, 1, 1); 
                         hLine.SetPos(20, y + 79);
                         view.AddElement(hLine);
                         count++;
@@ -313,7 +332,7 @@ namespace ShopLookup.Content
             }
             else
             {
-                TextUIE noSell = new(Language.GetTextValue(LocalKey + "NoSell"));
+                TextUIE noSell = new(GTV("NoSell"));
                 noSell.SetCenter(0, 0, 0.5f, 0.5f);
                 ItemBg.Register(noSell);
             }
@@ -412,7 +431,7 @@ namespace ShopLookup.Content
                     }
                     if (!entrys.Any())
                     {
-                        TextUIE empty = new(Language.GetTextValue(LocalKey + "EmptyShop"));
+                        TextUIE empty = new(GTV("EmptyShop"));
                         empty.SetCenter(0, 0, 0.5f, 0.5f);
                         view.Register(empty);
                         return;
@@ -615,6 +634,29 @@ namespace ShopLookup.Content
                 }
             }
         }
+        private void LookupVanillaShop()
+        {
+            RegisterScroll(false, ref view);
+            ChangeItem(ItemID.None, false);
+            viewType = ViewType.Vanilla;
+            ShopBg.Info.IsVisible = false;
+            float y = 0;
+            int count = 1;
+            foreach (Entry entry in SpeicalShops.GetVanillaShop(out int amount))
+            {
+                RegisterInfo(y, entry.Item.Name, entry, -1, false, false, null, out float yoff);
+                if (count < amount)
+                {
+                    y += yoff;
+                    UIImage hLine = new(LineTex, -40, 1, 1);
+                    hLine.SetPos(20, y + 79);
+                    view.AddElement(hLine);
+                    count++;
+                    y += 90;
+                }
+            }
+
+        }
         private void LookupQoTShop()
         {
             RegisterScroll(false, ref view);
@@ -642,10 +684,10 @@ namespace ShopLookup.Content
         }
         private void LoadSpeicalShop()
         {
-            speicalShops = new(default, 56 + 20, bg.Height / 2f, 2);
+            speicalShops = new(default, 56 + 20, 4 * 50 + 30, 2);
             speicalShops.Info.Top.Percent = 0.5f;
             speicalShops.SetCenter(-speicalShops.Width / 2f, 0, 0, 0.5f);
-            speicalShops.hoverText = Language.GetTextValue(LocalKey + "SpeicalShop.Label");
+            speicalShops.hoverText = GTV("Special.Label");
             bg.Register(speicalShops);
 
             List<BaseUIElement> speical = new();
@@ -663,24 +705,41 @@ namespace ShopLookup.Content
                 if (pylon.Info.IsMouseHover)
                 {
                     mult = 1;
-                    Main.hoverItemName += Language.GetTextValue(LocalKey + "SpeicalShop.Pylon");
+                    Main.hoverItemName += GTV("SpecialShop.Pylon");
                 }
                 sb.Draw(tex, pylon.Center(), null, Color.White * mult, 0, tex.Size() / 2f, 0.75f, 0, 0);
             };
             pylon.Events.OnLeftClick += evt => LookupPylons();
             pylon.Events.OnRightClick += evt => LookupPylons();
-            pylon.SetCenter(0, 0, 0.53f, 0.3f);
             speical.Add(pylon);
 
+            UIImage convenient = new(slot);
+            convenient.SetCenter(0, 0, 0.53f, 0.7f);
+            convenient.Info.IsSensitive = true;
+            convenient.Events.OnLeftClick += evt => LookupVanillaShop();
+            convenient.Events.OnRightClick += evt => LookupVanillaShop();
+            convenient.ReDraw = sb =>
+            {
+                convenient.DrawSelf(sb);
+                Texture2D tex = T2D(AssetKey + "Vanilla");
+                sb.Draw(tex, convenient.Center(), null, Color.White
+                    * (convenient.Info.IsMouseHover ? 1 : 0.75f), 0, tex.Size() / 2f, 1f, 0, 0);
+                if (convenient.Info.IsMouseHover)
+                {
+                    string key = "SpecialShop.Convenient.";
+                    Main.hoverItemName += GTV(key + "Label") + "\n" + GTV(key + "Description");
+                }
+            };
+            speical.Add(convenient);
+
             UIImage qotbg = new(slot);
-            qotbg.SetCenter(0, 0, 0.53f, 0.7f);
             qotbg.Info.IsSensitive = true;
             qotbg.ReDraw = sb =>
             {
                 qotbg.DrawSelf(sb);
                 if (qotbg.Info.IsMouseHover)
                 {
-                    Main.hoverItemName += Language.GetTextValue(LocalKey + $"SpeicalShop.QoT.{(ShopLookup.EnableQoT ? "Enable" : "Disable")}");
+                    Main.hoverItemName += GTV($"SpecialShop.QoT.{(ShopLookup.EnableQoT ? "Enable" : "Disable")}");
                 }
             };
             qotbg.Events.OnLeftClick += evt => LookupQoTShop();
@@ -690,13 +749,12 @@ namespace ShopLookup.Content
             qot.ReDraw = sb =>
             {
                 float mult = qotbg.Info.IsMouseHover ? 1f : 0.75f;
-                Texture2D tex = qot.Tex;
-                sb.Draw(tex, qot.Center(), null, Color.White * mult, 0, tex.Size() / 2f, 1f, 0, 0);
+                sb.Draw(qot.Tex, qot.Pos(), null, Color.White * mult, 0, Vector2.Zero, 1f, 0, 0);
             };
             qotbg.Register(qot);
             speical.Add(qotbg);
 
-            speicalShops.SetChildrenList(speical, false);
+            speicalShops.SetChildrenList(speical, true);
         }
     }
 }

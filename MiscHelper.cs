@@ -1,6 +1,8 @@
 ﻿using ReLogic.Graphics;
+using ShopLookup.Content;
 using System.Reflection;
 using Terraria.GameContent.UI;
+using Terraria.Localization;
 
 namespace ShopLookup
 {
@@ -261,5 +263,6 @@ namespace ShopLookup
             }
             return new Vector4(x, y, w, h);
         }
+        public static string GTV(string key) => Language.GetTextValue(SLUI.LocalKey + key);
     }
 }

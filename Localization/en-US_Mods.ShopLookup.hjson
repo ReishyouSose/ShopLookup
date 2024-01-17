@@ -16,9 +16,14 @@ NoSpawn: Not fulfill the spawn conditions of this Non-Permanent NPC
 UnknowCds: Unknown condition, ignore can be enabled in ModConfig
 EmptyShop: Empty shop
 
-SpeicalShop: {
+SpecialShop: {
 	Label: SpeicalShop
 	Pylon: Shop of pylons
+
+	Convenient: {
+		Label: Shop of Vanilla
+		Description: Sell some items that are inexplicably hard to get
+	}
 
 	QoT: {
 		Enable: Shop of "Quality of Terraria"
