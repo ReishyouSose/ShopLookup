@@ -31,6 +31,7 @@ namespace ShopLookup.Content
                 CanPutInSlot = new(Item => false),
                 CanTakeOutSlot = new(Item => false),
             };
+            itemSlot.ContainedItem.isAShopItem = true;
             itemSlot.SetCenter(0, 26, 0.5f);
             itemSlot.Events.OnLeftDown += evt => CanBuyItem();
             itemSlot.Events.OnRightDown += evt => CanBuyItem();

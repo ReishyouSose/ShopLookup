@@ -9,7 +9,10 @@
         }
         public static NPCShop Add(this NPCShop shop, Mod mod, string itemName, params Condition[] conditions)
         {
-            shop.Add(new Item(mod.Find<ModItem>(itemName).Type), conditions);
+            if (mod.TryFind(itemName, out ModItem mi))
+            {
+                shop.Add(new Item(mi.Type), conditions);
+            }
             return shop;
         }
         public static NPCShop Add(this NPCShop shop, Mod mod, string[] itemName, params Condition[] condition)
