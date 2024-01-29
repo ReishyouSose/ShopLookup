@@ -1,6 +1,11 @@
 NoSell: No TownNPCs sell this
 NoCondition: Any time
-Keybinds.ShopLookup.DisplayName: Shop Lookup
+
+Keybinds: {
+	ShopLookup.DisplayName: Shop Lookup
+	"Look up.DisplayName": Look up
+}
+
 Source: From {0}
 Vanilla: Terraria
 Index: Index

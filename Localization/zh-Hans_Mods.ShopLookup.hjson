@@ -1,6 +1,11 @@
 NoSell: 没有城镇NPC售卖这个物品
 NoCondition: 任何时候
-Keybinds.ShopLookup.DisplayName: 查询售卖
+
+Keybinds: {
+	ShopLookup.DisplayName: 查询售卖
+	// "Look up.DisplayName": Look up
+}
+
 Source: 来自{0}
 Vanilla: 原版
 Index: 索引

@@ -1,8 +1,16 @@
-﻿using ReLogic.Graphics;
-using ShopLookup.Content;
-using System.Reflection;
-using Terraria.GameContent.UI;
-using Terraria.Localization;
+﻿global using Microsoft.Xna.Framework;
+global using Microsoft.Xna.Framework.Graphics;
+global using ReLogic.Graphics;
+global using System;
+global using System.Collections.Generic;
+global using System.Reflection;
+global using Terraria;
+global using Terraria.Audio;
+global using Terraria.GameContent;
+global using Terraria.GameContent.UI;
+global using Terraria.ID;
+global using Terraria.Localization;
+global using Terraria.ModLoader;
 
 namespace ShopLookup
 {
@@ -263,6 +271,10 @@ namespace ShopLookup
             }
             return new Vector4(x, y, w, h);
         }
-        public static string GTV(string key) => Language.GetTextValue(SLUI.LocalKey + key);
+        private const string LocalKey = "Mods.ShopLookup.";
+        private const string AssetKey = "ShopLookup/UISupport/Asset/";
+        public static string GTV(string key) => Language.GetTextValue(LocalKey + key);
+        public static Texture2D UIT2D(string key) => T2D(AssetKey + key);
+        public static Vector2 ScrResolution = new(Main.screenWidth, Main.screenHeight);
     }
 }
