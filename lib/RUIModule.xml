@@ -535,7 +535,7 @@
             </summary>
             <returns>用于乘算的修正值</returns>
         </member>
-        <member name="P:RUIModule.RUISys.AssetLoader.BackBround">
+        <member name="P:RUIModule.RUISys.AssetLoader.BackGround">
             <summary>
             0
             </summary>
@@ -625,7 +625,12 @@
             鼠标左键冷却
             </summary>
         </member>
-        <member name="M:RUIModule.RUISys.RUISystem.Load">
+        <member name="E:RUIModule.RUISys.RUISystem.ExtraDrawOver">
+            <summary>
+            额外的绘制，位于UI上层
+            </summary>
+        </member>
+        <member name="M:RUIModule.RUISys.RUISystem.Load(Terraria.ModLoader.Mod)">
             <summary>
             反射加载所有ContainerElement
             </summary>

@@ -11,6 +11,9 @@ global using Terraria.GameContent.UI;
 global using Terraria.ID;
 global using Terraria.Localization;
 global using Terraria.ModLoader;
+global using static ShopLookup.MiscHelper;
+using RUIModule.RUISys;
+using ShopLookup.Content.UI;
 
 namespace ShopLookup
 {
@@ -272,9 +275,10 @@ namespace ShopLookup
             return new Vector4(x, y, w, h);
         }
         private const string LocalKey = "Mods.ShopLookup.";
-        private const string AssetKey = "ShopLookup/UISupport/Asset/";
         public static string GTV(string key) => Language.GetTextValue(LocalKey + key);
-        public static Texture2D UIT2D(string key) => T2D(AssetKey + key);
-        public static Vector2 ScrResolution = new(Main.screenWidth, Main.screenHeight);
+        public static string GTV(string key, params string[] obj) => Language.GetText(LocalKey + key).WithFormatArgs(obj).Value;
+        public static Vector2 ScrResolution => new(Main.screenWidth, Main.screenHeight);
+        private static readonly string SLUIKey = typeof(ShopLookupUI).FullName;
+        public static ShopLookupUI SLUI => RUIManager.UIEs[SLUIKey] as ShopLookupUI;
     }
 }

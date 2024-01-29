@@ -5,9 +5,15 @@
     <AssemblyName>ShopLookup</AssemblyName>
     <TargetFramework>net6.0</TargetFramework>
     <PlatformTarget>AnyCPU</PlatformTarget>
-    <LangVersion>latest</LangVersion>
+    <LangVersion>preview</LangVersion>
   </PropertyGroup>
   <ItemGroup>
+    <None Remove="Assets\All.png" />
+    <None Remove="Assets\Coins.png" />
+    <None Remove="Assets\NoIcon.png" />
+    <None Remove="Assets\QoT.png" />
+    <None Remove="Assets\Slot.png" />
+    <None Remove="Assets\Vanilla.png" />
     <None Remove="changelog.txt" />
     <None Remove="description_workshop.txt" />
     <None Remove="description_workshop_en.txt" />
@@ -16,10 +22,6 @@
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="tModLoader.CodeAssist" Version="0.1.*" />
-  </ItemGroup>
-  <ItemGroup>
-    <Folder Include="Content\UI\ExtraUI\" />
-    <Folder Include="Assets\" />
   </ItemGroup>
   <ItemGroup>
     <Reference Include="RUIModule">

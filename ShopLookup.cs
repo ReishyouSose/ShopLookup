@@ -1,4 +1,5 @@
 using RUIModule.RUISys;
+using ShopLookup.Content.Sys;
 
 namespace ShopLookup
 {
@@ -13,7 +14,16 @@ namespace ShopLookup
 
         private void AssetLoader_ExtraLoad(Dictionary<string, Texture2D> extraAssets)
         {
-            throw new NotImplementedException();
+            string[] files = ["All", "Coins", "NoIcon", "QoT", "Slot", "Vanilla"];
+            string path = GetType().Namespace + "/Assets/";
+            foreach (string file in files)
+            {
+                extraAssets[file] = T2D(path + file);
+            }
+        }
+        public override void PostSetupContent()
+        {
+            RUIManager.Ins.ExtraDrawOver += SLUI.ExtraDrawInfo;
         }
     }
 }
