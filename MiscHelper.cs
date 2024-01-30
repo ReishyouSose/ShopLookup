@@ -1,6 +1,9 @@
 ﻿global using Microsoft.Xna.Framework;
 global using Microsoft.Xna.Framework.Graphics;
 global using ReLogic.Graphics;
+global using RUIModule.RUIElements;
+global using RUIModule.RUISys;
+global using ShopLookup.Content.UI;
 global using System;
 global using System.Collections.Generic;
 global using System.Reflection;
@@ -12,8 +15,7 @@ global using Terraria.ID;
 global using Terraria.Localization;
 global using Terraria.ModLoader;
 global using static ShopLookup.MiscHelper;
-using RUIModule.RUISys;
-using ShopLookup.Content.UI;
+
 
 namespace ShopLookup
 {

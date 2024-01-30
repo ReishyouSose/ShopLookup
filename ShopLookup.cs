@@ -1,4 +1,3 @@
-using RUIModule.RUISys;
 using ShopLookup.Content.Sys;
 
 namespace ShopLookup
@@ -24,6 +23,7 @@ namespace ShopLookup
         public override void PostSetupContent()
         {
             RUIManager.Ins.ExtraDrawOver += SLUI.ExtraDrawInfo;
+            ShopNPCData.ReflectCurrency();
         }
     }
 }

@@ -1,6 +1,4 @@
 ﻿using RUIModule;
-using RUIModule.RUIElements;
-using RUIModule.RUISys;
 using static ShopLookup.Content.Sys.ShopNPCData;
 
 namespace ShopLookup.Content.UI.ExtraUI
@@ -9,7 +7,7 @@ namespace ShopLookup.Content.UI.ExtraUI
     {
         public int npcType;
         private readonly Texture2D head;
-        public UINPCSlot(int npcType, Mod mod, Vector2? size = null, Color? color = null) : base(AssetLoader.ExtraAssets["Slot"], size, color)
+        public UINPCSlot(int npcType, Mod mod, Vector2? size = null, Color? color = null) : base(AssetLoader.Slot, size, color)
         {
             this.npcType = npcType;
             Main.instance.LoadNPC(npcType);

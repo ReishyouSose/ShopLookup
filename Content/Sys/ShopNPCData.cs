@@ -5,23 +5,21 @@ namespace ShopLookup.Content.Sys;
 
 internal static class ShopNPCData
 {
+    internal static Mod FakeMod { get; private set; }
     internal static Dictionary<int, Mod> ModID { get; private set; }
     internal static Dictionary<Mod, HashSet<int>> ModNPCs { get; private set; }
-    internal static Dictionary<int, string> HasShopNPCs { get; private set; }
     internal static Dictionary<int, Texture2D> NPCHeads { get; private set; }
+    internal static Dictionary<int, Dictionary<int, int>> Currencys { get; private set; }
     internal static HashSet<Entry> Pylons { get; private set; }
-    internal static Mod FakeMod { get; private set; }
     internal static void Load()
     {
         FakeMod = new();
         ModID = new();
         ModNPCs = new();
-        HasShopNPCs = new();
         NPCHeads = new();
         foreach (AbstractNPCShop shop in NPCShopDatabase.AllShops)
         {
             int type = shop.NpcType;
-            HasShopNPCs.TryAdd(type, NPCID.Search.GetName(type));
             ModNPC mn = ContentSamples.NpcsByNetId[type].ModNPC;
             Mod mod = mn?.Mod ?? FakeMod;
             if (!ModID.ContainsValue(mod))
@@ -58,5 +56,21 @@ internal static class ShopNPCData
             }
         }
         return null;
+    }
+    internal static void ReflectCurrency()
+    {
+        Currencys = new();
+        Type target = typeof(CustomCurrencyManager);
+        var info = target.GetField("_currencies", BindingFlags.Static | BindingFlags.NonPublic);
+        var currencies = info.GetValue(target) as Dictionary<int, CustomCurrencySystem>;
+        foreach (var (id, currencys) in currencies)
+        {
+            target = currencys.GetType();
+            info = target.GetField("_valuePerUnit", BindingFlags.Instance | BindingFlags.NonPublic);
+            var values = info.GetValue(target) as Dictionary<int, int>;
+            var list = values.ToList();
+            list.Sort((x, y) => y.Value.CompareTo(x.Value));
+            Currencys[id] = list.ToDictionary(x => x.Key, y => y.Value);
+        }
     }
 }
