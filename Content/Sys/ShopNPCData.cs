@@ -24,7 +24,10 @@ internal static class ShopNPCData
             HasShopNPCs.TryAdd(type, NPCID.Search.GetName(type));
             ModNPC mn = ContentSamples.NpcsByNetId[type].ModNPC;
             Mod mod = mn?.Mod ?? FakeMod;
-            ModID.TryAdd(ModID.Count, mod);
+            if (!ModID.ContainsValue(mod))
+            {
+                ModID.Add(ModID.Count, mod);
+            }
             ModNPCs.TryAdd(mod, new());
             var npcList = ModNPCs[mod];
             if (!npcList.Contains(type)) npcList.Add(type);

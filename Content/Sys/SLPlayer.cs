@@ -16,7 +16,12 @@ namespace ShopLookup.Content.Sys
         }
         public override void ProcessTriggers(TriggersSet triggersSet)
         {
-            if (Check.JustPressed) SLUI.Info.IsVisible = !SLUI.Info.IsVisible;
+            if (Check.JustPressed)
+            {
+                SLUI.OnInitialization();
+                SLUI.Info.IsVisible = true;
+                //SLUI.Info.IsVisible = !SLUI.Info.IsVisible;
+            }
         }
     }
 }

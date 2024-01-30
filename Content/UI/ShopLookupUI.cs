@@ -12,6 +12,7 @@ public class ShopLookupUI : ContainerElement
     public override void OnInitialization()
     {
         base.OnInitialization();
+        RemoveAll();
 
         UIPanel bg = new(500, 360);
         bg.SetCenter(0, 0, 0.5f, 0.5f);
@@ -20,15 +21,13 @@ public class ShopLookupUI : ContainerElement
         Register(bg);
 
         npcs = new();
-        npcs.SetSize(-144, 52, 1);
+        npcs.SetSize(-144, 72, 1);
         npcs.SetPos(72, 0);
         npcs.Info.SetMargin(0);
         bg.Register(npcs);
 
-        HorizontalScrollbar hscroll = new(62, false);
-        hscroll.SetPos(72, 62);
-        npcs.SetHorizontalScrollbar(hscroll);
-        bg.Register(hscroll);
+        HorizontalScrollbar Hscroll = new(62);
+        npcs.SetHorizontalScrollbar(Hscroll);
 
         UIImage filter = new(ExtraAssets["Slot"]);
         filter.SetPos(-52, 0, 1);
@@ -51,8 +50,8 @@ public class ShopLookupUI : ContainerElement
             if (modIndex < 0) modIndex = count - 1;
         }
         else modIndex = ++modIndex % count;
-        filter.hoverText = $"[{modIndex + 1}/{count}]" + "\n" +
-             GTV("Filter", modIndex == 0 ? "All" : ModID[modIndex - 1].DisplayName) + "\n" + GTV("Switch");
+        filter.hoverText = $"[{modIndex + 1}/{count}]" + "\n" + GTV("Filter",
+            modIndex == 0 ? "All" : ModID[modIndex - 1].DisplayName ?? "Terraria") + "\n" + GTV("Switch");
         ReLoadNPCView();
     }
     public void ReLoadNPCView()
@@ -65,9 +64,9 @@ public class ShopLookupUI : ContainerElement
             {
                 foreach (int type in mnpcs)
                 {
-                    UINPCSlot slot = new(type, mod);
-                    slot.SetPos(x, 0);
-                    npcs.AddElement(slot);
+                    UINPCSlot Hslot = new(type, mod);
+                    Hslot.SetPos(x, 0);
+                    npcs.AddElement(Hslot);
                     x += 62;
                 }
             }
@@ -77,9 +76,9 @@ public class ShopLookupUI : ContainerElement
             Mod mod = ModID[modIndex - 1];
             foreach (int type in ModNPCs[mod])
             {
-                UINPCSlot slot = new(type, mod);
-                slot.SetPos(x, 0);
-                npcs.AddElement(slot);
+                UINPCSlot Hslot = new(type, mod);
+                Hslot.SetPos(x, 0);
+                npcs.AddElement(Hslot);
                 x += 62;
             }
         }

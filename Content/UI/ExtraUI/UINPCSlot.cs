@@ -12,8 +12,10 @@ namespace ShopLookup.Content.UI.ExtraUI
         public UINPCSlot(int npcType, Mod mod, Vector2? size = null, Color? color = null) : base(AssetLoader.ExtraAssets["Slot"], size, color)
         {
             this.npcType = npcType;
+            Main.instance.LoadNPC(npcType);
             head = NPCHeads[npcType];
-            hoverText = NPCID.Search.GetName(npcType) + "\n" + GTV("Source", mod?.DisplayName ?? "Terraria");
+            hoverText = ContentSamples.NpcsByNetId[npcType].TypeName + "\n" +
+                GTV("Source", " " + (mod.DisplayName ?? "Terraria"));
         }
         public override void DrawSelf(SpriteBatch sb)
         {
