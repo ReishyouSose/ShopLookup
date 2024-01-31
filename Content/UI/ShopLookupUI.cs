@@ -8,9 +8,22 @@ namespace ShopLookup.Content.UI;
 public class ShopLookupUI : ContainerElement
 {
     private int modIndex;
-    private UIContainerPanel npcs;
+    private UIContainerPanel[] views;
+    private UIContainerPanel View_NPC => views[0];
+    /// <summary>
+    /// NPC商店索引
+    /// </summary>
+    private UIContainerPanel View_Index => views[1];
+    /// <summary>
+    /// NPC商店视图
+    /// </summary>
+    private UIContainerPanel View_Item => views[2];
+    /// <summary>
+    /// 用于非NPC商店
+    /// </summary>
+    private UIContainerPanel View_Shop => views[3];
+    private UIItemSlot focusItem;
     private List<string> tempIndex;
-    private UIBottom area;
     public override void OnInitialization()
     {
         base.OnInitialization();
@@ -24,15 +37,47 @@ public class ShopLookupUI : ContainerElement
         bg.canDrag = true;
         Register(bg);
 
-        npcs = new();
-        npcs.SetSize(-144, 72, 1);
-        npcs.SetPos(72, 0);
-        npcs.Info.SetMargin(0);
-        bg.Register(npcs);
+        focusItem = new();
+        bg.Register(focusItem);
 
-        HorizontalScrollbar scroll = new(62);
-        scroll.Info.Top.Pixel += 3;
-        npcs.SetHorizontalScrollbar(scroll);
+        views = [new(), new(), new(), new()];
+
+        View_NPC.SetSize(-144, 72, 1);
+        View_NPC.SetPos(72, 0);
+        View_NPC.DrawRec[0] = Color.Black;
+        bg.Register(View_NPC);
+
+        HorizontalScrollbar npcScroll = new(62);
+        npcScroll.Info.Top.Pixel += 3;
+        View_NPC.SetHorizontalScrollbar(npcScroll);
+
+        View_Index.SetSize(0, 30, 1);
+        View_Index.SetPos(0, 72);
+        View_Index.DrawRec[0] = Color.Red;
+        View_Index.Info.IsVisible = false;
+        bg.Register(View_Index);
+
+        HorizontalScrollbar indexScroll = new(62);
+        indexScroll.Info.Top.Pixel += 3;
+        View_Index.SetHorizontalScrollbar(indexScroll);
+
+        View_Item.SetSize(0, -112, 1, 1);
+        View_Item.SetPos(0, 102);
+        View_Item.DrawRec[0] = Color.Red;
+        View_Item.Info.IsVisible = false;
+        bg.Register(View_Item);
+
+        VerticalScrollbar shopScroll = new(80);
+        View_Item.SetVerticalScrollbar(shopScroll);
+
+        View_Shop.SetSize(0, -82, 1, 1);
+        View_Shop.SetPos(0, 82);
+        View_Shop.Info.IsVisible = false;
+        View_Shop.DrawRec[0] = Color.Red;
+        bg.Register(View_Shop);
+
+        VerticalScrollbar itemScroll = new(80);
+        View_Shop.SetVerticalScrollbar(itemScroll);
 
         UIImage filter = new(ExtraAssets["Slot"]);
         filter.SetPos(-52, 0, 1);
@@ -44,11 +89,6 @@ public class ShopLookupUI : ContainerElement
         UIAdjust adjust = new(null);
         adjust.SetPos(0, 0, 1, 1);
         bg.Register(adjust);
-
-        area = new(0, -72, 1, 1);
-        area.SetPos(0, 72);
-        area.DrawRec[0] = Color.Red;
-        bg.Register(area);
     }
     public override void Update(GameTime gt)
     {
@@ -70,31 +110,17 @@ public class ShopLookupUI : ContainerElement
     }
     public void ReLoadNPCView()
     {
-        npcs.ClearAllElements();
+        View_NPC.ClearAllElements();
+        List<Mod> mods = modIndex == 0 ? ModNPCs.Keys.ToList() : [ModID[modIndex - 1]];
         int x = 0;
-        if (modIndex == 0)
+        foreach (var mod in mods)
         {
-            foreach (var (mod, mnpcs) in ModNPCs)
-            {
-                foreach (int type in mnpcs)
-                {
-                    UINPCSlot slot = new(type, mod);
-                    slot.SetPos(x, 0);
-                    slot.Events.OnLeftDown += evt => { int t = type; ChangeShopView_NPC(t); };
-                    slot.Events.OnRightDown += evt => { int t = type; ChangeShopView_NPC(t); };
-                    npcs.AddElement(slot);
-                    x += 62;
-                }
-            }
-        }
-        else
-        {
-            Mod mod = ModID[modIndex - 1];
             foreach (int type in ModNPCs[mod])
             {
-                UINPCSlot Hslot = new(type, mod);
-                Hslot.SetPos(x, 0);
-                npcs.AddElement(Hslot);
+                UINPCSlot slot = new(type, mod);
+                slot.SetPos(x, 0);
+                slot.Events.OnLeftDown += evt => ChangeShopView_NPC(slot.npcType);
+                View_NPC.AddElement(slot);
                 x += 62;
             }
         }
@@ -102,15 +128,8 @@ public class ShopLookupUI : ContainerElement
     private void ChangeShopView_NPC(int type)
     {
         tempIndex.Clear();
-        area.RemoveAll();
-
-        UIContainerPanel indexView = new();
-        indexView.SetSize(0, 30, 1);
-        area.Register(indexView);
-
-        HorizontalScrollbar scroll = new();
-        scroll.Info.Top.Pixel += 3;
-
+        SwitchView(true);
+        int i = 0;
         int x = 0;
         foreach (AbstractNPCShop shop in NPCShopDatabase.AllShops)
         {
@@ -119,6 +138,11 @@ public class ShopLookupUI : ContainerElement
                 tempIndex.Add(shop.FullName);
                 UIText name = new(shop.Name, drawStyle: 0);
                 name.SetPos(x, 0);
+                name.SetSize(name.TextSize);
+                name.Events.OnLeftDown += uie => LookupNPC(uie.id);
+                View_Index.AddElement(name);
+                x += name.Width + 10;
+                i++;
             }
         }
         LookupNPC(0);
@@ -127,16 +151,38 @@ public class ShopLookupUI : ContainerElement
     {
         if (NPCShopDatabase.TryGetNPCShop(tempIndex[index], out AbstractNPCShop shop))
         {
+            View_Item.ClearAllElements();
             int count = shop.ActiveEntries.Count();
             int y = 0;
             foreach (AbstractNPCShop.Entry entry in shop.ActiveEntries)
             {
-                y++;
+                UIShopSlot slot = new(entry);
+                slot.SetPos(0, y);
+                slot.DrawRec[0] = Color.White;
+                View_Item.AddElement(slot);
+                y += 110;
             }
+        }
+    }
+    private void SwitchView(bool npc)
+    {
+        View_Index.ClearAllElements();
+        View_Item.ClearAllElements();
+        View_Shop.ClearAllElements();
+        if (npc)
+        {
+            View_Index.Info.IsVisible = true;
+            View_Item.Info.IsVisible = true;
+            View_Shop.Info.IsVisible = false;
+        }
+        else
+        {
+            View_Index.Info.IsVisible = false;
+            View_Item.Info.IsVisible = false;
+            View_Shop.Info.IsVisible = true;
         }
     }
     public void ExtraDrawInfo(SpriteBatch sb)
     {
-
     }
 }

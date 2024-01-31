@@ -59,15 +59,19 @@ internal static class ShopNPCData
     }
     internal static void ReflectCurrency()
     {
-        Currencys = new();
-        Type target = typeof(CustomCurrencyManager);
-        var info = target.GetField("_currencies", BindingFlags.Static | BindingFlags.NonPublic);
-        var currencies = info.GetValue(target) as Dictionary<int, CustomCurrencySystem>;
+        Currencys = new() { { -1, new() } };
+        int v = 1000000;
+        for (int i = 74; i >= 71; i--)
+        {
+            Currencys[-1].Add(i, v);
+            v /= 100;
+        }
+        var info = typeof(CustomCurrencyManager).GetField("_currencies", BindingFlags.Static | BindingFlags.NonPublic);
+        var currencies = info.GetValue(null) as Dictionary<int, CustomCurrencySystem>;
         foreach (var (id, currencys) in currencies)
         {
-            target = currencys.GetType();
-            info = target.GetField("_valuePerUnit", BindingFlags.Instance | BindingFlags.NonPublic);
-            var values = info.GetValue(target) as Dictionary<int, int>;
+            info = currencys.GetType().GetField("_valuePerUnit", BindingFlags.Instance | BindingFlags.NonPublic);
+            var values = info.GetValue(currencys) as Dictionary<int, int>;
             var list = values.ToList();
             list.Sort((x, y) => y.Value.CompareTo(x.Value));
             Currencys[id] = list.ToDictionary(x => x.Key, y => y.Value);
