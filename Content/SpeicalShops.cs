@@ -64,11 +64,18 @@
             NPCShop shop = new NPCShop(-1)
                 .Add(361, Item.buyPrice(0, 5))//哥布林战旗
                 .Add(4271, Item.buyPrice(0, 1))//血泪
+                .Add(3124, Item.buyPrice(0, 12))//手机
+                .Add(ItemID.FallenStar, Item.buyPrice(0, 0, 3))
                 .Add(2674, Item.buyPrice(0, 0, 3))//三种鱼饵
                 .Add(2675, Item.buyPrice(0, 0, 5))
                 .Add(2676, Item.buyPrice(0, 0, 15))
-                .Add(3124, Item.buyPrice(0, 12))//手机
-                .Add(ItemID.FallenStar, Item.buyPrice(0, 0, 3))
+                .Add(2422, Condition.Hardmode)//熔岩钓竿
+                .Add(2294)//金鱼竿
+                .Add(2373)//渔夫饰品
+                .Add(2374)
+                .Add(2375)
+                .Add(4881, Condition.DownedEowOrBoc)
+                .Add(3183)//金虫网
                 .Add(275, Item.buyPrice(0, 0, 5), Condition.InBeach)//珊瑚
                 .Add(5, Item.buyPrice(0, 0, 3), Condition.InShoppingZoneForest)//四种蘑菇
                 .Add(2887, Item.buyPrice(0, 0, 0, 50), Condition.InCrimson)
@@ -77,7 +84,8 @@
                 .Add(4361, Item.buyPrice(0, 1), Condition.InShoppingZoneForest)//瓢虫
                 .Add(ItemID.TargetDummy, Item.buyPrice(0, 0, 10))
                 .Add(2673, Item.buyPrice(0, 20), Condition.InGlowshroom, Condition.Hardmode)//松露虫
-                .Add(4961, Item.buyPrice(0, 10), Condition.InHallow, Condition.TimeNight)/*七彩草蛉*/;
+                .Add(4961, Item.buyPrice(0, 10), Condition.InHallow, Condition.TimeNight)/*七彩草蛉*/
+                .Add(ItemID.TerrasparkBoots, Condition.DownedGoblinArmy);
             count = shop.ActiveEntries.Count();
             return shop.ActiveEntries;
         }
