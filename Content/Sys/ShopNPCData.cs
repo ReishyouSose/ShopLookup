@@ -1,5 +1,4 @@
 ﻿using System.Linq;
-using static Terraria.ModLoader.NPCShop;
 
 namespace ShopLookup.Content.Sys;
 
@@ -7,16 +6,30 @@ internal static class ShopNPCData
 {
     internal static Mod FakeMod { get; private set; }
     internal static Dictionary<int, Mod> ModID { get; private set; }
+    internal static Dictionary<int, Texture2D> ModIcon { get; private set; }
     internal static Dictionary<Mod, HashSet<int>> ModNPCs { get; private set; }
     internal static Dictionary<int, Texture2D> NPCHeads { get; private set; }
     internal static Dictionary<int, Dictionary<int, int>> Currencys { get; private set; }
-    internal static HashSet<Entry> Pylons { get; private set; }
+    internal static HashSet<int> Pylons { get; private set; }
     internal static void Load()
     {
         FakeMod = new();
-        ModID = new();
-        ModNPCs = new();
-        NPCHeads = new();
+        ModID = [];
+        ModIcon = [];
+        ModNPCs = [];
+        NPCHeads = [];
+        static Texture2D GetModIcon(Mod mod)
+        {
+            if (mod == FakeMod)
+            {
+                return AssetLoader.ExtraAssets["Vanilla"];
+            }
+            if (mod.HasAsset("icon_small"))
+            {
+                return T2D(mod.Name + "/icon_small");
+            }
+            return null;
+        }
         foreach (AbstractNPCShop shop in NPCShopDatabase.AllShops)
         {
             int type = shop.NpcType;
@@ -25,15 +38,15 @@ internal static class ShopNPCData
             if (!ModID.ContainsValue(mod))
             {
                 ModID.Add(ModID.Count, mod);
+                ModIcon.Add(ModIcon.Count, GetModIcon(mod));
             }
-            ModNPCs.TryAdd(mod, new());
+            ModNPCs.TryAdd(mod, []);
             var npcList = ModNPCs[mod];
             if (!npcList.Contains(type)) npcList.Add(type);
             NPCHeads.TryAdd(type, RequestNPCHead(type, mn, mod));
         }
-        Pylons = NPCShopDatabase.GetPylonEntries().ToHashSet();
+        Pylons = NPCShopDatabase.GetPylonEntries().Select(x => x.Item.type).ToHashSet();
     }
-    private const string _Head = "_Head";
     private static Texture2D RequestNPCHead(int type, ModNPC mn, Mod mod)
     {
         int headIndex = NPC.TypeToDefaultHeadIndex(type);
@@ -44,6 +57,7 @@ internal static class ShopNPCData
         if (mn != null)
         {
             string modFolder = mod.Name + "/";
+            string _Head = "_Head";
             string path = mn.Texture + _Head;
             if (mod.HasAsset(path.Replace(modFolder, "")))
             {
@@ -75,6 +89,10 @@ internal static class ShopNPCData
             var list = values.ToList();
             list.Sort((x, y) => y.Value.CompareTo(x.Value));
             Currencys[id] = list.ToDictionary(x => x.Key, y => y.Value);
+            foreach (int itemid in Currencys[id].Keys)
+            {
+                Main.instance.LoadItem(itemid);
+            }
         }
     }
 }

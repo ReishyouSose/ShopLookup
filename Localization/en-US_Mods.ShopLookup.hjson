@@ -11,15 +11,17 @@ Vanilla: Terraria
 Index: Index
 Filter: Mod Filer: {0}
 Switch: Left or Right click to switch
-NoEnough: You don't have enough currency
+CantAfford: You don't have enough currency
 NoActive: No corresponding NPC visit in the world
-CantBuy: Purchase conditions not met
+NoMet: Purchase conditions not met
 NoIcon: This mod doesn't have a icon_small pngfile
 Travel: Need two town NPCs in the world
 NonPermanent: Non-Permanent NPC
 NoSpawn: Not fulfill the spawn conditions of this Non-Permanent NPC
 UnknowCds: Unknown condition, ignore can be enabled in ModConfig
 EmptyShop: Empty shop
+SellPrice: Sell Price
+NoSavings: None
 
 SpecialShop: {
 	Label: SpeicalShop

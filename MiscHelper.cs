@@ -152,8 +152,8 @@ namespace ShopLookup
         /// <returns>从左到右从上到下的裁剪</returns>
         public static Rectangle[] Rec3x3(int w, int h, int offset = 2)
         {
-            return new Rectangle[9]
-            {
+            return
+            [
                 new(0, 0, w, h),
                 new(w + offset, 0, w, h),
                 new((w + offset) * 2, 0, w, h),
@@ -163,7 +163,7 @@ namespace ShopLookup
                 new(0, (h + offset) * 2, w, h),
                 new(w, (h + offset) * 2, w, h),
                 new((w + offset) * 2, (h + offset) * 2, w, h),
-            };
+            ];
         }
         public static Color SetAlpha(this Color c, byte alpha)
         {
@@ -282,5 +282,15 @@ namespace ShopLookup
         public static Vector2 ScrResolution => new(Main.screenWidth, Main.screenHeight);
         private static readonly string SLUIKey = typeof(ShopLookupUI).FullName;
         public static ShopLookupUI SLUI => RUIManager.UIEs[SLUIKey] as ShopLookupUI;
+        public static string ItemText(int id, int stack = 1, int prefix = 0)
+        {
+            string text = "[i";
+            if (stack > 1) text += "/s" + stack;
+            if (prefix > 0) text += "/p" + prefix;
+            return text + ":" + id + "]";
+        }
+        public static readonly Color G = new(0, 230, 100, 255);
+        public static readonly Color R = new(255, 50, 100, 255);
+        public static readonly Color Y = new(255, 165, 0, 255);
     }
 }

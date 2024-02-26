@@ -20,6 +20,7 @@ namespace ShopLookup.Content.Sys
             {
                 SLUI.OnInitialization();
                 SLUI.Info.IsVisible = true;
+                SLUI.Calculation();
                 //SLUI.Info.IsVisible = !SLUI.Info.IsVisible;
             }
         }

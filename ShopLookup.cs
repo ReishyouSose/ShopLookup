@@ -19,6 +19,7 @@ namespace ShopLookup
             {
                 extraAssets[file] = T2D(path + file);
             }
+            AssetLoader.edgeBlur = ModContent.Request<Effect>("ShopLookup/Assets/EdgeBlur", ReLogic.Content.AssetRequestMode.ImmediateLoad).Value;
         }
         public override void PostSetupContent()
         {

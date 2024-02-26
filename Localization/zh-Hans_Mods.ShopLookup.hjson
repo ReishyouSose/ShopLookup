@@ -11,15 +11,17 @@ Vanilla: 原版
 Index: 索引
 Filter: 模组筛选：{0}
 Switch: 左击或右击以切换
-NoEnough: 你没有足够的货币
+CantAfford: 你没有足够的货币
 NoActive: 世界中没有对应NPC到访
-CantBuy: 有未达成的购买条件
+NoMet: 有未达成的购买条件
 NoIcon: 这个Mod没有icon_small贴图文件
 Travel: 需要世界上有两个城镇NPC
 NonPermanent: 非常驻NPC
 NoSpawn: 不满足这个非常驻NPC的生成条件
 UnknowCds: 未知条件，可在设置中启用忽略
 EmptyShop: 空商店
+SellPrice: 售价
+NoSavings: 无
 
 SpecialShop: {
 	Label: 特殊商店

@@ -17,11 +17,11 @@ public class ShopLookupUI : ContainerElement
     /// <summary>
     /// NPC商店视图
     /// </summary>
-    private UIContainerPanel View_Item => views[2];
+    private UIContainerPanel View_Shop => views[2];
     /// <summary>
-    /// 用于非NPC商店
+    /// 物品查询和特殊商店
     /// </summary>
-    private UIContainerPanel View_Shop => views[3];
+    private UIContainerPanel View_Item => views[3];
     private UIItemSlot focusItem;
     private List<string> tempIndex;
     public override void OnInitialization()
@@ -29,7 +29,7 @@ public class ShopLookupUI : ContainerElement
         base.OnInitialization();
         RemoveAll();
 
-        tempIndex = new();
+        tempIndex = [];
 
         UIPanel bg = new(500, 360);
         bg.SetCenter(0, 0, 0.5f, 0.5f);
@@ -42,42 +42,66 @@ public class ShopLookupUI : ContainerElement
 
         views = [new(), new(), new(), new()];
 
+        UIImage npcLine = new(TextureAssets.MagicPixel.Value);
+        npcLine.SetSize(-40, 2, 1);
+        npcLine.SetPos(20, 68);
+        bg.Register(npcLine);
+
         View_NPC.SetSize(-144, 72, 1);
         View_NPC.SetPos(72, 0);
-        View_NPC.DrawRec[0] = Color.Black;
+        View_NPC.SetEdgeBlur(1, 20, 0);
+        //View_NPC.DrawRec[0] = Color.Black;
         bg.Register(View_NPC);
 
         HorizontalScrollbar npcScroll = new(62);
         npcScroll.Info.Top.Pixel += 3;
         View_NPC.SetHorizontalScrollbar(npcScroll);
 
-        View_Index.SetSize(0, 30, 1);
-        View_Index.SetPos(0, 72);
-        View_Index.DrawRec[0] = Color.Red;
+        UIImage indexLine = new(TextureAssets.MagicPixel.Value);
+        indexLine.SetSize(-40, 2, 1);
+        indexLine.SetPos(20, 101);
+        bg.Register(indexLine);
+
+        UIText index = new(GTV("Index"), drawStyle: 1);
+        index.SetSize(52, 30);
+        index.SetPos(0, 72);
+        index.Events.OnMouseOver += evt => index.color = Color.Gold;
+        index.Events.OnMouseOut += evt => index.color = Color.White;
+        bg.Register(index);
+
+        View_Index.SetSize(-144, 40, 1);
+        View_Index.SetPos(72, 72);
+        //View_Index.DrawRec[0] = Color.Red;
         View_Index.Info.IsVisible = false;
         bg.Register(View_Index);
 
         HorizontalScrollbar indexScroll = new(62);
-        indexScroll.Info.Top.Pixel += 3;
+        indexScroll.Info.Top.Pixel += 5;
         View_Index.SetHorizontalScrollbar(indexScroll);
 
-        View_Item.SetSize(0, -112, 1, 1);
-        View_Item.SetPos(0, 102);
-        View_Item.DrawRec[0] = Color.Red;
-        View_Item.Info.IsVisible = false;
-        bg.Register(View_Item);
-
-        VerticalScrollbar shopScroll = new(80);
-        View_Item.SetVerticalScrollbar(shopScroll);
-
-        View_Shop.SetSize(0, -82, 1, 1);
-        View_Shop.SetPos(0, 82);
+        View_Shop.SetSize(0, -112, 1, 1);
+        View_Shop.SetPos(0, 112);
+        //View_Item.DrawRec[0] = Color.Red;
         View_Shop.Info.IsVisible = false;
-        View_Shop.DrawRec[0] = Color.Red;
+        View_Shop.autoPos[0] = true;
+        View_Shop.SetEdgeBlur(0, 0, 20);
         bg.Register(View_Shop);
 
+        VerticalScrollbar shopScroll = new(80);
+        shopScroll.Info.Left.Pixel += 8;
+        View_Shop.SetVerticalScrollbar(shopScroll);
+
+        View_Item.SetSize(0, -72, 1, 1);
+        View_Item.SetPos(0, 82);
+        View_Item.Info.IsVisible = false;
+        //View_Shop.DrawRec[0] = Color.Red;
+        View_Item.autoPos[0] = true;
+        View_Item.SetEdgeBlur(0, 0, 20);
+        bg.Register(View_Item);
+
         VerticalScrollbar itemScroll = new(80);
-        View_Shop.SetVerticalScrollbar(itemScroll);
+        itemScroll.Info.Left.Pixel += 8;
+        View_Item.SetVerticalScrollbar(itemScroll);
 
         UIImage filter = new(ExtraAssets["Slot"]);
         filter.SetPos(-52, 0, 1);
@@ -94,7 +118,6 @@ public class ShopLookupUI : ContainerElement
     {
         base.Update(gt);
     }
-
     private void SwitchMod(BaseUIElement filter, bool reverse)
     {
         int count = ModID.Count + 1;
@@ -111,7 +134,7 @@ public class ShopLookupUI : ContainerElement
     public void ReLoadNPCView()
     {
         View_NPC.ClearAllElements();
-        List<Mod> mods = modIndex == 0 ? ModNPCs.Keys.ToList() : [ModID[modIndex - 1]];
+        List<Mod> mods = modIndex == 0 ? [.. ModNPCs.Keys] : [ModID[modIndex - 1]];
         int x = 0;
         foreach (var mod in mods)
         {
@@ -136,12 +159,15 @@ public class ShopLookupUI : ContainerElement
             if (shop.NpcType == type)
             {
                 tempIndex.Add(shop.FullName);
-                UIText name = new(shop.Name, drawStyle: 0);
-                name.SetPos(x, 0);
-                name.SetSize(name.TextSize);
-                name.Events.OnLeftDown += uie => LookupNPC(uie.id);
+                UIText name = new(shop.Name);
+                name.SetPos(x + 2, 0);
+                name.SetSize(name.TextSize + Vector2.UnitX * 2);
+                var evt = name.Events;
+                evt.OnLeftDown += uie => LookupNPC(uie.id);
+                evt.OnMouseOver += uie => name.color = Color.Gold;
+                evt.OnMouseOut += uie => name.color = Color.White;
                 View_Index.AddElement(name);
-                x += name.Width + 10;
+                x += name.Width + 20;
                 i++;
             }
         }
@@ -151,35 +177,35 @@ public class ShopLookupUI : ContainerElement
     {
         if (NPCShopDatabase.TryGetNPCShop(tempIndex[index], out AbstractNPCShop shop))
         {
-            View_Item.ClearAllElements();
-            int count = shop.ActiveEntries.Count();
-            int y = 0;
-            foreach (AbstractNPCShop.Entry entry in shop.ActiveEntries)
+            View_Shop.ClearAllElements();
+            var entrys = shop.ActiveEntries.Where(x => !Pylons.Contains(x.Item.type) && x.Item.type > ItemID.None);
+            int count = entrys.Count(), i = 0, y = 0;
+            foreach (AbstractNPCShop.Entry entry in entrys)
             {
-                UIShopSlot slot = new(entry);
+                UIShopSlot slot = new(entry, shop.NpcType, ++i == count);
                 slot.SetPos(0, y);
-                slot.DrawRec[0] = Color.White;
-                View_Item.AddElement(slot);
-                y += 110;
+                //slot.DrawRec[0] = Color.White;
+                View_Shop.AddElement(slot);
+                y += slot.Height;
             }
         }
     }
     private void SwitchView(bool npc)
     {
         View_Index.ClearAllElements();
-        View_Item.ClearAllElements();
         View_Shop.ClearAllElements();
+        View_Item.ClearAllElements();
         if (npc)
         {
             View_Index.Info.IsVisible = true;
-            View_Item.Info.IsVisible = true;
-            View_Shop.Info.IsVisible = false;
+            View_Shop.Info.IsVisible = true;
+            View_Item.Info.IsVisible = false;
         }
         else
         {
             View_Index.Info.IsVisible = false;
-            View_Item.Info.IsVisible = false;
-            View_Shop.Info.IsVisible = true;
+            View_Shop.Info.IsVisible = false;
+            View_Item.Info.IsVisible = true;
         }
     }
     public void ExtraDrawInfo(SpriteBatch sb)
