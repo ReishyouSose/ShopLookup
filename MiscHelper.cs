@@ -281,7 +281,7 @@ namespace ShopLookup
         public static string GTV(string key, params string[] obj) => Language.GetText(LocalKey + key).WithFormatArgs(obj).Value;
         public static Vector2 ScrResolution => new(Main.screenWidth, Main.screenHeight);
         private static readonly string SLUIKey = typeof(ShopLookupUI).FullName;
-        public static ShopLookupUI SLUI => RUIManager.UIEs[SLUIKey] as ShopLookupUI;
+        public static ReBuild SLUI => RUIManager.UIEs[typeof(ReBuild).FullName] as ReBuild;
         public static string ItemText(int id, int stack = 1, int prefix = 0)
         {
             string text = "[i";

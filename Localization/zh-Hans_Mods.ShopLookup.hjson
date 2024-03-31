@@ -8,7 +8,7 @@ Keybinds: {
 
 Source: 来自{0}
 Vanilla: 原版
-Index: 索引
+Index: 索引 |
 Filter: 模组筛选：{0}
 Switch: 左击或右击以切换
 CantAfford: 你没有足够的货币
@@ -22,6 +22,17 @@ UnknowCds: 未知条件，可在设置中启用忽略
 EmptyShop: 空商店
 SellPrice: 售价
 NoSavings: 无
+SearchNPC: 搜索
+Navigate: 右键导航到商店
+
+UIButton: {
+	Adjust:
+		'''
+		按住鼠标
+		拖动到面板外以调整大小
+		'''
+	Move: 按住以拖动面板
+}
 
 SpecialShop: {
 	Label: 特殊商店

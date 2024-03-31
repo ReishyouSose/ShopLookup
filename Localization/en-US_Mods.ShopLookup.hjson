@@ -8,7 +8,7 @@ Keybinds: {
 
 Source: From {0}
 Vanilla: Terraria
-Index: Index
+Index: Index |
 Filter: Mod Filer: {0}
 Switch: Left or Right click to switch
 CantAfford: You don't have enough currency
@@ -20,8 +20,19 @@ NonPermanent: Non-Permanent NPC
 NoSpawn: Not fulfill the spawn conditions of this Non-Permanent NPC
 UnknowCds: Unknown condition, ignore can be enabled in ModConfig
 EmptyShop: Empty shop
-SellPrice: Sell Price
+SellPrice: Price
 NoSavings: None
+SearchNPC: Search
+Navigate: Right click navigate to shop
+
+UIButton: {
+	Adjust:
+		'''
+		Hold down the mouse
+		and drag outside the panel to resize
+		'''
+	Move: Hold down the mouse to drag the panel
+}
 
 SpecialShop: {
 	Label: SpeicalShop

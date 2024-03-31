@@ -1,4 +1,4 @@
-﻿using ShopLookup.Content.Sys;
+﻿using ShopLookup.Content.Data;
 using System.Linq;
 using Terraria.UI.Chat;
 
@@ -35,7 +35,7 @@ public class UICurrency : BaseUIElement
         color = Color.White;
         values = [];
         float i = 0;
-        float offsetX = FontAssets.MouseText.Value.MeasureString(GTV("SellPrice")).X + 10;
+        float offsetX = FontAssets.MouseText.Value.MeasureString(GTV("SellPrice")).X + 5;
         foreach (var (itemID, rank) in ShopNPCData.Currencys[currencyID])
         {
             int stack = value / rank;
@@ -46,7 +46,7 @@ public class UICurrency : BaseUIElement
                 //c.DrawRec[0] = Color.Red;
                 c.SetPos(offsetX + i, 0);
                 Register(c);
-                i += 26;
+                i += 20;
                 //valueText += $"[i/s{stack}:{itemID}]";
             }
             value %= rank;
@@ -90,7 +90,7 @@ public class UICurrency : BaseUIElement
         color = count >= value ? G : R;
         if (Blink) color = BlinkColor;
         Vector2 pos = hasCrc.HitBox().TopLeft();
-        TextSnippet[] savings = [new(" / "), new(Lang.inter[66].Value, color), new(" ")];
+        TextSnippet[] savings = [new("/"), new(Lang.inter[66].Value, color), new(" ")];
         ChatManager.DrawColorCodedStringWithShadow(sb, font, savings, pos, 0, Vector2.Zero, Vector2.One, out _, -1, 1.5f);
         pos.X += ChatManager.GetStringSize(font, savings, Vector2.One).X;
         if (count == 0)

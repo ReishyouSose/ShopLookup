@@ -1,6 +1,6 @@
 ﻿using System.Linq;
 
-namespace ShopLookup.Content.Sys;
+namespace ShopLookup.Content.Data;
 
 internal static class ShopNPCData
 {
@@ -28,7 +28,7 @@ internal static class ShopNPCData
             {
                 return T2D(mod.Name + "/icon_small");
             }
-            return null;
+            else return T2D(mod.Name + "icon");
         }
         foreach (AbstractNPCShop shop in NPCShopDatabase.AllShops)
         {

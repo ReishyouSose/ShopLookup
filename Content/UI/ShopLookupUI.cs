@@ -1,7 +1,7 @@
 ﻿using ShopLookup.Content.UI.ExtraUI;
 using System.Linq;
 using static RUIModule.RUISys.AssetLoader;
-using static ShopLookup.Content.Sys.ShopNPCData;
+using static ShopLookup.Content.Data.ShopNPCData;
 
 namespace ShopLookup.Content.UI;
 
@@ -182,11 +182,11 @@ public class ShopLookupUI : ContainerElement
             int count = entrys.Count(), i = 0, y = 0;
             foreach (AbstractNPCShop.Entry entry in entrys)
             {
-                UIShopSlot slot = new(entry, shop.NpcType, ++i == count);
+                /*UIShopSlot slot = new(entry, shop.NpcType, ++i == count);
                 slot.SetPos(0, y);
                 //slot.DrawRec[0] = Color.White;
                 View_Shop.AddElement(slot);
-                y += slot.Height;
+                y += slot.Height;*/
             }
         }
     }
