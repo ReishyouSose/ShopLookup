@@ -5,6 +5,7 @@
         public readonly UIItemSlot itemSlot;
         public readonly UINPCSlot npcSlot;
         public readonly UIImage iconSlot;
+        public bool HasFocus { get; private set; }
         public UIFocusSlot()
         {
             SetSize(52, 52);
@@ -16,6 +17,7 @@
             Register(itemSlot);
             Register(npcSlot);
             Register(iconSlot);
+            Info.IsSensitive = true;
         }
         public void ChangeFocus(Entity entity)
         {
@@ -27,14 +29,15 @@
                     itemSlot.Info.IsVisible = true;
                     npcSlot.Info.IsVisible = false;
                     iconSlot.Info.IsVisible = false;
-                    return;
+                    HasFocus = true;
                 }
-                if (entity is NPC npc)
+                else if (entity is NPC npc)
                 {
                     npcSlot.ChangeNPC(npc.type);
                     npcSlot.Info.IsVisible = true;
                     itemSlot.Info.IsVisible = false;
                     iconSlot.Info.IsVisible = false;
+                    HasFocus = true;
                 }
             }
         }
@@ -51,10 +54,14 @@
         }
         private void ReSetFocus()
         {
-            itemSlot.ContainedItem = null;
-            itemSlot.Info.IsVisible = true;
-            npcSlot.Info.IsVisible = false;
-            iconSlot.Info.IsVisible = false;
+            if (HasFocus)
+            {
+                itemSlot.ContainedItem = null;
+                itemSlot.Info.IsVisible = true;
+                npcSlot.Info.IsVisible = false;
+                iconSlot.Info.IsVisible = false;
+                HasFocus = false;
+            }
         }
     }
 }

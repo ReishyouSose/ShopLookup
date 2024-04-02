@@ -13,15 +13,14 @@ namespace ShopLookup.Content.Sys
         }
         public override void OnEnterWorld()
         {
-            ShopNPCData.Load();
-            ExtraShop.Load();
+            ShopNPCData.Load(Mod);
             //SLUI.ReLoadNPCView();
         }
         public override void ProcessTriggers(TriggersSet triggersSet)
         {
             if (Check.JustPressed)
             {
-                if (loaded)
+                /*if (loaded)
                 {
                     SLUI.Info.IsVisible = !SLUI.IsVisible;
                     if (SLUI.IsVisible)
@@ -35,7 +34,11 @@ namespace ShopLookup.Content.Sys
                     SLUI.Info.IsVisible = true;
                     SLUI.Calculation();
                     loaded = true;
-                }
+                }*/
+                SLUI.OnInitialization();
+                SLUI.Info.IsVisible = true;
+                SLUI.Calculation();
+                SLUI.LookupItem(Main.HoverItem);
             }
         }
     }

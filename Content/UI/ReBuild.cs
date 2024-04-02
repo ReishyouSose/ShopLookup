@@ -29,6 +29,20 @@ public class ReBuild : ContainerElement
         bg.Register(fltBg);
 
         focus = new();
+        focus.Events.OnLeftDown += evt =>
+        {
+            if (focus.HasFocus)
+            {
+                ClearLookup();
+            }
+            else
+            {
+                if (Main.HoverItem?.type > ItemID.None)
+                {
+                    focus.ChangeFocus(Main.HoverItem);
+                }
+            }
+        };
         bg.Register(focus);
 
         UIVnlPanel inputBg = new(122, 28);
@@ -67,6 +81,7 @@ public class ReBuild : ContainerElement
         search.SetVerticalScrollbar(sscroll);
         fltBg.Register(sscroll);
 
+        int modCount = ModID.Count - 1;
         foreach (var (id, mod) in ModID)
         {
             UIIconSlot modSlot = new(ModIcon[id], 6)
@@ -96,16 +111,32 @@ public class ReBuild : ContainerElement
             npcBg.Register(vs);
 
             int i = 0;
-            foreach (int npc in ModNPCs[mod])
+            if (id == modCount)
             {
-                UINPCSlot slot = new(npc, mod);
-                slot.SetPos(20, i++ * 62);
-                slot.Events.OnLeftDown += evt =>
+                foreach (ExShop exShop in ExtraShop.extraShops)
                 {
-                    LookupIndex(slot.npcType);
-                    LookupNPCShop(slot.npcType);
-                };
-                npcView.AddElement(slot);
+                    UIIconSlot slot = new(exShop.icon);
+                    slot.SetPos(20, i++ * 62);
+                    slot.Events.OnLeftDown += evt =>
+                    {
+                        ClearLookup();
+                    };
+                    npcView.AddElement(slot);
+                }
+            }
+            else
+            {
+                foreach (int npc in ModNPCs[mod])
+                {
+                    UINPCSlot slot = new(npc, mod);
+                    slot.SetPos(20, i++ * 62);
+                    slot.Events.OnLeftDown += evt =>
+                    {
+                        LookupIndex(slot.npcType);
+                        LookupNPCShop(slot.npcType);
+                    };
+                    npcView.AddElement(slot);
+                }
             }
         }
         ReCalculateFilterPanel(null);
@@ -232,7 +263,7 @@ public class ReBuild : ContainerElement
         shop.ClearAllElements();
         int id = 0;
         bool firster(AbstractNPCShop x) => x.NpcType == npc && (name is null || name == x.Name);
-        bool wherer(AbstractNPCShop.Entry x) => !Pylons.Contains(x.Item.type) && x.Item.type > ItemID.None;
+        bool wherer(AbstractNPCShop.Entry x) => !Pylons.Select(y => y.Item.type).Contains(x.Item.type) && x.Item.type > ItemID.None;
         foreach (AbstractNPCShop.Entry entry in NPCShopDatabase.AllShops.First(firster).ActiveEntries.Where(wherer))
         {
             UIShopSlot slot = new(entry, npc);
@@ -244,6 +275,11 @@ public class ReBuild : ContainerElement
         {
             shop.Vscroll.ForceSetPixel(shop.InnerUIE[id].Info.Top.Pixel);
         }
+    }
+    private void ClearLookup()
+    {
+        index.ClearAllElements();
+        shop.ClearAllElements();
     }
     private void FindNPC(string text)
     {
@@ -289,7 +325,7 @@ public class ReBuild : ContainerElement
             index.ClearAllElements();
             index.ChangeShowElement(new(GTV("Navigate")));
             shop.ClearAllElements();
-            foreach (var shops in NPCShopDatabase.AllShops.Concat(ExtraShop.extraShops.Values))
+            foreach (var shops in NPCShopDatabase.AllShops.Concat(ExtraShop.extraShops.Select(x => x.shop)))
             {
                 foreach (var entry in shops.ActiveEntries)
                 {
@@ -307,7 +343,16 @@ public class ReBuild : ContainerElement
                     }
                 }
             }
+            if (!shop.InnerUIE.Any())
+            {
+                UIText none = new(GTV("NoSell"));
+                shop.AddElement(none);
+            }
         }
+    }
+    private void LookupExShop(ExType exType)
+    {
+
     }
     public override void OnSaveAndQuit()
     {

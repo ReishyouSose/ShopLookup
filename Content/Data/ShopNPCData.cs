@@ -10,8 +10,8 @@ internal static class ShopNPCData
     internal static Dictionary<Mod, HashSet<int>> ModNPCs { get; private set; }
     internal static Dictionary<int, Texture2D> NPCHeads { get; private set; }
     internal static Dictionary<int, Dictionary<int, int>> Currencys { get; private set; }
-    internal static HashSet<int> Pylons { get; private set; }
-    internal static void Load()
+    internal static IEnumerable<NPCShop.Entry> Pylons { get; private set; }
+    internal static void Load(Mod slMod)
     {
         FakeMod = new();
         ModID = [];
@@ -45,7 +45,10 @@ internal static class ShopNPCData
             if (!npcList.Contains(type)) npcList.Add(type);
             NPCHeads.TryAdd(type, RequestNPCHead(type, mn, mod));
         }
-        Pylons = NPCShopDatabase.GetPylonEntries().Select(x => x.Item.type).ToHashSet();
+        ExtraShop.Load();
+        ModID.Add(ModID.Count, slMod);
+        ModIcon.Add(ModIcon.Count,GetModIcon(slMod));
+        Pylons = NPCShopDatabase.GetPylonEntries();
     }
     private static Texture2D RequestNPCHead(int type, ModNPC mn, Mod mod)
     {
