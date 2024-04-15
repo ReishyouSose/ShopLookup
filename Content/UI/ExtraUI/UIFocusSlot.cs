@@ -48,11 +48,7 @@
             itemSlot.Info.IsVisible = false;
             npcSlot.Info.IsVisible = false;
         }
-        public override void LoadEvents()
-        {
-            Events.OnLeftDown += evt => ReSetFocus();
-        }
-        private void ReSetFocus()
+        public void ReSetFocus()
         {
             if (HasFocus)
             {

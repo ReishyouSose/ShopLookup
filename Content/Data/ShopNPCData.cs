@@ -1,9 +1,11 @@
 ﻿using System.Linq;
+using Terraria.ModLoader.IO;
 
 namespace ShopLookup.Content.Data;
 
-internal static class ShopNPCData
+internal class ShopNPCData : ModSystem
 {
+    private const string PREFIX = "Mods.";
     internal static Mod FakeMod { get; private set; }
     internal static Dictionary<int, Mod> ModID { get; private set; }
     internal static Dictionary<int, Texture2D> ModIcon { get; private set; }
@@ -11,6 +13,8 @@ internal static class ShopNPCData
     internal static Dictionary<int, Texture2D> NPCHeads { get; private set; }
     internal static Dictionary<int, Dictionary<int, int>> Currencys { get; private set; }
     internal static IEnumerable<NPCShop.Entry> Pylons { get; private set; }
+    internal static HashSet<int> PylonIDs { get; private set; }
+    internal static HashSet<int> VisitedNPCs { get; private set; }
     internal static void Load(Mod slMod)
     {
         FakeMod = new();
@@ -18,6 +22,7 @@ internal static class ShopNPCData
         ModIcon = [];
         ModNPCs = [];
         NPCHeads = [];
+        VisitedNPCs = [];
         static Texture2D GetModIcon(Mod mod)
         {
             if (mod == FakeMod)
@@ -45,10 +50,12 @@ internal static class ShopNPCData
             if (!npcList.Contains(type)) npcList.Add(type);
             NPCHeads.TryAdd(type, RequestNPCHead(type, mn, mod));
         }
-        ExtraShop.Load();
         ModID.Add(ModID.Count, slMod);
-        ModIcon.Add(ModIcon.Count,GetModIcon(slMod));
+        ModIcon.Add(ModIcon.Count, GetModIcon(slMod));
         Pylons = NPCShopDatabase.GetPylonEntries();
+        PylonIDs = Pylons.Select(x => x.Item.type).ToHashSet();
+        ExtraShop.Load();
+        ReflectCurrency();
     }
     private static Texture2D RequestNPCHead(int type, ModNPC mn, Mod mod)
     {
@@ -98,4 +105,6 @@ internal static class ShopNPCData
             }
         }
     }
+    public override void SaveWorldData(TagCompound tag) => tag["visitedNPC"] = VisitedNPCs.ToArray();
+    public override void LoadWorldData(TagCompound tag) => VisitedNPCs = [.. tag.Get<int[]>("visitedNPC")];
 }

@@ -7,11 +7,11 @@ namespace ShopLookup.Content.UI.ExtraUI;
 public class UICurrency : BaseUIElement
 {
     public Color color;
-    private readonly int currencyID;
+    public readonly int currencyID;
     private readonly Dictionary<int, int> values;
     private readonly string valueText;
     private readonly UIText hasCrc;
-    private readonly int value;
+    public readonly int value;
     private int blinkTime;
     public bool Blink
     {

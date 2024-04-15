@@ -36,12 +36,8 @@ UIButton: {
 
 SpecialShop: {
 	Label: SpeicalShop
-	Pylon: Shop of pylons
-
-	Convenient: {
-		Label: Shop of Vanilla
-		Description: Sell some items that are inexplicably hard to get
-	}
+	Pylon.Label: Shop of pylons
+	Vanilla.Label: Shop of Vanilla
 
 	QoT: {
 		Enable: Shop of "Quality of Terraria"

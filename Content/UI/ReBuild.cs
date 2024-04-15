@@ -1,8 +1,8 @@
 ﻿using ShopLookup.Content.Data;
-using ShopLookup.Content.Sys;
 using ShopLookup.Content.UI.ExtraUI;
 using System.Linq;
 using static ShopLookup.Content.Data.ShopNPCData;
+using static ShopLookup.ShopLookup;
 
 namespace ShopLookup.Content.UI;
 
@@ -14,12 +14,14 @@ public class ReBuild : ContainerElement
     public override void OnInitialization()
     {
         base.OnInitialization();
-        if (Main.gameMenu) return;
+        if (Main.gameMenu)
+            return;
         RemoveAll();
 
         UIVnlPanel bg = new(500, 300);
         bg.Info.SetMargin(10);
         bg.SetCenter(0, 0, 0.5f, 0.5f);
+        bg.canDrag = true;
         Register(bg);
 
         UIVnlPanel fltBg = new(0, 0);
@@ -34,12 +36,15 @@ public class ReBuild : ContainerElement
             if (focus.HasFocus)
             {
                 ClearLookup();
+                focus.ReSetFocus();
             }
             else
             {
-                if (Main.HoverItem?.type > ItemID.None)
+                Item item = Main.mouseItem;
+                if (item.type > ItemID.None)
                 {
-                    focus.ChangeFocus(Main.HoverItem);
+                    focus.ChangeFocus(item);
+                    LookupItem(item);
                 }
             }
         };
@@ -51,7 +56,7 @@ public class ReBuild : ContainerElement
 
         UIInputBox input = new(GTV("SearchNPC"), color: Color.White);
         input.SetSize(0, 0, 1, 1);
-        input.OnInputText += FindNPC;
+        input.OnInputText += SearchAny;
         inputBg.Register(input);
 
         UIClose clear = new();
@@ -91,7 +96,7 @@ public class ReBuild : ContainerElement
             modSlot.Events.OnLeftClick += ReCalculateFilterPanel;
             filter.AddElement(modSlot);
 
-            UIBottom npcBg = new(82, 62 * Math.Min(ModNPCs[mod].Count, 3) - 10);
+            UIBottom npcBg = new(82, 62 * (id == modCount ? 3 : Math.Min(ModNPCs[mod].Count, 3)) - 10);
             npcBg.Info.IsVisible = false;
             filter.AddElement(npcBg);
 
@@ -115,11 +120,15 @@ public class ReBuild : ContainerElement
             {
                 foreach (ExShop exShop in ExtraShop.extraShops)
                 {
-                    UIIconSlot slot = new(exShop.icon);
+                    UIIconSlot slot = new(exShop.icon)
+                    {
+                        hoverText = GTV("SpecialShop." + exShop.exType + ".Label")
+                    };
                     slot.SetPos(20, i++ * 62);
                     slot.Events.OnLeftDown += evt =>
                     {
-                        ClearLookup();
+                        ExType ext = exShop.exType;
+                        LookupExShop(ext);
                     };
                     npcView.AddElement(slot);
                 }
@@ -158,20 +167,20 @@ public class ReBuild : ContainerElement
         shop.SetVerticalScrollbar(shopvsl);
         shopBg.Register(shopvsl);
 
-        index = new(shop, x =>
+        index = new(bg, shop, x =>
         {
             UIText uie = new(x.text);
             uie.SetPos(10, 5);
             return uie;
-        });
-        index.SetSize(0, 0, 1, 1);
+        })
+        { buttonXoffset = 10 };
         index.SetWhellPixel(30);
 
         index.showArea.SetPos(62, 24);
         index.showArea.SetSize(-194, 28, 1);
 
         index.expandArea.SetPos(62, 62);
-        index.expandArea.SetSize(-194, 82 + 20, 1);
+        index.expandArea.SetSize(-194, 90, 1);
 
         index.expandView.Info.Height.Pixel -= 10;
         index.expandView.autoPos[0] = true;
@@ -185,21 +194,19 @@ public class ReBuild : ContainerElement
         index.expandView.SetHorizontalScrollbar(hsl);
         index.expandArea.Register(hsl);
 
-        bg.Register(index);
-
         UIClose close = new();
         close.SetPos(-20, 0, 1);
         close.Events.OnLeftDown += evt => Info.IsVisible = false;
         bg.Register(close);
 
-        UIMove move = new() { hoverText = GTV("UIButton.Move") };
+        /*UIMove move = new() { hoverText = GTV("UIButton.Move") };
         move.SetPos(-50, 0, 1);
         move.Events.OnMouseOver += evt => inputBg.Info.IsVisible = false;
         move.Events.OnMouseOut += evt => inputBg.Info.IsVisible = true;
-        bg.Register(move);
+        bg.Register(move);*/
 
         UIAdjust adjust = new(AssetLoader.VnlAdjust) { hoverText = GTV("UIButton.Adjust") };
-        adjust.SetPos(-80, 0, 1);
+        adjust.SetPos(-50, 0, 1);
         adjust.Events.OnMouseOver += evt => inputBg.Info.IsVisible = false;
         adjust.Events.OnMouseOut += evt => inputBg.Info.IsVisible = true;
         bg.Register(adjust);
@@ -218,7 +225,8 @@ public class ReBuild : ContainerElement
                 {
                     id = id == 14 ? 6 : 14;
                 }
-                else id = 6;
+                else
+                    id = 6;
             }
             if (e is UIBottom)
             {
@@ -226,13 +234,15 @@ public class ReBuild : ContainerElement
                 {
                     e.Info.IsVisible = !e.IsVisible;
                 }
-                else e.Info.IsVisible = false;
+                else
+                    e.Info.IsVisible = false;
                 if (e.IsVisible)
                 {
                     y += e.Height;
                 }
             }
-            else y += e.Height;
+            else
+                y += e.Height;
             y += 10;
         }
         filter.Calculation();
@@ -245,11 +255,17 @@ public class ReBuild : ContainerElement
         bool change = true;
         foreach (string name in NPCShopDatabase.AllShops.Where(x => x.NpcType == npc).Select(x => x.Name))
         {
-            UIText shop = new(name);
+            string tempName = name;
+            if (ShopNames.TryGetValue(npc, out var shops) && shops.TryGetValue(name, out LocalizedText localName))
+            {
+                tempName = localName.Value;
+            }
+            UIText shop = new(tempName);
             shop.SetSize(shop.TextSize);
             shop.Events.OnMouseOver += evt => shop.color = Color.Gold;
             shop.Events.OnMouseOut += evt => shop.color = Color.White;
-            shop.Events.OnLeftDown += evt => LookupNPCShop(npc, shop.text);
+            string shopIndex = name;
+            shop.Events.OnLeftDown += evt => LookupNPCShop(npc, shopIndex);
             index.AddElement(shop);
             if (name == target || change)
             {
@@ -263,12 +279,13 @@ public class ReBuild : ContainerElement
         shop.ClearAllElements();
         int id = 0;
         bool firster(AbstractNPCShop x) => x.NpcType == npc && (name is null || name == x.Name);
-        bool wherer(AbstractNPCShop.Entry x) => !Pylons.Select(y => y.Item.type).Contains(x.Item.type) && x.Item.type > ItemID.None;
+        bool wherer(AbstractNPCShop.Entry x) => x.Item.type > ItemID.None && !PylonIDs.Contains(x.Item.type);
         foreach (AbstractNPCShop.Entry entry in NPCShopDatabase.AllShops.First(firster).ActiveEntries.Where(wherer))
         {
             UIShopSlot slot = new(entry, npc);
             shop.AddElement(slot);
-            if (entry.Item.type == itemTarget) id = slot.id;
+            if (entry.Item.type == itemTarget)
+                id = slot.id;
         }
         shop.Calculation();
         if (itemTarget >= 0)
@@ -281,7 +298,7 @@ public class ReBuild : ContainerElement
         index.ClearAllElements();
         shop.ClearAllElements();
     }
-    private void FindNPC(string text)
+    private void SearchAny(string text)
     {
         if (text.Any())
         {
@@ -307,9 +324,22 @@ public class ReBuild : ContainerElement
                     }
                 }
             }
+            shop.ClearAllElements();
+            foreach (AbstractNPCShop shops in NPCShopDatabase.AllShops)
+            {
+                foreach (var entry in shops.ActiveEntries)
+                {
+                    if (entry.Item.Name.Contains(text))
+                    {
+                        UIShopSlot slot = new(entry, ExType.None);
+                        shop.AddElement(slot);
+                    }
+                }
+            }
         }
         else
         {
+            shop.ClearAllElements();
             filter.Info.IsVisible = true;
             filter.Vscroll.Info.IsVisible = true;
             search.Info.IsVisible = false;
@@ -318,14 +348,13 @@ public class ReBuild : ContainerElement
     }
     public void LookupItem(Item item)
     {
-        if (ChildrenElements[0].ContainsPoint(Main.MouseScreen)) return;
         if (item?.type > 0)
         {
             focus.ChangeFocus(item);
             index.ClearAllElements();
             index.ChangeShowElement(new(GTV("Navigate")));
             shop.ClearAllElements();
-            foreach (var shops in NPCShopDatabase.AllShops.Concat(ExtraShop.extraShops.Select(x => x.shop)))
+            foreach (var shops in NPCShopDatabase.AllShops)
             {
                 foreach (var entry in shops.ActiveEntries)
                 {
@@ -343,6 +372,22 @@ public class ReBuild : ContainerElement
                     }
                 }
             }
+            foreach (var shops in ExtraShop.extraShops)
+            {
+                foreach (var entry in shops.ActiveEntries)
+                {
+                    if (entry.Item.type == item.type)
+                    {
+                        UIShopSlot slot = new(entry, shops.exType);
+                        slot.hoverText = GTV("SpecialShop" + shops.exType + "Label");
+                        slot.Events.OnRightClick += evt =>
+                        {
+                            LookupExShop(slot.exType);
+                        };
+                        shop.AddElement(slot);
+                    }
+                }
+            }
             if (!shop.InnerUIE.Any())
             {
                 UIText none = new(GTV("NoSell"));
@@ -350,13 +395,27 @@ public class ReBuild : ContainerElement
             }
         }
     }
-    private void LookupExShop(ExType exType)
+    private void LookupExShop(ExType exType, int itemTarget = -1)
     {
-
+        ClearLookup();
+        UIText name = new(GTV("SpecialShop." + exType + ".Label"));
+        index.ChangeShowElement(name);
+        foreach (var entry in ExtraShop.extraShops[(int)exType - 1].shop.ActiveEntries)
+        {
+            UIShopSlot slot = new(entry, exType);
+            shop.AddElement(slot);
+            if (entry.Item.type == itemTarget)
+                id = slot.id;
+        }
+        shop.Calculation();
+        if (itemTarget >= 0)
+        {
+            shop.Vscroll.ForceSetPixel(shop.InnerUIE[id].Info.Top.Pixel);
+        }
     }
     public override void OnSaveAndQuit()
     {
         Info.IsVisible = false;
-        SLPlayer.loaded = false;
+        RemoveAll();
     }
 }

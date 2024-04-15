@@ -36,12 +36,8 @@ UIButton: {
 
 SpecialShop: {
 	Label: 特殊商店
-	Pylon: 晶塔商店
-
-	Convenient: {
-		Label: 便捷商店
-		Description: 出售一些莫名其妙难以获得的物品
-	}
+	Pylon.Label: 晶塔商店
+	Vanilla.Label: 便捷商店
 
 	QoT: {
 		Enable: 更好的体验

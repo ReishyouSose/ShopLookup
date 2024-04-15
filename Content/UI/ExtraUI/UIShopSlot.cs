@@ -1,4 +1,5 @@
-﻿using System.Linq;
+﻿using ShopLookup.Content.Data;
+using System.Linq;
 using Terraria.UI.Chat;
 
 namespace ShopLookup.Content.UI.ExtraUI
@@ -52,7 +53,7 @@ namespace ShopLookup.Content.UI.ExtraUI
                     return true;
                 }
                 desc = condition.Description.Value;
-                return condition == Condition.AnotherTownNPCNearby || condition == Condition.HappyEnough;
+                return condition == Condition.AnotherTownNPCNearby || condition == Condition.HappyEnoughToSellPylons;
             }
         }
         internal static bool Portable;
@@ -62,11 +63,15 @@ namespace ShopLookup.Content.UI.ExtraUI
 
         public readonly UIItemSlot itemSlot;
         public readonly int npcType;
-        private bool buying;
+        public readonly ExType exType;
         private readonly UIImage vline;
         private readonly CdCheck[] cdChecks;
         private readonly UICurrency currency;
-        public UIShopSlot(AbstractNPCShop.Entry entry, int npcType/*, bool last*/) : base(0, 0, opacity: 0)
+        private bool buying;
+        private int buyTime;
+        private int buyCD;
+        private int buyStack;
+        public UIShopSlot(AbstractNPCShop.Entry entry, int npcType) : base(0, 0, opacity: 0)
         {
             Info.SetMargin(10);
             Info.IsSensitive = true;
@@ -78,13 +83,7 @@ namespace ShopLookup.Content.UI.ExtraUI
             item.isAShopItem = true;
             itemSlot = new(item);
             itemSlot.SetCenter(26, 0, 0, 0.5f);
-            //itemSlot.DrawRec[0] = Color.Blue;
             Register(itemSlot);
-
-            /*vline = new(TextureAssets.MagicPixel.Value);
-            vline.SetSize(2, -20, 0, 1);
-            vline.SetPos(62, 10);
-            Register(vline);*/
 
             UIText name = new(item.Name);
             name.SetPos(62, 0);
@@ -101,17 +100,47 @@ namespace ShopLookup.Content.UI.ExtraUI
             {
                 int i = 0;
                 cdChecks = new CdCheck[cds.Count()];
-                foreach (Condition c in cds) cdChecks[i++] = new(c, Width - 82);
+                foreach (Condition c in cds)
+                    cdChecks[i++] = new(c, Width - 82);
             }
-            else cdChecks = [new(empty, Width - 82)];
+            else
+                cdChecks = [new(empty, Width - 82)];
+            ReSetBuy();
+        }
+        public UIShopSlot(AbstractNPCShop.Entry entry, ExType exType) : base(0, 0, opacity: 0)
+        {
+            Info.SetMargin(10);
+            Info.IsSensitive = true;
+            Info.Width.Set(-30, 1);
 
-            /*if (!last)
+            this.exType = exType;
+
+            Item item = entry.Item;
+            item.isAShopItem = true;
+            itemSlot = new(item);
+            itemSlot.SetCenter(26, 0, 0, 0.5f);
+            Register(itemSlot);
+
+            UIText name = new(item.Name);
+            name.SetPos(62, 0);
+            name.SetSize(-62, 30, 1);
+            name.SetMaxWidth(name.Width);
+            Register(name);
+
+            currency = new(item.shopCustomPrice ?? item.value, item.shopSpecialCurrency);
+            currency.SetPos(62, 30);
+            Register(currency);
+
+            var cds = entry.Conditions;
+            if (cds.Any())
             {
-                UIImage hline = new(TextureAssets.MagicPixel.Value);
-                hline.SetSize(-20, 2, 1, 0);
-                hline.SetPos(10, -2, 0, 1);
-                Register(hline);
-            }*/
+                int i = 0;
+                cdChecks = new CdCheck[cds.Count()];
+                foreach (Condition c in cds)
+                    cdChecks[i++] = new(c, Width - 82);
+            }
+            else
+                cdChecks = [new(empty, Width - 82)];
         }
         public override void LoadEvents()
         {
@@ -120,7 +149,8 @@ namespace ShopLookup.Content.UI.ExtraUI
         }
         public override void Calculation()
         {
-            if (ParentElement == null) return;
+            if (ParentElement == null)
+                return;
             float width = Info.Width.GetPixelBaseParent(ParentElement.Width);
             float height = 0;
             foreach (CdCheck cd in cdChecks)
@@ -131,6 +161,11 @@ namespace ShopLookup.Content.UI.ExtraUI
             Info.Height.Pixel = height + 70;
             base.Calculation();
         }
+        public override void Update(GameTime gt)
+        {
+            if (buying)
+                BuyItem();
+        }
         public override void DrawSelf(SpriteBatch sb)
         {
             base.DrawSelf(sb);
@@ -140,8 +175,10 @@ namespace ShopLookup.Content.UI.ExtraUI
                 Color color = Color.White;
                 if (Info.IsMouseHover && !buying)
                 {
-                    if (Portable || PermanentTips) color = cd.IsMet ? G : R;
-                    if (cd.ignore) color = Y;
+                    if (Portable || PermanentTips)
+                        color = cd.IsMet ? G : R;
+                    if (cd.ignore)
+                        color = Y;
                 }
                 if (cd.Blink)
                 {
@@ -152,9 +189,21 @@ namespace ShopLookup.Content.UI.ExtraUI
                 y += cd.TextY;
             }
         }
+        private bool CheckNPCAcitve()
+        {
+            if (ShopLookup.NonPermanentNPCs.TryGetValue(npcType, out var cds) && cds.All(x => x.IsMet()))
+            {
+                return true;
+            }
+            if (exType == ExType.None && npcType >= 0 && NPC.FindFirstNPC(npcType) >= 0)
+            {
+                return true;
+            }
+            return false;
+        }
         private void CheckBuyItem(BaseUIElement uie)
         {
-            if (npcType >= 0 && NPC.FindFirstNPC(npcType) < 1 /*|| VisitedNPCSys.Contains(npcType)*/ )
+            if (!CheckNPCAcitve())
             {
                 Main.NewText(GTV("NoActive"));
                 return;
@@ -173,16 +222,88 @@ namespace ShopLookup.Content.UI.ExtraUI
                     return;
                 }
             }
-            if (currency.color == R)
+            if (!Main.LocalPlayer.CanAfford(currency.value, currency.currencyID))
             {
                 currency.StartBlink();
                 Main.NewText(GTV("CantAfford"));
                 return;
             }
+            Main.playerInventory = true;
             buying = true;
         }
         private void BuyItem()
         {
+            if (!ContainsPoint(Main.MouseScreen))
+            {
+                ReSetBuy();
+            }
+            ref Item mouse = ref Main.mouseItem;
+            int type = itemSlot.ContainedItem.type;
+            if (mouse.type != type && mouse.type > 0)
+            {
+                ReSetBuy();
+                return;
+            }
+            Player p = Main.LocalPlayer;
+            if (Main.mouseLeft)
+            {
+                Item.NewItem(p.GetSource_GiftOrReward(), p.Hitbox, type);
+                p.BuyItem(currency.value, currency.currencyID);
+                ReSetBuy();
+                return;
+            }
+            if (Main.mouseRight)
+            {
+                if (buyTime == 30)
+                {
+                    if (mouse.type == 0)
+                    {
+                        mouse = new(type);
+                    }
+                    else
+                    {
+                        mouse.stack++;
+                    }
+                    p.BuyItem(currency.value, currency.currencyID);
+                    buyCD = buyTime = 20;
+                }
+                else if (buyCD <= 0)
+                {
+                    for (int i = 0; i < buyStack; i++)
+                    {
+                        if (ItemCheck(mouse, p))
+                        {
+                            mouse.stack++;
+                        }
+                        else
+                            return;
+                    }
+                    buyCD = --buyTime / 2;
+                    if (buyTime == 0)
+                    {
+                        buyTime = 3;
+                        buyStack++;
+                    }
+                }
+                buyCD--;
+            }
+        }
+        private bool ItemCheck(Item hover, Player p)
+        {
+            if (hover.stack < hover.maxStack && p.CanAfford(currency.value, currency.currencyID))
+            {
+                p.BuyItem(currency.value, currency.currencyID);
+                return true;
+            }
+            return ReSetBuy();
+        }
+        private bool ReSetBuy()
+        {
+            buying = false;
+            buyTime = 30;
+            buyCD = 0;
+            buyStack = 1;
+            return false;
         }
     }
 }
