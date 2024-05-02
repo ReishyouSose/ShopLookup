@@ -31,6 +31,7 @@ namespace ShopLookup.Content.UI.ExtraUI
             this.condition = condition;
             ignore = IgnoreCondition(out desc);
             Desc = desc;
+            Color = Color.White;
             Calculate(maxWidth);
         }
         public void Update(bool mouseHover, bool buying)

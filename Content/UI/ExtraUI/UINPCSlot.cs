@@ -1,5 +1,6 @@
 ﻿using RUIModule;
 using System.Linq;
+using System.Text;
 using static RUIModule.RUIHelper;
 using static ShopLookup.Content.Data.ShopNPCData;
 using static ShopLookup.ShopLookup;
@@ -18,17 +19,27 @@ namespace ShopLookup.Content.UI.ExtraUI
                 this.npcType = npcType;
                 Main.instance.LoadNPC(npcType);
                 hoverText = ContentSamples.NpcsByNetId[npcType].TypeName;
-                nonPermanent = NonPermanentNPCs.TryGetValue(npcType, out Condition[] cds);
+                nonPermanent = NonPermanentNPCs.ContainsKey(npcType);
+                if (nonPermanent)
+                    overrideSlot = AssetLoader.ExtraAssets["Permanent"];
+            }
+            Events.OnMouseOver += evt =>
+            {
                 if (nonPermanent)
                 {
-                    overrideSlot = AssetLoader.ExtraAssets["Permanent"];
-                    hoverText += "\n";
-                    foreach (Condition c in cds)
+                    hoverText = ContentSamples.NpcsByNetId[npcType].TypeName;
+                    foreach (Condition c in NonPermanentNPCs[npcType])
                     {
-                        hoverText += c.Description.Value + "\n";
+                        hoverText += new StringBuilder()
+                            .AppendLine()
+                            .Append("[c/")
+                            .Append(c.IsMet() ? "00FF00" : "FF0000")
+                            .Append(':')
+                            .Append(c.Description.Value)
+                            .Append(']');
                     }
                 }
-            }
+            };
         }
         public override void Update(GameTime gt)
         {

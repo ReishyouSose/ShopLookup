@@ -14,7 +14,7 @@ namespace ShopLookup
             AddContent<RUIManager>();
             ShopNames = [];
             NonPermanentNPCs = [];
-            NonPermanentNPCs.Add(NPCID.TravellingMerchant, [new Condition(Language.GetText("Mods.ShopLookup.Travel"),
+            NonPermanentNPC(NPCID.TravellingMerchant, new Condition(Language.GetText("Mods.ShopLookup.Travel"),
                 () =>
                 {
                     int count = 0;
@@ -22,12 +22,13 @@ namespace ShopLookup
                     {
                         if (npc.active && npc.townNPC)
                         {
-                            count++;
-                            if (count >= 2) return true;
+                            if (++count >= 2)
+                                return true;
                         }
                     }
                     return false;
-                })]);
+                }));
+            NonPermanentNPC(NPCID.SkeletonMerchant, Condition.InRockLayerHeight);
             SpecialNPCHeads = [];
         }
 

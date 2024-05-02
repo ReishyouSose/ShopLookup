@@ -3,8 +3,6 @@ Lookup NPC shop items at any time!
 Please bind shortcut keys before using
 [list]
 [*]Use bindKey on an item to query all NPC shops and their indexes that sell this item
-[*]You can also lookup all shops and items of an NPC when you are chatting with it
-[*]Support for NPC slots located in the housing lookup UI panel
 [*]Click the NPC slot in the UI panel to lookup their shop
 [/list]
 There is a small button in the lower right corner of the UI panel
@@ -13,7 +11,8 @@ Press and hold to change size of the panel
 [h1][b]Portable Shop[/b][/h1]
 Buy items from the NPC shop anytime, anywhere if the conditions are met!
 This feature needs to be turned on in the Mod settings
-When certain conditions are met, you can [b] left click (purchase single) / right click and long press (continuous purchase) in the UI[/b]
+When certain conditions are met, you can [b] left click (purchase single, will drop in world)
+right click and long press (continuous purchase) in the UI[/b]
 [list]
 [*]There are corresponding NPC visits in the world or has visited before
 [*]Meet the sell conditions of the corresponding items

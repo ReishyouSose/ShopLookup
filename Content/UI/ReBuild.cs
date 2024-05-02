@@ -2,6 +2,7 @@
 using ShopLookup.Content.Sys;
 using ShopLookup.Content.UI.ExtraUI;
 using System.Linq;
+using System.Text;
 using static ShopLookup.Content.Data.ShopNPCData;
 using static ShopLookup.ShopLookup;
 
@@ -120,10 +121,15 @@ public class ReBuild : ContainerElement
         focus.Events.OnLeftDown += evt =>
         {
             int type = Main.mouseItem.type;
-            focus.item.SetDefaults(type);
             if (type > ItemID.None)
             {
                 LookupItem(type);
+            }
+            else
+            {
+                focus.item.SetDefaults(0);
+                indexList.ChangeShowElement(0);
+                LookupShop();
             }
         };
         bg.Register(focus);
@@ -214,8 +220,13 @@ public class ReBuild : ContainerElement
             {
                 int npcType = npcList.ShowUIE.npcType;
                 int index = NPC.FindFirstNPC(npcType);
-                evt.hoverText += "\n[c/" + (index < 0 ? "FF0000" : "00FF00") + ":" +
-                    GTV("UIButton.Find", ContentSamples.NpcsByNetId[npcType].TypeName) + "]";
+                evt.hoverText += new StringBuilder()
+                    .AppendLine()
+                    .Append("[c/")
+                    .Append(index < 0 ? "FF0000" : "00FF00")
+                    .Append(':')
+                    .Append(GTV("UIButton.Find", ContentSamples.NpcsByNetId[npcType].TypeName))
+                    .Append(']');
             }
         };
         bg.Register(onlyCanBuy);
@@ -471,46 +482,43 @@ public class ReBuild : ContainerElement
     }
     public void LookupItem(int type)
     {
-        if (type > 0)
+        focus.item.SetDefaults(type);
+        shopView.ClearAllElements();
+        indexList.ChangeShowElement(new UIShopName(GTV("LookupItem", ContentSamples.ItemsByType[type].Name)));
+        foreach (var shops in NPCShopDatabase.AllShops)
         {
-            indexList.ClearAllElements();
-            shopView.ClearAllElements();
-            indexList.ChangeShowElement(new UIShopName(GTV("LookupItem", ContentSamples.ItemsByType[type].Name)));
-            foreach (var shops in NPCShopDatabase.AllShops)
+            foreach (var entry in shops.ActiveEntries)
             {
-                foreach (var entry in shops.ActiveEntries)
+                if (entry.Item.type == type)
                 {
-                    if (entry.Item.type == type)
+                    string mod = shops.FullName[..shops.FullName.IndexOf('/')];
+                    UIShopSlot slot = new(entry, shops.NpcType)
                     {
-                        string mod = shops.FullName[..shops.FullName.IndexOf('/')];
-                        UIShopSlot slot = new(entry, shops.NpcType)
-                        {
-                            hoverText = ModsByName[mod].mod.DisplayName + "\n" +
-                            $"{ContentSamples.NpcsByNetId[shops.NpcType].TypeName} [{shops.Name}]"
-                        };
-                        shopView.AddElement(slot);
-                    }
+                        hoverText = ModsByName[mod].mod.DisplayName + "\n" +
+                        $"{ContentSamples.NpcsByNetId[shops.NpcType].TypeName} [{shops.Name}]"
+                    };
+                    shopView.AddElement(slot);
                 }
             }
-            foreach (var shops in ExtraShop.extraShops)
+        }
+        foreach (var shops in ExtraShop.extraShops)
+        {
+            foreach (var entry in shops.ActiveEntries)
             {
-                foreach (var entry in shops.ActiveEntries)
+                if (entry.Item.type == type)
                 {
-                    if (entry.Item.type == type)
+                    UIShopSlot slot = new(entry, shops.exType)
                     {
-                        UIShopSlot slot = new(entry, shops.exType)
-                        {
-                            hoverText = GTV("SpecialShop." + shops.exType + ".Label")
-                        };
-                        shopView.AddElement(slot);
-                    }
+                        hoverText = GTV("SpecialShop." + shops.exType + ".Label")
+                    };
+                    shopView.AddElement(slot);
                 }
             }
-            if (shopView.InnerUIE.Count == 0)
-            {
-                UIText none = new(GTV("NoSell"));
-                shopView.AddElement(none);
-            }
+        }
+        if (shopView.InnerUIE.Count == 0)
+        {
+            UIText none = new(GTV("NoSell"));
+            shopView.AddElement(none);
         }
     }
     private void ChangePanel()

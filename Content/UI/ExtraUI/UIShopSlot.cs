@@ -119,7 +119,10 @@ namespace ShopLookup.Content.UI.ExtraUI
             float y = 70;
             foreach (CdCheck cd in cdChecks)
             {
-                cd.Update(Info.IsMouseHover, buying);
+                if (Ins.Portable || Ins.PermanentTips)
+                {
+                    cd.Update(Info.IsMouseHover, buying);
+                }
                 if (!Ins.FlowLayout && !hardCode)
                 {
                     ChatManager.DrawColorCodedStringWithShadow(sb, FontAssets.MouseText.Value, cd.Desc,
@@ -144,6 +147,8 @@ namespace ShopLookup.Content.UI.ExtraUI
         }
         private void CheckBuyItem(BaseUIElement uie)
         {
+            if (!Ins.Portable)
+                return;
             if (!hardCode && exType == ExShopType.None && !CheckNPCAcitve())
             {
                 Main.NewText(GTV("NoActive"));

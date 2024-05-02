@@ -20,13 +20,13 @@ namespace ShopLookup.Content.Sys
         {
             if (Check.JustPressed)
             {
-                SLUI.OnInitialization();
-                SLUI.Calculation();
-                SLUI.Info.IsVisible = !SLUI.IsVisible;
-                if (SLUI.IsVisible && !SLUI.ContainsPoint(Main.MouseScreen))
+                if (Main.HoverItem.type > ItemID.None)
                 {
+                    SLUI.Info.IsVisible = true;
                     SLUI.LookupItem(Main.HoverItem.type);
                 }
+                else
+                    SLUI.Info.IsVisible = !SLUI.IsVisible;
             }
         }
     }
