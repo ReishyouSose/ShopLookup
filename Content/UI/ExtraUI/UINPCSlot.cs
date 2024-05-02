@@ -18,10 +18,15 @@ namespace ShopLookup.Content.UI.ExtraUI
                 this.npcType = npcType;
                 Main.instance.LoadNPC(npcType);
                 hoverText = ContentSamples.NpcsByNetId[npcType].TypeName;
-                nonPermanent = NonPermanentNPCs.ContainsKey(npcType);
+                nonPermanent = NonPermanentNPCs.TryGetValue(npcType, out Condition[] cds);
                 if (nonPermanent)
                 {
                     overrideSlot = AssetLoader.ExtraAssets["Permanent"];
+                    hoverText += "\n";
+                    foreach (Condition c in cds)
+                    {
+                        hoverText += c.Description.Value + "\n";
+                    }
                 }
             }
         }

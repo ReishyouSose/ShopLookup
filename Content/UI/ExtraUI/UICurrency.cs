@@ -134,7 +134,7 @@ public class UICurrency : BaseUIElement
     public void StartBlink() => blinkTime = 36;
     public string ToItemText()
     {
-        string result = GTV("SellPrice");
+        string result = "[c/FFA500:" + GTV("SellPrice") + "] ";
         foreach (var (id, stack) in values)
         {
             result += RUIHelper.ItemText(id, stack);

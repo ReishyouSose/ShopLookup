@@ -14,7 +14,6 @@ global using Terraria.ID;
 global using Terraria.Localization;
 global using Terraria.ModLoader;
 global using static ShopLookup.MiscHelper;
-using ShopLookup.Content.Data;
 
 
 namespace ShopLookup
@@ -90,19 +89,21 @@ namespace ShopLookup
         }
 
         /// <returns>对应NPC存活</returns>
-        public static bool TryGetCanBuyEntrys(this AbstractNPCShop shop, out Item[] result)
+        public static bool TryGetCanBuyEntrys(this AbstractNPCShop shop, bool exShop, out Item[] result)
         {
             result = new Item[40];
             int index = NPC.FindFirstNPC(shop.NpcType);
-            if (index == -1)
+            if (index == -1 && !exShop)
                 return false;
             int i = 0;
             foreach (var entry in shop.ActiveEntries)
             {
-                if (!entry.Conditions.AllMet() || ShopNPCData.PylonIDs.Contains(entry.Item.type))
+                if (!entry.Conditions.AllMet())
                     continue;
                 result[i++] = entry.Item;
             }
+            if (exShop)
+                return true;
             NPC npc = Main.npc[index];
             NPCLoader.ModifyActiveShop(npc, shop.FullName, result);
             return true;

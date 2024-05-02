@@ -13,7 +13,6 @@ internal class ShopNPCData : ModSystem
         public readonly Dictionary<int, Texture2D> npcAndHead = npcAndHead;
     }
 
-    private const string PREFIX = "Mods.";
     private const string IconSmall = "icon_small";
     private const string Icon = "icon";
     internal static Mod Vanilla { get; private set; }

@@ -34,8 +34,8 @@ namespace ShopLookup.Content.Data
             NPCShop shop = new NPCShop(-1)
                 .Add(361, Item.buyPrice(0, 5))//哥布林战旗
                 .Add(4271, Item.buyPrice(0, 1))//血泪
-                .Add(3124, Item.buyPrice(0, 12))//手机
-                .Add(ItemID.FallenStar, Item.buyPrice(0, 0, 3))
+                .Add(3124, Item.buyPrice(0, 25))//手机
+                .Add(ItemID.FallenStar, Item.buyPrice(0, 0, 10))
                 .Add(2674, Item.buyPrice(0, 0, 3))//三种鱼饵
                 .Add(2675, Item.buyPrice(0, 0, 5))
                 .Add(2676, Item.buyPrice(0, 0, 15))
@@ -55,7 +55,7 @@ namespace ShopLookup.Content.Data
                 .Add(ItemID.TargetDummy, Item.buyPrice(0, 0, 10))
                 .Add(2673, Item.buyPrice(0, 20), Condition.InGlowshroom, Condition.Hardmode)//松露虫
                 .Add(4961, Item.buyPrice(0, 10), Condition.InHallow, Condition.TimeNight)/*七彩草蛉*/
-                .Add(ItemID.TerrasparkBoots, Condition.DownedGoblinArmy);
+                .Add(ItemID.TerrasparkBoots, Item.buyPrice(1, 14, 51, 4), Condition.DownedGoblinArmy, Condition.Hardmode);
             return new(ExShopType.Vanilla, ShopNPCData.ModsByName["Terraria"].icon, shop);
         }
         private static ExShop Qot()

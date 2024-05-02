@@ -26,13 +26,6 @@ NoSavings: 无
 SearchAny: 搜索物品或NPC
 LookupItem: 查询物品 - {0}
 
-LookupRange: {
-	Normal: NPC的单个商店
-	NPCAll: NPC的所有商店
-	ModAll: Mod的所有商店
-	All: 所有已注册商店
-}
-
 UIButton: {
 	Adjust:
 		'''
@@ -43,8 +36,9 @@ UIButton: {
 	Flow: 流式布局
 	Strip: 条式布局
 	Search: 切换到搜索页面
-	OnlyCanBuy: View only items available for purchase
-	Return: 查看所有注册的商品
+	OnlyCanBuy: 仅查看可购买的商品
+	Find: 需要世界上有 {0}
+	Return: 切换到商店页面
 }
 
 SpecialShop: {

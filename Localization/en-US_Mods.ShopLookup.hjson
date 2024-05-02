@@ -26,13 +26,6 @@ NoSavings: None
 SearchAny: Search item or npc
 LookupItem: Lookup Item - {0}
 
-LookupRange: {
-	Normal: NPC's single shop
-	NPCAll: NPC's all shop
-	ModAll: Mods's all shop
-	All: All registed shop
-}
-
 UIButton: {
 	Adjust:
 		'''
@@ -44,7 +37,8 @@ UIButton: {
 	Strip: Strip Layout
 	Search: Switch to search panel
 	OnlyCanBuy: View only items available for purchase
-	Return: View all registered items
+	Find: Requires {0} in the world
+	Return: Switch to shop panel
 }
 
 SpecialShop: {
