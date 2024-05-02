@@ -58,7 +58,7 @@ Or use ModCall.
 
 #### Parameters
 
-- `int MethodType`: required parameter, should be filled in as `2`
+- `int MethodType`: required parameter, should be set to `2`
 - `int npcType`: required parameter, the ID of the target NPC
 - `Texture2D head`: required parameter, specifies the head texture of the target NPC
 
