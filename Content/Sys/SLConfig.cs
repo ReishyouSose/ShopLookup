@@ -1,5 +1,4 @@
-﻿using ShopLookup.Content.UI.ExtraUI;
-using System.ComponentModel;
+﻿using System.ComponentModel;
 using Terraria.ModLoader.Config;
 
 namespace ShopLookup.Content.Sys
@@ -18,11 +17,9 @@ namespace ShopLookup.Content.Sys
 
         [DefaultValue(false)]
         public bool IgnoreUnknowCds;
-        public override void OnChanged()
-        {
-            UIShopSlot.IgnoreUnknowCds = IgnoreUnknowCds;
-            UIShopSlot.PermanentTips = PermanentTips;
-            UIShopSlot.Portable = Portable;
-        }
+
+        [DefaultValue(false)]
+        public bool FlowLayout;
+        public override void OnLoaded() => Ins = this;
     }
 }

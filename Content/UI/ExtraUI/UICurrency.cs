@@ -1,4 +1,5 @@
-﻿using ShopLookup.Content.Data;
+﻿using RUIModule;
+using ShopLookup.Content.Data;
 using System.Linq;
 using Terraria.UI.Chat;
 
@@ -8,6 +9,9 @@ public class UICurrency : BaseUIElement
 {
     public Color color;
     public readonly int currencyID;
+    /// <summary>
+    /// id, stack
+    /// </summary>
     private readonly Dictionary<int, int> values;
     private readonly string valueText;
     private readonly UIText hasCrc;
@@ -53,7 +57,7 @@ public class UICurrency : BaseUIElement
         }
         hasCrc = new("");
         hasCrc.SetPos(offsetX + i, 0);
-        hasCrc.ReDraw = DrawHasCurrency;
+        hasCrc.ReDraw = sb => DrawHasCurrency(sb, hasCrc.HitBox().TopLeft());
         hasCrc.Info.IsVisible = false;
         Register(hasCrc);
     }
@@ -68,7 +72,7 @@ public class UICurrency : BaseUIElement
         ChatManager.DrawColorCodedStringWithShadow(sb, FontAssets.MouseText.Value,
             GTV("SellPrice"), pos, Color.White, 0, Vector2.Zero, Vector2.One, -1, 1.5f);
     }
-    private void DrawHasCurrency(SpriteBatch sb)
+    public void DrawHasCurrency(SpriteBatch sb, Vector2 pos)
     {
         Player player = Main.LocalPlayer;
         var font = FontAssets.MouseText.Value;
@@ -88,9 +92,9 @@ public class UICurrency : BaseUIElement
             }
         }
         color = count >= value ? G : R;
-        if (Blink) color = BlinkColor;
-        Vector2 pos = hasCrc.HitBox().TopLeft();
-        TextSnippet[] savings = [new("/"), new(Lang.inter[66].Value, color), new(" ")];
+        if (Blink)
+            color = BlinkColor;
+        TextSnippet[] savings = [new(Lang.inter[66].Value, color), new(" ")];
         ChatManager.DrawColorCodedStringWithShadow(sb, font, savings, pos, 0, Vector2.Zero, Vector2.One, out _, -1, 1.5f);
         pos.X += ChatManager.GetStringSize(font, savings, Vector2.One).X;
         if (count == 0)
@@ -111,20 +115,30 @@ public class UICurrency : BaseUIElement
         {
             if (stack > 0)
             {
-                ChatManager.DrawColorCodedStringWithShadow(sb, font, ItemText(itemID, stack),
+                ChatManager.DrawColorCodedStringWithShadow(sb, font, RUIHelper.ItemText(itemID, stack),
                     pos, Color.White, 0, Vector2.Zero, Vector2.One, -1, 1.5f);
                 CheckDrawItem(pos, itemID, stack);
                 pos.X += 26;
             }
         }
     }
+
     private static void CheckDrawItem(Vector2 pos, int itemID, int stack)
     {
-        if (NewRec(pos, new(24)).Contains(Main.MouseScreen.ToPoint()))
+        if (RUIHelper.NewRec(pos, new(24)).Contains(Main.MouseScreen.ToPoint()))
         {
             Main.HoverItem = new(itemID, stack);
             Main.hoverItemName = Main.HoverItem.Name;
         }
     }
     public void StartBlink() => blinkTime = 36;
+    public string ToItemText()
+    {
+        string result = GTV("SellPrice");
+        foreach (var (id, stack) in values)
+        {
+            result += RUIHelper.ItemText(id, stack);
+        }
+        return result;
+    }
 }

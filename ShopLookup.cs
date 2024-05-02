@@ -1,8 +1,9 @@
+using RUIModule;
+
 namespace ShopLookup
 {
     public class ShopLookup : Mod
     {
-        internal static bool IsLoadedQoT;
         internal static Dictionary<int, Dictionary<string, LocalizedText>> ShopNames { get; private set; }
         internal static Dictionary<int, Condition[]> NonPermanentNPCs { get; private set; }
         internal static Dictionary<int, Texture2D> SpecialNPCHeads { get; private set; }
@@ -32,18 +33,21 @@ namespace ShopLookup
 
         private void AssetLoader_ExtraLoad(Dictionary<string, Texture2D> extraAssets)
         {
-            string[] files = ["All", "Coins", "NoIcon", "QoT", "Slot", "Vanilla", "Permanent"];
+            string[] files = ["All", "Coins", "NoIcon", "QoT", "Slot", "Vanilla", "Permanent",
+                "StripLayout", "FlowLayout", "Search", "OnlyCanBuy"];
             string path = GetType().Namespace + "/Assets/";
             foreach (string file in files)
             {
-                extraAssets[file] = T2D(path + file);
+                extraAssets[file] = RUIHelper.T2D(path + file);
             }
-            AssetLoader.edgeBlur = ModContent.Request<Effect>("ShopLookup/Assets/EdgeBlur", ReLogic.Content.AssetRequestMode.ImmediateLoad).Value;
-        }
-        public override void PostSetupContent()
-        {
-            //RUIManager.Ins.ExtraDrawOver += SLUI.ExtraDrawInfo;
-            IsLoadedQoT = ModLoader.HasMod("ImproveGame");
+            string[] itemFilters = ["Weapon", "Armor", "Vanity", "Tools", "Materials", "Furniture",
+                "BuildingBlock", "Accessories", "MiscAccessories", "MiscFallback", "Consumables"];
+            path += "ItemFilter/";
+            foreach (string filter in itemFilters)
+            {
+                extraAssets[filter] = RUIHelper.T2D(path + filter);
+            }
+            //AssetLoader.edgeBlur = ModContent.Request<Effect>("ShopLookup/Assets/EdgeBlur", ReLogic.Content.AssetRequestMode.ImmediateLoad).Value;
         }
         public override object Call(params object[] args)
         {
@@ -73,7 +77,7 @@ namespace ShopLookup
                     return method switch
                     {
                         0 => LocalizedTextShopName(args),
-                        1 => PermanentNPC(args),
+                        1 => NonPermanentNPC(args),
                         2 => SpecialNPCHead(args),
                         _ => (0, typeof(int)),
                     };
@@ -102,13 +106,13 @@ namespace ShopLookup
             else
                 return (1, typeof(int));
         }
-        private static (int, Type) PermanentNPC(params object[] args)
+        private static (int, Type) NonPermanentNPC(params object[] args)
         {
             if (args[1] is int npc)
             {
                 if (args[2] is Condition[] cds)
                 {
-                    PermanentNPC(npc, cds);
+                    NonPermanentNPC(npc, cds);
                     return (-1, null);
                 }
                 else
@@ -136,7 +140,6 @@ namespace ShopLookup
         /// ModCall Index => 0
         /// </summary>
         /// <param name="npc">The type for target shop npc</param>
-        /// <param name="mod">Your mod instance</param>
         /// <param name="shopLocals">Key is ShopName, Value is LocalizeText's Key (Don't need "Mods.YourMod.")</param>
         private static void LocalizedTextShopName(int npc, Dictionary<string, LocalizedText> shopLocals)
         {
@@ -145,9 +148,9 @@ namespace ShopLookup
         /// <summary>
         /// ModCall Index => 1
         /// </summary>
-        /// <param name="type">The type for target permanent npc</param>
+        /// <param name="type">The type for target NonPermanent npc</param>
         /// <param name="cds">The spawn conditions for this npc</param>
-        private static void PermanentNPC(int type, params Condition[] cds) => NonPermanentNPCs.Add(type, cds);
+        private static void NonPermanentNPC(int type, params Condition[] cds) => NonPermanentNPCs.Add(type, cds);
         /// <summary>
         /// ModCall Index => 2
         /// </summary>

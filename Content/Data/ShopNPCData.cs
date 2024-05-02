@@ -1,62 +1,55 @@
 ﻿using System.Linq;
 using Terraria.ModLoader.IO;
+using static RUIModule.RUIHelper;
 
 namespace ShopLookup.Content.Data;
 
 internal class ShopNPCData : ModSystem
 {
+    public readonly struct ModInfo(Mod mod, Texture2D icon = null, Dictionary<int, Texture2D> npcAndHead = null)
+    {
+        public readonly Mod mod = mod;
+        public readonly Texture2D icon = icon ?? GetModIcon(mod);
+        public readonly Dictionary<int, Texture2D> npcAndHead = npcAndHead;
+    }
+
     private const string PREFIX = "Mods.";
-    internal static Mod FakeMod { get; private set; }
-    internal static Dictionary<int, Mod> ModID { get; private set; }
-    internal static Dictionary<int, Texture2D> ModIcon { get; private set; }
-    internal static Dictionary<Mod, HashSet<int>> ModNPCs { get; private set; }
-    internal static Dictionary<int, Texture2D> NPCHeads { get; private set; }
+    private const string IconSmall = "icon_small";
+    private const string Icon = "icon";
+    internal static Mod Vanilla { get; private set; }
+    internal static Dictionary<string, ModInfo> ModsByName { get; private set; }
     internal static Dictionary<int, Dictionary<int, int>> Currencys { get; private set; }
     internal static IEnumerable<NPCShop.Entry> Pylons { get; private set; }
     internal static HashSet<int> PylonIDs { get; private set; }
     internal static HashSet<int> VisitedNPCs { get; private set; }
     internal static void Load(Mod slMod)
     {
-        FakeMod = new();
-        ModID = [];
-        ModIcon = [];
-        ModNPCs = [];
-        NPCHeads = [];
-        VisitedNPCs = [];
-        static Texture2D GetModIcon(Mod mod)
-        {
-            if (mod == FakeMod)
-            {
-                return AssetLoader.ExtraAssets["Vanilla"];
-            }
-            if (mod.HasAsset("icon_small"))
-            {
-                return T2D(mod.Name + "/icon_small");
-            }
-            else return T2D(mod.Name + "icon");
-        }
+        ModsByName = [];
+        Vanilla = new();
+        Dictionary<Mod, Dictionary<int, Texture2D>> modNpcs = [];
         foreach (AbstractNPCShop shop in NPCShopDatabase.AllShops)
         {
             int type = shop.NpcType;
             ModNPC mn = ContentSamples.NpcsByNetId[type].ModNPC;
-            Mod mod = mn?.Mod ?? FakeMod;
-            if (!ModID.ContainsValue(mod))
-            {
-                ModID.Add(ModID.Count, mod);
-                ModIcon.Add(ModIcon.Count, GetModIcon(mod));
-            }
-            ModNPCs.TryAdd(mod, []);
-            var npcList = ModNPCs[mod];
-            if (!npcList.Contains(type)) npcList.Add(type);
-            NPCHeads.TryAdd(type, RequestNPCHead(type, mn, mod));
+            Mod mod = mn?.Mod ?? Vanilla;
+            modNpcs.TryAdd(mod, []);
+            modNpcs[mod].TryAdd(type, RequestNPCHead(type, mn, mod));
         }
-        ModID.Add(ModID.Count, slMod);
-        ModIcon.Add(ModIcon.Count, GetModIcon(slMod));
+        foreach (var (mod, npcInfo) in modNpcs)
+        {
+            if (mod == Vanilla)
+                ModsByName.Add("Terraria", new(mod, AssetLoader.ExtraAssets["Vanilla"], npcInfo));
+            else
+                ModsByName.Add(mod.Name, new(mod, GetModIcon(mod), npcInfo));
+        }
+        ModsByName.Add(slMod.Name, new(slMod, GetModIcon(slMod), null));
         Pylons = NPCShopDatabase.GetPylonEntries();
         PylonIDs = Pylons.Select(x => x.Item.type).ToHashSet();
         ExtraShop.Load();
         ReflectCurrency();
+        VisitedNPCs = [];
     }
+    private static Texture2D GetModIcon(Mod mod) => T2D(mod.Name + "/" + (mod.HasAsset(IconSmall) ? IconSmall : Icon));
     private static Texture2D RequestNPCHead(int type, ModNPC mn, Mod mod)
     {
         int headIndex = NPC.TypeToDefaultHeadIndex(type);

@@ -1,4 +1,5 @@
 NoSell: No TownNPCs sell this
+NoResult: No Result
 NoCondition: Any time
 
 Keybinds: {
@@ -22,8 +23,15 @@ UnknowCds: Unknown condition, ignore can be enabled in ModConfig
 EmptyShop: Empty shop
 SellPrice: Price
 NoSavings: None
-SearchNPC: Search
-Navigate: Right click navigate to shop
+SearchAny: Search item or npc
+LookupItem: Lookup Item - {0}
+
+LookupRange: {
+	Normal: NPC's single shop
+	NPCAll: NPC's all shop
+	ModAll: Mods's all shop
+	All: All registed shop
+}
 
 UIButton: {
 	Adjust:
@@ -32,6 +40,11 @@ UIButton: {
 		and drag outside the panel to resize
 		'''
 	Move: Hold down the mouse to drag the panel
+	Flow: Flow Layout
+	Strip: Strip Layout
+	Search: Switch to search panel
+	OnlyCanBuy: View only items available for purchase
+	Return: View all registered items
 }
 
 SpecialShop: {
@@ -40,7 +53,7 @@ SpecialShop: {
 	Vanilla.Label: Shop of Vanilla
 
 	QoT: {
-		Enable: Shop of "Quality of Terraria"
+		Label: Shop of "Quality of Terraria"
 		Disable: Requires mod "Quality of Terraria" to be enabled
 	}
 }
@@ -86,6 +99,11 @@ Configs: {
 				If enab1e, players may be able to obtain items beyond the progress
 				Please use with caution
 				'''
+		}
+
+		FlowLayout: {
+			Label: Flow Layout
+			Tooltip: ""
 		}
 	}
 }

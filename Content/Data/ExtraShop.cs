@@ -2,16 +2,16 @@
 
 namespace ShopLookup.Content.Data
 {
-    public enum ExType
+    public enum ExShopType
     {
         None,
         Pylon,
         Vanilla,
         QoT,
     }
-    internal readonly struct ExShop(ExType exType, Texture2D icon, AbstractNPCShop shop)
+    internal readonly struct ExShop(ExShopType exType, Texture2D icon, AbstractNPCShop shop)
     {
-        public readonly ExType exType = exType;
+        public readonly ExShopType exType = exType;
         public readonly Texture2D icon = icon;
         public readonly AbstractNPCShop shop = shop;
         public readonly IEnumerable<AbstractNPCShop.Entry> ActiveEntries => shop.ActiveEntries;
@@ -27,7 +27,7 @@ namespace ShopLookup.Content.Data
             shop.Add(ShopNPCData.Pylons.ToArray());
             int pylonID = ItemID.TeleportationPylonVictory;
             Main.instance.LoadItem(pylonID);
-            return new(ExType.Pylon, TextureAssets.Item[pylonID].Value, shop);
+            return new(ExShopType.Pylon, TextureAssets.Item[pylonID].Value, shop);
         }
         private static ExShop Vanilla()
         {
@@ -56,14 +56,13 @@ namespace ShopLookup.Content.Data
                 .Add(2673, Item.buyPrice(0, 20), Condition.InGlowshroom, Condition.Hardmode)//松露虫
                 .Add(4961, Item.buyPrice(0, 10), Condition.InHallow, Condition.TimeNight)/*七彩草蛉*/
                 .Add(ItemID.TerrasparkBoots, Condition.DownedGoblinArmy);
-            return new(ExType.Vanilla, ShopNPCData.ModIcon[0], shop);
+            return new(ExShopType.Vanilla, ShopNPCData.ModsByName["Terraria"].icon, shop);
         }
         private static ExShop Qot()
         {
             NPCShop shop = new(-1);
-            if (ShopLookup.IsLoadedQoT)
+            if (ModLoader.TryGetMod("ImproveGame", out Mod qot))
             {
-                Mod qot = ModLoader.GetMod("ImproveGame");
                 shop.Add(qot, new string[] { "BannerChest", "ExtremeStorage", "Autofisher",
                     "CreateWand", "MagickWand", "DetectorDrone", "PaintWand"})
                     .Add(qot, new (string, int)[] { ("PotionBag", Item.buyPrice(0,2,50)),
@@ -72,7 +71,7 @@ namespace ShopLookup.Content.Data
                     .Add(qot, "LiquidWand", Condition.DownedEowOrBoc)
                     .Add(qot, new string[] { "StarburstWand", "ConstructWand" }, Condition.Hardmode);
             }
-            return new(ExType.QoT, AssetLoader.ExtraAssets["QoT"], shop);
+            return new(ExShopType.QoT, AssetLoader.ExtraAssets["QoT"], shop);
         }
         public static NPCShop Add(this NPCShop shop, int itemType, int? customPrice, params Condition[] conditions)
         {
@@ -89,7 +88,7 @@ namespace ShopLookup.Content.Data
         }
         public static NPCShop Add(this NPCShop shop, Mod mod, string[] itemName, params Condition[] condition)
         {
-            if (itemName.Any())
+            if (itemName.Length != 0)
             {
                 for (int i = 0; i < itemName.Length; i++)
                 {
@@ -102,7 +101,7 @@ namespace ShopLookup.Content.Data
         /// <param name="itemarray">id, 货币id, 需求量</param>
         public static NPCShop Add(this NPCShop shop, Mod mod, (string itemName, int currency, int value)[] itemarray, params Condition[] condition)
         {
-            if (itemarray.Any())
+            if (itemarray.Length != 0)
             {
                 for (int i = 0; i < itemarray.Length; i++)
                 {

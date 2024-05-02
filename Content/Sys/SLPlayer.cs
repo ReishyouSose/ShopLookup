@@ -25,7 +25,7 @@ namespace ShopLookup.Content.Sys
                 SLUI.Info.IsVisible = !SLUI.IsVisible;
                 if (SLUI.IsVisible && !SLUI.ContainsPoint(Main.MouseScreen))
                 {
-                    SLUI.LookupItem(Main.HoverItem);
+                    SLUI.LookupItem(Main.HoverItem.type);
                 }
             }
         }

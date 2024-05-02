@@ -1,4 +1,5 @@
 NoSell: 没有城镇NPC售卖这个物品
+NoResult: 无结果
 NoCondition: 任何时候
 
 Keybinds: {
@@ -22,8 +23,15 @@ UnknowCds: 未知条件，可在设置中启用忽略
 EmptyShop: 空商店
 SellPrice: 售价
 NoSavings: 无
-SearchNPC: 搜索
-Navigate: 右键导航到商店
+SearchAny: 搜索物品或NPC
+LookupItem: 查询物品 - {0}
+
+LookupRange: {
+	Normal: NPC的单个商店
+	NPCAll: NPC的所有商店
+	ModAll: Mod的所有商店
+	All: 所有已注册商店
+}
 
 UIButton: {
 	Adjust:
@@ -32,6 +40,11 @@ UIButton: {
 		拖动到面板外以调整大小
 		'''
 	Move: 按住以拖动面板
+	Flow: 流式布局
+	Strip: 条式布局
+	Search: 切换到搜索页面
+	OnlyCanBuy: View only items available for purchase
+	Return: 查看所有注册的商品
 }
 
 SpecialShop: {
@@ -40,7 +53,7 @@ SpecialShop: {
 	Vanilla.Label: 便捷商店
 
 	QoT: {
-		Enable: 更好的体验
+		Label: 更好的体验
 		Disable: 需要启用模组：更好的体验（QoT）
 	}
 }
@@ -86,6 +99,11 @@ Configs: {
 				如果启用，玩家可能可以获取超出当前时期的素材
 				请谨慎使用
 				'''
+		}
+
+		FlowLayout: {
+			// Label: Flow Layout
+			// Tooltip: ""
 		}
 	}
 }
