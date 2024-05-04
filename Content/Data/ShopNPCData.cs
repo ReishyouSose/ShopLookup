@@ -23,10 +23,8 @@ internal class ShopNPCData : ModSystem
     internal static HashSet<int> PylonIDs { get; private set; }
     internal static HashSet<int> VisitedNPCs { get; private set; }
     private static Dictionary<Mod, Dictionary<int, Texture2D>> modNpcs = [];
-    private static bool init;
     internal static void Load()
     {
-        init = false;
         ModsByName = [];
         Vanilla = new();
         modNpcs = [];
@@ -42,24 +40,20 @@ internal class ShopNPCData : ModSystem
         PylonIDs = Pylons.Select(x => x.Item.type).ToHashSet();
         PylonIDs.Add(ItemID.TeleportationPylonVictory);
         ModsByName.Add("Terraria", new(Vanilla, AssetLoader.ExtraAssets["Vanilla"], modNpcs[Vanilla]));
-        ExtraShopDataBase.Load();
         ReflectCurrency();
         VisitedNPCs = [];
     }
     public static void FinishSetup()
     {
-        if (!init)
+        ExtraShopDataBase.RegisterSLUExtra();
+        foreach (Mod mod in ModLoader.Mods)
         {
-            foreach (Mod mod in ModLoader.Mods)
+            if (modNpcs.TryGetValue(mod, out var npcInfo) | ExtraShopDataBase.ModShops.TryGetValue(mod.Name, out var extra))
             {
-                if (modNpcs.TryGetValue(mod, out var npcInfo) | ExtraShopDataBase.ModShops.TryGetValue(mod.Name, out var extra))
-                {
-                    ModsByName.Add(mod.Name, new(mod, GetModIcon(mod), npcInfo, extra));
-                }
+                ModsByName.Add(mod.Name, new(mod, GetModIcon(mod), npcInfo, extra));
             }
-            modNpcs = null;
-            init = true;
         }
+        modNpcs = null;
     }
     private static Texture2D GetModIcon(Mod mod) => T2D(mod.Name + "/" + (mod.HasAsset(IconSmall) ? IconSmall : Icon));
     private static Texture2D RequestNPCHead(int type, ModNPC mn, Mod mod)

@@ -21,7 +21,6 @@ public class ReBuild : ContainerElement
     private bool inShopPanel;
     private bool onlyCanBuy;
     private bool anyFilterActive;
-    private bool init;
     private static ref bool FlowLayout => ref SLConfig.Ins.FlowLayout;
     public override void OnInitialization()
     {
@@ -31,7 +30,7 @@ public class ReBuild : ContainerElement
         RemoveAll();
         FlowLayout = false;
 
-        UIVnlPanel bg = new(530, 370);
+        UIVnlPanel bg = new(530, 365);
         bg.Info.SetMargin(10);
         bg.SetCenter(0, 0, 0.5f, 0.5f);
         bg.canDrag = true;
@@ -115,18 +114,8 @@ public class ReBuild : ContainerElement
     }
     public override void OnSaveAndQuit()
     {
-        init = false;
         Info.IsVisible = false;
         RemoveAll();
-    }
-    public void FirstLoad()
-    {
-        FinishSetup();
-        if (!init)
-        {
-            OnInitialization();
-            init = true;
-        }
     }
     private void RegisterShopPanel(UIBottom bg)
     {
@@ -369,7 +358,12 @@ public class ReBuild : ContainerElement
             index.SetSize(index.TextSize);
             index.HoverToGold();
             indexList.AddElement(index);
-            index.Events.OnLeftDown += evt => LookupShop();
+            index.Events.OnLeftDown += evt =>
+            {
+                if (focus.item.type > ItemID.None)
+                    focus.item.SetDefaults(0);
+                LookupShop();
+            };
         }
         if (focus.item.type > ItemID.None)
             focus.item.SetDefaults(0);
@@ -391,9 +385,17 @@ public class ReBuild : ContainerElement
                 if (shop.NpcType == npcType)
                 {
                     string name = shop.Name;
-                    AddToIndexList(ShopNames.TryGetValue(npcType, out var shops)
-                          && shops.TryGetValue(name, out LocalizedText localName) ?
-                          new(localName.Value, name) : new(name));
+                    if (name == "Shop")
+                    {
+                        AddToIndexList(new(Lang.inter[28].Value, name));
+                        continue;
+                    }
+                    else if (ShopNames.TryGetValue(npcType, out var shops) && shops.TryGetValue(name, out LocalizedText shopLocal))
+                    {
+                        AddToIndexList(new(shopLocal.Value, name));
+                        continue;
+                    }
+                    AddToIndexList(new(name));
                 }
             }
         }
@@ -574,6 +576,8 @@ public class ReBuild : ContainerElement
         int itemType = focus.item.type;
         if (itemType > ItemID.None)
         {
+            if (!inShopPanel)
+                ChangePanel();
             indexList.ChangeShowElement(new UIShopName(GTV("LookupItem", ContentSamples.ItemsByType[itemType].Name)));
             foreach (var shops in NPCShopDatabase.AllShops)
             {

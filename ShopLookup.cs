@@ -16,6 +16,7 @@ namespace ShopLookup
             AssetLoader.ExtraLoad += AssetLoader_ExtraLoad;
             AddContent<RUIManager>();
             ShopNames = [];
+            LocalizedTextShopName(NPCID.Painter, new() { { "Decor", Language.GetText("GameUI.PainterDecor") } });
             NonPermanentNPCs = [];
             NonPermanentNPC(NPCID.TravellingMerchant, new Condition(Language.GetText("Mods.ShopLookup.Travel"),
                 () =>
@@ -33,6 +34,7 @@ namespace ShopLookup
                 }));
             NonPermanentNPC(NPCID.SkeletonMerchant, Condition.InRockLayerHeight);
             SpecialNPCHeads = [];
+            ExtraShopDataBase.Load();
             MonoModHooks.Add(typeof(NPCShopDatabase).GetMethod("FinishSetup",
                 BindingFlags.NonPublic | BindingFlags.Static), () => ShopNPCData.Load());
         }
@@ -144,12 +146,7 @@ namespace ShopLookup
                 {
                     if (args[3] is Texture2D icon)
                     {
-                        if (args[4] is NPCShop[] shops)
-                        {
-                            ExtraShopDataBase.Register(mod.Name, exShopType, icon, shops);
-                            return (-1, null);
-                        }
-                        else if (args[4] is NPCShop shop)
+                        if (args[4] is NPCShop shop)
                         {
                             ExtraShopDataBase.Register(mod.Name, exShopType, icon, shop);
                             return (-1, null);

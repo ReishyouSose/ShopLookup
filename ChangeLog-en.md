@@ -6,6 +6,15 @@
 
 </div>
 
+# v1.0.0
+UI panel overhaul.
+Added support for fake shops.
+The bindable keys now only toggle the panel and query items.
+Added search functionality.
+Added flow layout.
+Added item filters.
+Added support for `NPCLoader.ModifyActiveShop`, use button "View only items available for purchase"
+
 # v0.4.3
 Change the adjust for visited NPC
 # v0.4.2

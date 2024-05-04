@@ -9,9 +9,12 @@
         {
             ModShops = [];
             extraShops = [];
-            var slu = ShopLookup.Ins.Name;
+        }
+        public static void RegisterSLUExtra()
+        {
             int pylonID = ItemID.TeleportationPylonVictory;
             Main.instance.LoadItem(pylonID);
+            var slu = ShopLookup.Ins.Name;
             Register(slu, "Pylon", TextureAssets.Item[pylonID].Value, [.. Pylon()]);
             Register(slu, "Vanilla", AssetLoader.ExtraAssets["Vanilla"], [.. Vanilla()]);
         }
