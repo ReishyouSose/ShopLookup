@@ -1,4 +1,4 @@
-NoSell: No TownNPCs sell this
+NoSell: No shop sell this
 NoResult: No Result
 NoCondition: Any time
 
@@ -41,14 +41,27 @@ UIButton: {
 	Return: Switch to shop panel
 }
 
-SpecialShop: {
-	Label: SpeicalShop
-	Pylon.Label: Shop of pylons
-	Vanilla.Label: Shop of Vanilla
+FakeShops: {
+	Pylon: {
+		Label: Pylon shop
+		Disable: No pylons
+		Vanilla: Vanilla pylon shop
+		Mods: Mod pylons shop
+	}
+
+	Vanilla: {
+		Label: Convenience shop
+		Spawner: Summoning shop
+		Fish: Fishing shop
+		Other: Other item shop
+	}
 
 	QoT: {
-		Label: Shop of "Quality of Terraria"
-		Disable: Requires mod "Quality of Terraria" to be enabled
+		Label: Shop for Mod [Quality of Terraria]
+		Disable: Requires Mod [Quality of Terraria] (QoT)
+		Wand: Wand shop
+		Locator: Locator shop
+		Other: Other item shop
 	}
 }
 

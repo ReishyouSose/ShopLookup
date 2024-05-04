@@ -1,14 +1,17 @@
 using RUIModule;
+using ShopLookup.Content.Data;
 
 namespace ShopLookup
 {
     public class ShopLookup : Mod
     {
+        internal static ShopLookup Ins;
         internal static Dictionary<int, Dictionary<string, LocalizedText>> ShopNames { get; private set; }
         internal static Dictionary<int, Condition[]> NonPermanentNPCs { get; private set; }
         internal static Dictionary<int, Texture2D> SpecialNPCHeads { get; private set; }
         public override void Load()
         {
+            Ins = this;
             RUIManager.mod = this;
             AssetLoader.ExtraLoad += AssetLoader_ExtraLoad;
             AddContent<RUIManager>();
@@ -30,6 +33,27 @@ namespace ShopLookup
                 }));
             NonPermanentNPC(NPCID.SkeletonMerchant, Condition.InRockLayerHeight);
             SpecialNPCHeads = [];
+            MonoModHooks.Add(typeof(NPCShopDatabase).GetMethod("FinishSetup",
+                BindingFlags.NonPublic | BindingFlags.Static), () => ShopNPCData.Load());
+        }
+        public override object Call(params object[] args)
+        {
+            var (index, type) = ModCall(args);
+            if (index == -1)
+            {
+                Logger.Info("Success");
+                return true;
+            }
+            if (index == 0)
+            {
+                Logger.Warn("Wrong method type");
+                return false;
+            }
+            else
+            {
+                Logger.Warn($"params {index + 1} error,should be {type.FullName}");
+                return false;
+            }
         }
 
         private void AssetLoader_ExtraLoad(Dictionary<string, Texture2D> extraAssets)
@@ -50,25 +74,6 @@ namespace ShopLookup
             }
             //AssetLoader.edgeBlur = ModContent.Request<Effect>("ShopLookup/Assets/EdgeBlur", ReLogic.Content.AssetRequestMode.ImmediateLoad).Value;
         }
-        public override object Call(params object[] args)
-        {
-            var (index, type) = ModCall(args);
-            if (index == -1)
-            {
-                Logger.Info("Success");
-                return true;
-            }
-            if (index == 0)
-            {
-                Logger.Warn("Wrong method type");
-                return false;
-            }
-            else
-            {
-                Logger.Warn($"params {index + 1} error,should be {type.Name}");
-                return false;
-            }
-        }
         public static (int, Type) ModCall(params object[] args)
         {
             try
@@ -80,9 +85,9 @@ namespace ShopLookup
                         0 => LocalizedTextShopName(args),
                         1 => NonPermanentNPC(args),
                         2 => SpecialNPCHead(args),
+                        3 => FakeShop(args),
                         _ => (0, typeof(int)),
                     };
-                    ;
                 }
                 return (0, null);
             }
@@ -101,11 +106,9 @@ namespace ShopLookup
                     LocalizedTextShopName(npc, shopLocals);
                     return (-1, null);
                 }
-                else
-                    return (2, typeof(Dictionary<string, LocalizedText>));
+                return (2, typeof(Dictionary<string, LocalizedText>));
             }
-            else
-                return (1, typeof(int));
+            return (1, typeof(int));
         }
         private static (int, Type) NonPermanentNPC(params object[] args)
         {
@@ -116,11 +119,9 @@ namespace ShopLookup
                     NonPermanentNPC(npc, cds);
                     return (-1, null);
                 }
-                else
-                    return (2, typeof(Condition[]));
+                return (2, typeof(Condition[]));
             }
-            else
-                return (1, typeof(int));
+            return (1, typeof(int));
         }
         private static (int, Type) SpecialNPCHead(params object[] args)
         {
@@ -131,11 +132,35 @@ namespace ShopLookup
                     SpecialNPCHead(npc, head);
                     return (-1, null);
                 }
-                else
-                    return (2, typeof(Texture2D));
+                return (2, typeof(Texture2D));
             }
-            else
-                return (1, typeof(int));
+            return (1, typeof(int));
+        }
+        private static (int, Type) FakeShop(params object[] args)
+        {
+            if (args[1] is Mod mod)
+            {
+                if (args[2] is string exShopType)
+                {
+                    if (args[3] is Texture2D icon)
+                    {
+                        if (args[4] is NPCShop[] shops)
+                        {
+                            ExtraShopDataBase.Register(mod.Name, exShopType, icon, shops);
+                            return (-1, null);
+                        }
+                        else if (args[4] is NPCShop shop)
+                        {
+                            ExtraShopDataBase.Register(mod.Name, exShopType, icon, shop);
+                            return (-1, null);
+                        }
+                        return (4, typeof(NPCShop[]));
+                    }
+                    return (3, typeof(NPCShop));
+                }
+                return (2, typeof(string));
+            }
+            return (1, typeof(Mod));
         }
         /// <summary>
         /// ModCall Index => 0

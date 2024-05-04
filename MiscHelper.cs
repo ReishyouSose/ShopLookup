@@ -89,11 +89,11 @@ namespace ShopLookup
         }
 
         /// <returns>对应NPC存活</returns>
-        public static bool TryGetCanBuyEntrys(this AbstractNPCShop shop, bool exShop, out Item[] result)
+        public static bool TryGetCanBuyEntrys(this AbstractNPCShop shop, out Item[] result)
         {
             result = new Item[40];
             int index = NPC.FindFirstNPC(shop.NpcType);
-            if (index == -1 && !exShop)
+            if (index == -1)
                 return false;
             int i = 0;
             foreach (var entry in shop.ActiveEntries)
@@ -102,11 +102,90 @@ namespace ShopLookup
                     continue;
                 result[i++] = entry.Item;
             }
-            if (exShop)
-                return true;
             NPC npc = Main.npc[index];
             NPCLoader.ModifyActiveShop(npc, shop.FullName, result);
             return true;
+        }
+        public static NPCShop Add(this NPCShop shop, int[] itemTypes, params Condition[] conditions)
+        {
+            foreach (int itemType in itemTypes)
+            {
+                shop.Add(itemType, conditions);
+            }
+            return shop;
+        }
+        public static NPCShop Add(this NPCShop shop, int itemType, int? customPrice, params Condition[] conditions)
+        {
+            shop.Add(new Item(itemType) { shopCustomPrice = customPrice }, conditions);
+            return shop;
+        }
+        public static NPCShop Add(this NPCShop shop, int[] itemTypes, int? customPrice, params Condition[] conditions)
+        {
+            foreach (int itemType in itemTypes)
+            {
+                shop.Add(new Item(itemType) { shopCustomPrice = customPrice }, conditions);
+            }
+            return shop;
+        }
+        public static NPCShop Add(this NPCShop shop, Mod mod, string itemName, params Condition[] conditions)
+        {
+            if (mod.TryFind(itemName, out ModItem mi))
+            {
+                shop.Add(new Item(mi.Type), conditions);
+            }
+            return shop;
+        }
+        public static NPCShop Add(this NPCShop shop, Mod mod, string itemName, int value, params Condition[] conditions)
+        {
+            if (mod.TryFind(itemName, out ModItem mi))
+            {
+                shop.Add(new Item(mi.Type) { shopCustomPrice = value }, conditions);
+            }
+            return shop;
+        }
+        public static NPCShop Add(this NPCShop shop, Mod mod, string[] itemName, params Condition[] condition)
+        {
+            if (itemName.Length != 0)
+            {
+                for (int i = 0; i < itemName.Length; i++)
+                {
+                    shop.Add(mod, itemName[i], condition);
+                }
+            }
+            return shop;
+        }
+
+        /// <param name="itemarray">id, 货币id, 需求量</param>
+        public static NPCShop Add(this NPCShop shop, Mod mod, (string itemName, int currency, int value)[] itemarray, params Condition[] condition)
+        {
+            if (itemarray.Length != 0)
+            {
+                for (int i = 0; i < itemarray.Length; i++)
+                {
+                    shop.Add(new Item(mod.Find<ModItem>(itemarray[i].itemName).Type)
+                    {
+                        shopSpecialCurrency = itemarray[i].currency,
+                        shopCustomPrice = itemarray[i].value,
+                    }, condition);
+                }
+            }
+            return shop;
+        }
+        /// <param name="currency">货币id</param>
+        public static NPCShop Add(this NPCShop shop, Mod mod, (string itemName, int value)[] itemarray, int currency = -1, params Condition[] condition)
+        {
+            if (itemarray.Length > 0)
+            {
+                for (int i = 0; i < itemarray.Length; i++)
+                {
+                    shop.Add(new Item(mod.Find<ModItem>(itemarray[i].itemName).Type)
+                    {
+                        shopSpecialCurrency = currency,
+                        shopCustomPrice = itemarray[i].value,
+                    }, condition);
+                }
+            }
+            return shop;
         }
     }
 }

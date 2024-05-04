@@ -1,4 +1,4 @@
-NoSell: 没有城镇NPC售卖这个物品
+NoSell: 没有商店售卖这个物品
 NoResult: 无结果
 NoCondition: 任何时候
 
@@ -41,14 +41,27 @@ UIButton: {
 	Return: 切换到商店页面
 }
 
-SpecialShop: {
-	Label: 特殊商店
-	Pylon.Label: 晶塔商店
-	Vanilla.Label: 便捷商店
+FakeShops: {
+	Pylon: {
+		Label: 晶塔商店
+		Disable: 无结果
+		Vanilla: 原版晶塔商店
+		Mods: 模组晶塔商店
+	}
+
+	Vanilla: {
+		Label: 便捷商店
+		Spawner: 召唤物商店
+		Fish: 钓鱼商店
+		Other: 杂项商店
+	}
 
 	QoT: {
 		Label: 更好的体验
-		Disable: 需要启用模组：更好的体验（QoT）
+		Disable: 需要模组 更好的体验（QoT）
+		Wand: 魔杖商店
+		Locator: 定位球商店
+		Other: 杂项商店
 	}
 }
 

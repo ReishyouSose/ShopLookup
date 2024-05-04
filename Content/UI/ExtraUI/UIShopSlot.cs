@@ -1,255 +1,112 @@
-﻿using ShopLookup.Content.Data;
+﻿using RUIModule;
+using ShopLookup.Content.Data;
 using System.Linq;
-using Terraria.UI.Chat;
-using static ShopLookup.Content.Sys.SLConfig;
+using System.Text;
+using static RUIModule.RUIHelper;
+using static ShopLookup.Content.Data.ShopNPCData;
+using static ShopLookup.ShopLookup;
 
 namespace ShopLookup.Content.UI.ExtraUI
 {
-    public class UIShopSlot : UIVnlPanel
+    public class UIShopSlot(Texture2D icon) : UIIconSlot(icon)
     {
-        internal static UIShopSlot HoverSlot;
-        internal static readonly Condition empty = new("Mods.ShopLookup.NoCondition", () => true);
-        public readonly UIItemSlot itemSlot;
-        public readonly int npcType;
-        public readonly ExShopType exType;
-        public readonly CdCheck[] cdChecks;
-        public readonly UICurrency currency;
-        private bool buying;
-        private int buyTime;
-        private int buyCD;
-        private int buyStack;
-        public readonly bool hardCode;
-        public UIShopSlot(Item item, IEnumerable<Condition> cds = null, bool hardCode = true) : base(0, 0, opacity: 0)
+        public virtual UIShopSlot Clone() => new(icon);
+    }
+    public class UIShopSlotForNPC : UIShopSlot
+    {
+        public int npcType;
+        public readonly bool nonPermanent;
+        public UIShopSlotForNPC(int npcType) : this(npcType, FindHead(npcType)) { }
+        private UIShopSlotForNPC(int npcType, Texture2D head) : base(head)
         {
-            item.isAShopItem = true;
-            this.hardCode = hardCode;
-            if (Ins.FlowLayout || hardCode)
-            {
-                Info.IsSensitive = true;
-                SetSize(52, 52);
-                itemSlot = new(item);
-                Register(itemSlot);
-                currency = new(item.shopCustomPrice ?? item.value, item.shopSpecialCurrency);
-
-                if (cds?.Any() == true)
-                {
-                    int i = 0;
-                    cdChecks = new CdCheck[cds.Count()];
-                    foreach (Condition c in cds)
-                        cdChecks[i++] = new(c, -1);
-                }
-                else
-                    cdChecks = [new(empty, -1)];
-            }
-            else
-            {
-                Info.SetMargin(10);
-                Info.IsSensitive = true;
-                Info.Width.Set(0, 1);
-
-                itemSlot = new(item);
-                itemSlot.SetCenter(26, 0, 0, 0.5f);
-                Register(itemSlot);
-
-                UIText name = new(item.Name);
-                name.SetPos(62, 0);
-                name.SetSize(-62, 30, 1);
-                name.SetMaxWidth(name.Width);
-                Register(name);
-
-                currency = new(item.shopCustomPrice ?? item.value, item.shopSpecialCurrency);
-                currency.SetPos(62, 30);
-                Register(currency);
-
-                if (cds?.Any() == true)
-                {
-                    int i = 0;
-                    cdChecks = new CdCheck[cds.Count()];
-                    foreach (Condition c in cds)
-                        cdChecks[i++] = new(c, Width - 82);
-                }
-                else
-                    cdChecks = [new(empty, Width - 82)];
-                ReSetBuy();
-            }
-        }
-        public UIShopSlot(AbstractNPCShop.Entry entry, int npcType) : this(entry.Item, entry.Conditions, false)
-        {
+            if (npcType <= 0)
+                throw new Exception("NPCID must be > 0");
             this.npcType = npcType;
-        }
-        public UIShopSlot(AbstractNPCShop.Entry entry, ExShopType exType) : this(entry.Item, entry.Conditions, false)
-        {
-            this.exType = exType;
-        }
-        public override void LoadEvents()
-        {
-            if (Ins.FlowLayout && !hardCode)
+            Main.instance.LoadNPC(npcType);
+            hoverText = ContentSamples.NpcsByNetId[npcType].TypeName;
+            nonPermanent = NonPermanentNPCs.ContainsKey(npcType);
+            if (nonPermanent)
             {
-                Events.OnMouseOver += evt => HoverSlot = this;
-                Events.OnMouseOut += evt => HoverSlot = null;
-            }
-            itemSlot.Events.OnLeftDown += CheckBuyItem;
-            itemSlot.Events.OnRightDown += CheckBuyItem;
-        }
-        public override void Calculation()
-        {
-            if (ParentElement == null)
-                return;
-            if (!Ins.FlowLayout && !hardCode)
-            {
-                float width = Info.Width.GetPixelBaseParent(ParentElement.Width);
-                float height = 0;
-                foreach (CdCheck cd in cdChecks)
+                overrideSlot = AssetLoader.ExtraAssets["Permanent"];
+                Events.OnMouseOver += evt =>
                 {
-                    cd.Calculate(width - 82);
-                    height += cd.TextY;
-                }
-                Info.Height.Pixel = height + 70;
+                    hoverText = ContentSamples.NpcsByNetId[npcType].TypeName;
+                    foreach (Condition c in NonPermanentNPCs[npcType])
+                    {
+                        hoverText += new StringBuilder()
+                            .AppendLine()
+                            .Append("[c/")
+                            .Append(c.IsMet() ? "00FF00" : "FF0000")
+                            .Append(':')
+                            .Append(c.Description.Value)
+                            .Append(']');
+                    }
+                };
             }
-            base.Calculation();
         }
         public override void Update(GameTime gt)
         {
-            if (buying)
-                BuyItem();
+            if (nonPermanent)
+            {
+                if (overrideSlot == null)
+                {
+                    if (NonPermanentNPCs[npcType].Any(x => !x.IsMet()))
+                    {
+                        overrideSlot = AssetLoader.ExtraAssets["Permanent"];
+                    }
+                }
+                else if (NonPermanentNPCs[npcType].All(x => x.IsMet()))
+                {
+                    overrideSlot = null;
+                    slotID = 2;
+                }
+            }
+            else
+                slotID = VisitedNPCs.Contains(npcType) ? 2 : 1;
         }
         public override void DrawSelf(SpriteBatch sb)
         {
-            base.DrawSelf(sb);
-            float y = 70;
-            foreach (CdCheck cd in cdChecks)
+            DrawSlot(sb);
+            if (icon == null)
             {
-                if (Ins.Portable || Ins.PermanentTips)
-                {
-                    cd.Update(Info.IsMouseHover, buying);
-                }
-                if (!Ins.FlowLayout && !hardCode)
-                {
-                    ChatManager.DrawColorCodedStringWithShadow(sb, FontAssets.MouseText.Value, cd.Desc,
-                     HitBox().TopLeft() + new Vector2(72, y), cd.Color, 0, Vector2.Zero, Vector2.One, -1, 1.5f);
-                    y += cd.TextY;
-                }
+                Texture2D npc = TextureAssets.Npc[npcType].Value;
+                int height = npc.Height / Main.npcFrameCount[npcType];
+                Rectangle frame = new(0, 0, npc.Width, height);
+                Vector2 size = frame.Size();
+                sb.Draw(npc, Center(), frame, Color.White, 0, size / 2f, size.AutoScale(), 0, 0);
             }
+            else
+                sb.SimpleDraw(icon, Center(), null, icon.Size() / 2f);
         }
-        private bool CheckNPCAcitve()
+        public override UIShopSlot Clone() => new UIShopSlotForNPC(npcType, icon);
+        private static Texture2D FindHead(int npcType)
         {
-            if (hardCode)
-                return true;
-            if (ShopLookup.NonPermanentNPCs.TryGetValue(npcType, out var cds) && cds.All(x => x.IsMet()))
+            if (SpecialNPCHeads.TryGetValue(npcType, out var head))
+                return head;
+            foreach (var info in ModsByName.Values)
             {
-                return true;
+                if (info.npcAndHead?.TryGetValue(npcType, out head) == true)
+                    return head;
             }
-            if (exType == ExShopType.None && npcType >= 0 && NPC.FindFirstNPC(npcType) >= 0)
-            {
-                return true;
-            }
-            return false;
+            return null;
         }
-        private void CheckBuyItem(BaseUIElement uie)
+    }
+    public class UIShopSlotForEx : UIShopSlot
+    {
+        public readonly string modName;
+        public readonly string exShopType;
+
+        public UIShopSlotForEx(string modName, string exShopType) : base(ExtraShopDataBase.ModShops[modName][exShopType])
         {
-            if (!Ins.Portable)
-                return;
-            if (!hardCode && exType == ExShopType.None && !CheckNPCAcitve())
-            {
-                Main.NewText(GTV("NoActive"));
-                return;
-            }
-            foreach (CdCheck cd in cdChecks)
-            {
-                bool noMet = false;
-                if (!cd.IsMet)
-                {
-                    cd.StartBlink();
-                    noMet = true;
-                }
-                if (noMet)
-                {
-                    Main.NewText(GTV("NoMet"));
-                    return;
-                }
-            }
-            if (!Main.LocalPlayer.CanAfford(currency.value, currency.currencyID))
-            {
-                currency.StartBlink();
-                Main.NewText(GTV("CantAfford"));
-                return;
-            }
-            Main.playerInventory = true;
-            buying = true;
+            this.modName = modName;
+            this.exShopType = exShopType;
+            hoverText = Language.GetTextValue($"Mods.{modName}.FakeShops.{exShopType}.Label");
+            slotID = 14;
         }
-        private void BuyItem()
+        internal UIShopSlotForEx(ExtraShop extraShop) : this(extraShop.ModName, extraShop.ExShopType)
         {
-            if (!Info.IsMouseHover)
-            {
-                ReSetBuy();
-            }
-            ref Item mouse = ref Main.mouseItem;
-            int type = itemSlot.item.type;
-            if (mouse.type != type && mouse.type > 0)
-            {
-                ReSetBuy();
-                return;
-            }
-            Player p = Main.LocalPlayer;
-            if (Main.mouseLeft)
-            {
-                Item.NewItem(p.GetSource_GiftOrReward(), p.Hitbox, type);
-                p.BuyItem(currency.value, currency.currencyID);
-                ReSetBuy();
-                return;
-            }
-            if (Main.mouseRight)
-            {
-                if (buyTime == 30)
-                {
-                    if (mouse.type == 0)
-                    {
-                        mouse = new(type);
-                    }
-                    else
-                    {
-                        mouse.stack++;
-                    }
-                    p.BuyItem(currency.value, currency.currencyID);
-                    buyCD = buyTime = 20;
-                }
-                else if (buyCD <= 0)
-                {
-                    for (int i = 0; i < buyStack; i++)
-                    {
-                        if (ItemCheck(mouse, p))
-                        {
-                            mouse.stack++;
-                        }
-                        else
-                            return;
-                    }
-                    buyCD = --buyTime / 2;
-                    if (buyTime == 0)
-                    {
-                        buyTime = 3;
-                        buyStack++;
-                    }
-                }
-                buyCD--;
-            }
         }
-        private bool ItemCheck(Item hover, Player p)
-        {
-            if (hover.stack < hover.maxStack && p.CanAfford(currency.value, currency.currencyID))
-            {
-                p.BuyItem(currency.value, currency.currencyID);
-                return true;
-            }
-            return ReSetBuy();
-        }
-        private bool ReSetBuy()
-        {
-            buying = false;
-            buyTime = 30;
-            buyCD = 0;
-            buyStack = 1;
-            return false;
-        }
+
+        public override UIShopSlot Clone() => new UIShopSlotForEx(modName, exShopType);
     }
 }

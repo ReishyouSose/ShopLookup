@@ -10,19 +10,19 @@ namespace ShopLookup.Content.UI;
 
 public class ReBuild : ContainerElement
 {
-    private UIContainerPanel searchNPC, searchItem, shopView;
+    private UIContainerPanel searchShop, searchItem, shopView;
     private UIBottom shopPanel, searchPanel;
     private UIItemSlot focus;
     private UIDropDownList<UIShopName> indexList;
     private UIDropDownList<UIModSlot> modList;
-    private UIDropDownList<UINPCSlot> npcList;
+    private UIDropDownList<UIShopSlot> shopList;
     private UIInputBox input;
     private List<UIItemFilter> filters;
     private bool inShopPanel;
     private bool onlyCanBuy;
     private bool anyFilterActive;
-    private bool InExShop => modList.ShowUIE.modName == "ShopLookup";
-    private ref bool FlowLayout => ref SLConfig.Ins.FlowLayout;
+    private bool init;
+    private static ref bool FlowLayout => ref SLConfig.Ins.FlowLayout;
     public override void OnInitialization()
     {
         base.OnInitialization();
@@ -31,7 +31,7 @@ public class ReBuild : ContainerElement
         RemoveAll();
         FlowLayout = false;
 
-        UIVnlPanel bg = new(530, 350);
+        UIVnlPanel bg = new(530, 370);
         bg.Info.SetMargin(10);
         bg.SetCenter(0, 0, 0.5f, 0.5f);
         bg.canDrag = true;
@@ -76,6 +76,8 @@ public class ReBuild : ContainerElement
             FlowLayout = false;
             shopView.autoPos = [10, null];
             shopView.Vscroll.WheelPixel = 110;
+            searchItem.autoPos = [10, null];
+            searchItem.Vscroll.WheelPixel = 110;
             LookupShop();
             if (!inShopPanel)
             {
@@ -106,12 +108,26 @@ public class ReBuild : ContainerElement
         UIAdjust adjust = new(AssetLoader.VnlAdjust) { hoverText = GTV("UIButton.Adjust") };
         bg.Register(adjust);
     }
+    public override void Update(GameTime gt)
+    {
+        UIShopItem.HoverSlot = null;
+        base.Update(gt);
+    }
     public override void OnSaveAndQuit()
     {
+        init = false;
         Info.IsVisible = false;
         RemoveAll();
     }
-
+    public void FirstLoad()
+    {
+        FinishSetup();
+        if (!init)
+        {
+            OnInitialization();
+            init = true;
+        }
+    }
     private void RegisterShopPanel(UIBottom bg)
     {
         int top = 10;
@@ -121,14 +137,10 @@ public class ReBuild : ContainerElement
         focus.Events.OnLeftDown += evt =>
         {
             int type = Main.mouseItem.type;
-            if (type > ItemID.None)
+            focus.item.SetDefaults(type);
+            if (type == 0)
             {
-                LookupItem(type);
-            }
-            else
-            {
-                focus.item.SetDefaults(0);
-                indexList.ChangeShowElement(0);
+                LookupIndex();
                 LookupShop();
             }
         };
@@ -139,21 +151,13 @@ public class ReBuild : ContainerElement
         shopBg.Info.SetMargin(10);
         bg.Register(shopBg);
 
-        npcList = new(bg, shopBg, x =>
-        {
-            if (x is UIExShopSlot ex)
-            {
-                return new UIExShopSlot(ExtraShop.extraShops[(int)ex.exShopType - 1]);
-            }
-            else
-                return new(x.npcType) { icon = x.icon, hoverText = x.hoverText };
-        });
+        shopList = new(bg, shopBg, x => x.Clone());
 
-        npcList.showArea.SetPos(left, top - 2);
-        npcList.showArea.SetSize(90, 52);
-        npcList.showArea.Info.RightMargin.Pixel = 0;
-        npcList.showArea.Info.IsSensitive = true;
-        left += npcList.showArea.Width + 10;
+        shopList.showArea.SetPos(left, top - 2);
+        shopList.showArea.SetSize(90, 52);
+        shopList.showArea.Info.RightMargin.Pixel = 0;
+        shopList.showArea.Info.IsSensitive = true;
+        left += shopList.showArea.Width + 10;
 
         modList = new(bg, shopBg, x => new(x.modName, ModsByName[x.modName]) { hoverText = x.hoverText });
 
@@ -161,7 +165,7 @@ public class ReBuild : ContainerElement
         modList.showArea.SetSize(90, 52);
         modList.showArea.Info.RightMargin.Pixel = 0;
         modList.showArea.Info.IsSensitive = true;
-        left += modList.showArea.Width + 10;
+        left += modList.showArea.Width + 15;
 
         top += focus.Height + 10;
 
@@ -210,15 +214,15 @@ public class ReBuild : ContainerElement
             this.onlyCanBuy = !this.onlyCanBuy;
             FlowLayout = true;
             shopView.autoPos = [10, 10];
+            shopView.Vscroll.WheelPixel = 62;
             onlyCanBuy.color = this.onlyCanBuy ? Color.Gold : Color.White;
             LookupShop();
         };
         onlyCanBuy.Events.OnMouseOver += evt =>
         {
             evt.hoverText = GTV("UIButton.OnlyCanBuy");
-            if (!InExShop)
+            if (!FocusShop(out _, out int npcType, out _, out _))
             {
-                int npcType = npcList.ShowUIE.npcType;
                 int index = NPC.FindFirstNPC(npcType);
                 evt.hoverText += new StringBuilder()
                     .AppendLine()
@@ -233,7 +237,7 @@ public class ReBuild : ContainerElement
 
         shopView = new();
         shopView.SetSize(-30, 0, 1, 1);
-        shopView.autoPos[0] = 10;
+        shopView.autoPos = [10, null];
         shopBg.Register(shopView);
 
         indexList = new(bg, shopView, x => x.Clone());
@@ -271,62 +275,22 @@ public class ReBuild : ContainerElement
 
         modList.expandView.autoPos = [10, 10];
 
-        npcList.expandArea.SetPos(0, top);
-        npcList.expandArea.SetSize(0, -top, 1, 1);
+        shopList.expandArea.SetPos(0, top);
+        shopList.expandArea.SetSize(0, -top, 1, 1);
 
-        npcList.expandView.autoPos = [10, 10];
+        shopList.expandView.autoPos = [10, 10];
 
         foreach (var (name, modInfo) in ModsByName)
         {
             UIModSlot modSlot = new(name, modInfo);
             modSlot.BorderHoverToGold();
             modList.AddElement(modSlot);
-            if (name == "ShopLookup")
-            {
-                modSlot.Events.OnLeftDown += evt =>
-                {
-                    npcList.ClearAllElements();
-                    foreach (ExShop exShop in ExtraShop.extraShops)
-                    {
-                        UIExShopSlot slot = new(exShop);
-                        npcList.AddElement(slot);
-                        slot.Events.OnLeftDown += evt => LookupShop();
-                        slot.BorderHoverToGold();
-                    }
-                    npcList.ChangeShowElement(0);
-                    BaseUIElement uie = npcList.expandView.InnerUIE[0];
-                    uie.Events.LeftDown(uie);
-                };
-            }
-            else
-            {
-                modSlot.Events.OnLeftDown += evt =>
-                {
-                    npcList.ClearAllElements();
-                    UIModSlot modSlot = evt as UIModSlot;
-                    foreach (var (npcType, head) in ModsByName[modSlot.modName].npcAndHead)
-                    {
-                        UINPCSlot slot = new(npcType, SpecialNPCHeads.TryGetValue(npcType, out Texture2D spHead) ? spHead : head);
-                        slot.Events.OnLeftDown += evt =>
-                        {
-                            LookupIndex(slot.npcType);
-                            LookupShop();
-                        };
-                        slot.BorderHoverToGold();
-                        npcList.AddElement(slot);
-                    }
-                    npcList.ChangeShowElement(0);
-                    BaseUIElement uie = npcList.expandView.InnerUIE[0];
-                    uie.Events.LeftDown(uie);
-                };
-            }
-            modList.ChangeShowElement(0);
-            BaseUIElement uie = modList.expandView.InnerUIE[0];
-            uie.Events.LeftDown(uie);
-            npcList.ChangeShowElement(0);
-            uie = npcList.expandView.InnerUIE[0];
-            uie.Events.LeftDown(uie);
+            modSlot.Events.OnLeftDown += evt => LookupMod();
         }
+        modList.ChangeShowElement(0);
+        BaseUIElement uie = modList.expandView.InnerUIE[0];
+        uie.Events.LeftDown(uie);
+        Calculation();
     }
     private void ReigsterSearchPanel(UIBottom bg)
     {
@@ -342,7 +306,7 @@ public class ReBuild : ContainerElement
         inputBg.Register(input);
 
         UIClose clear = new();
-        clear.SetPos(-25, 4, 1);
+        clear.SetCenter(-20, 0, 1, 0.5f);
         clear.Events.OnLeftDown += evt => input.ClearText();
         inputBg.Register(clear);
 
@@ -353,14 +317,14 @@ public class ReBuild : ContainerElement
         bg.Register(npcBg);
         top += npcBg.Height + 10;
 
-        searchNPC = new();
-        searchNPC.SetSize(0, 0, 1, 1);
-        searchNPC.autoPos[1] = 5;
-        npcBg.Register(searchNPC);
+        searchShop = new();
+        searchShop.SetSize(0, 0, 1, 1);
+        searchShop.autoPos[1] = 5;
+        npcBg.Register(searchShop);
 
         HorizontalScrollbar npcH = new(62);
         npcH.Info.Top.Pixel += 10;
-        searchNPC.SetHorizontalScrollbar(npcH);
+        searchShop.SetHorizontalScrollbar(npcH);
         npcBg.Register(npcH);
 
         UIVnlPanel itemBg = new(0, 0);
@@ -370,7 +334,7 @@ public class ReBuild : ContainerElement
         bg.Register(itemBg);
 
         searchItem = new();
-        searchItem.SetSize(0, 0, 1, 1);
+        searchItem.SetSize(-30, 0, 1, 1);
         searchItem.autoPos[0] = 10;
         itemBg.Register(searchItem);
 
@@ -379,95 +343,182 @@ public class ReBuild : ContainerElement
         searchItem.SetVerticalScrollbar(itemV);
         itemBg.Register(itemV);
     }
-    private void LookupIndex(int npc)
+
+    /// <returns>是否在ExShop</returns>
+    private bool FocusShop(out string shopName, out int npcType, out string exShopType, out string modName)
     {
-        indexList.ClearAllElements();
-        foreach (string name in NPCShopDatabase.AllShops.Where(x => x.NpcType == npc).Select(x => x.Name))
+        exShopType = "";
+        npcType = 0;
+        shopName = indexList.ShowUIE?.key ?? "";
+        modName = modList.ShowUIE.modName;
+        if (shopList.ShowUIE is UIShopSlotForEx ex)
         {
-            UIShopName shopName = ShopNames.TryGetValue(npc, out var shops)
-                && shops.TryGetValue(name, out LocalizedText localName) ?
-                new(localName.Value, name) : new(name);
-            shopName.SetSize(shopName.TextSize);
-            shopName.HoverToGold();
-            indexList.AddElement(shopName);
-            shopName.Events.OnLeftDown += evt => LookupShop();
+            exShopType = ex.exShopType;
+            return true;
+        }
+        if (shopList.ShowUIE is UIShopSlotForNPC npc)
+        {
+            npcType = npc.npcType;
+        }
+        return false;
+    }
+    private void LookupIndex()
+    {
+        void AddToIndexList(UIShopName index)
+        {
+            index.SetSize(index.TextSize);
+            index.HoverToGold();
+            indexList.AddElement(index);
+            index.Events.OnLeftDown += evt => LookupShop();
+        }
+        if (focus.item.type > ItemID.None)
+            focus.item.SetDefaults(0);
+        indexList.ClearAllElements();
+        if (FocusShop(out _, out int npcType, out string exShopType, out string modName))
+        {
+            foreach (var exShop in ExtraShopDataBase.AllShops)
+            {
+                if (exShop.ModName == modName && exShop.ExShopType == exShopType)
+                {
+                    AddToIndexList(new(exShop.DisplayName, exShop.Name));
+                }
+            }
+        }
+        else
+        {
+            foreach (var shop in NPCShopDatabase.AllShops)
+            {
+                if (shop.NpcType == npcType)
+                {
+                    string name = shop.Name;
+                    AddToIndexList(ShopNames.TryGetValue(npcType, out var shops)
+                          && shops.TryGetValue(name, out LocalizedText localName) ?
+                          new(localName.Value, name) : new(name));
+                }
+            }
         }
         indexList.ChangeShowElement(0);
+        var uie = indexList.expandView.InnerUIE[0];
+        uie.Events.LeftDown(uie);
     }
     private void SearchAny(string text)
     {
-        searchNPC.ClearAllElements();
+        searchShop.ClearAllElements();
         searchItem.ClearAllElements();
         if (text.Length != 0)
         {
             foreach (var (mod, info) in ModsByName)
             {
                 var npcAndHead = info.npcAndHead;
-                if (npcAndHead == null)
-                    continue;
-                foreach (var (npc, head) in npcAndHead)
+                if (npcAndHead != null)
                 {
-                    if (ContentSamples.NpcsByNetId[npc].TypeName.Contains(text))
+                    foreach (var (npc, head) in npcAndHead)
                     {
-                        UINPCSlot slot = new(npc, head);
+                        if (ContentSamples.NpcsByNetId[npc].TypeName.Contains(text))
+                        {
+                            UIShopSlotForNPC slot = new(npc);
+                            slot.hoverText += "\n" + GTV("Source", " " + (info.mod.DisplayName ?? "Terraria"));
+                            string modName = mod;
+                            int npcType = npc;
+                            slot.Events.OnLeftDown += evt =>
+                            {
+                                ChangePanel();
+                                foreach (UIModSlot modSlot in modList.expandView.InnerUIE.Cast<UIModSlot>())
+                                {
+                                    if (modSlot.modName == modName)
+                                    {
+                                        modSlot.Events.LeftDown(modSlot);
+                                        break;
+                                    }
+                                }
+                                foreach (UIShopSlot shopSlot in shopList.expandView.InnerUIE.Cast<UIShopSlot>())
+                                {
+                                    if (shopSlot is UIShopSlotForNPC npcSlot && npcSlot.npcType == npcType)
+                                    {
+                                        shopSlot.Events.LeftDown(shopSlot);
+                                        break;
+                                    }
+                                }
+                            };
+                            searchShop.AddElement(slot);
+                        }
+                    }
+                }
+                foreach (ExtraShop exShop in ExtraShopDataBase.AllShops)
+                {
+                    if (exShop.TypeName.Contains(text))
+                    {
+                        UIShopSlotForEx slot = new(exShop);
                         slot.hoverText += "\n" + GTV("Source", " " + (info.mod.DisplayName ?? "Terraria"));
-                        string modName = mod;
-                        int npcType = npc;
                         slot.Events.OnLeftDown += evt =>
                         {
+                            UIShopSlotForEx thisSlot = evt as UIShopSlotForEx;
                             ChangePanel();
                             foreach (UIModSlot modSlot in modList.expandView.InnerUIE.Cast<UIModSlot>())
                             {
-                                if (modSlot.modName == modName)
+                                if (modSlot.modName == exShop.ModName)
                                 {
                                     modSlot.Events.LeftDown(modSlot);
                                     break;
                                 }
                             }
-                            foreach (UINPCSlot npcSlot in npcList.expandView.InnerUIE.Cast<UINPCSlot>())
+                            foreach (UIShopSlot shopSlot in shopList.expandView.InnerUIE.Cast<UIShopSlot>())
                             {
-                                if (npcSlot.npcType == npcType)
+                                if (shopSlot is UIShopSlotForEx exSlot && exSlot.exShopType == thisSlot.exShopType)
                                 {
-                                    npcSlot.Events.LeftDown(npcSlot);
+                                    shopSlot.Events.LeftDown(shopSlot);
                                     break;
                                 }
                             }
                         };
-                        searchNPC.AddElement(slot);
                     }
                 }
             }
-            if (searchNPC.InnerUIE.Count == 0)
+            if (searchShop.InnerUIE.Count == 0)
             {
                 UIText none = new(GTV("NoResult"));
-                searchNPC.AddElement(none);
+                searchShop.AddElement(none);
             }
-            foreach (var shops in NPCShopDatabase.AllShops)
+            foreach (var shop in NPCShopDatabase.AllShops)
             {
-                foreach (var entry in shops.ActiveEntries)
+                foreach (var entry in shop.ActiveEntries)
                 {
-                    if (entry.Item.Name.Contains(text))
+                    if (entry.Item.Name.Contains(text) && !PylonIDs.Contains(entry.Item.type))
                     {
-                        string name = shops.Name;
-                        UIShopSlot slot = new(entry, shops.NpcType);
+                        string name = shop.Name;
+                        UIShopItemForNPC slot = new(shop.NpcType, entry);
                         if (!FlowLayout)
                         {
-                            slot.hoverText = $"{ContentSamples.NpcsByNetId[slot.npcType].TypeName} [{name}]";
+                            slot.hoverText = "";
+                            string[] tooltips = shop.FullName.Split('/');
+                            int i = 0;
+                            foreach (var tooltip in tooltips)
+                            {
+                                slot.hoverText += i++ switch
+                                {
+                                    0 => ModsByName[tooltip].mod.DisplayName ?? "Terraria" + '\n',
+                                    1 => ContentSamples.NpcsByNetId[shop.NpcType].TypeName + '\n',
+                                    2 => tooltip,
+                                    _ => ""
+                                };
+                            }
                         }
                         searchItem.AddElement(slot);
                     }
                 }
             }
-            foreach (var shops in ExtraShop.extraShops)
+            foreach (var shop in ExtraShopDataBase.AllShops)
             {
-                foreach (var entry in shops.ActiveEntries)
+                foreach (var entry in shop.Entries)
                 {
                     if (entry.Item.Name.Contains(text))
                     {
-                        UIShopSlot slot = new(entry, shops.exType);
+                        UIShopItemForEx slot = new(shop.ExShopType, shop.ModName, entry);
                         if (!FlowLayout)
                         {
-                            slot.hoverText = GTV("SpecialShop." + shops.exType + ".Label");
+                            slot.hoverText += new StringBuilder(ModsByName[shop.ModName].mod.DisplayName)
+                                .AppendLine().Append(shop.DisplayName)
+                                .AppendLine().Append(shop.TypeName);
                         }
                         searchItem.AddElement(slot);
                     }
@@ -483,43 +534,7 @@ public class ReBuild : ContainerElement
     public void LookupItem(int type)
     {
         focus.item.SetDefaults(type);
-        shopView.ClearAllElements();
-        indexList.ChangeShowElement(new UIShopName(GTV("LookupItem", ContentSamples.ItemsByType[type].Name)));
-        foreach (var shops in NPCShopDatabase.AllShops)
-        {
-            foreach (var entry in shops.ActiveEntries)
-            {
-                if (entry.Item.type == type)
-                {
-                    string mod = shops.FullName[..shops.FullName.IndexOf('/')];
-                    UIShopSlot slot = new(entry, shops.NpcType)
-                    {
-                        hoverText = ModsByName[mod].mod.DisplayName + "\n" +
-                        $"{ContentSamples.NpcsByNetId[shops.NpcType].TypeName} [{shops.Name}]"
-                    };
-                    shopView.AddElement(slot);
-                }
-            }
-        }
-        foreach (var shops in ExtraShop.extraShops)
-        {
-            foreach (var entry in shops.ActiveEntries)
-            {
-                if (entry.Item.type == type)
-                {
-                    UIShopSlot slot = new(entry, shops.exType)
-                    {
-                        hoverText = GTV("SpecialShop." + shops.exType + ".Label")
-                    };
-                    shopView.AddElement(slot);
-                }
-            }
-        }
-        if (shopView.InnerUIE.Count == 0)
-        {
-            UIText none = new(GTV("NoSell"));
-            shopView.AddElement(none);
-        }
+        LookupShop();
     }
     private void ChangePanel()
     {
@@ -556,61 +571,93 @@ public class ReBuild : ContainerElement
     private void LookupShop()
     {
         shopView.ClearAllElements();
-        if (InExShop)
+        int itemType = focus.item.type;
+        if (itemType > ItemID.None)
         {
-            foreach (ExShop exshop in ExtraShop.extraShops)
+            indexList.ChangeShowElement(new UIShopName(GTV("LookupItem", ContentSamples.ItemsByType[itemType].Name)));
+            foreach (var shops in NPCShopDatabase.AllShops)
             {
-                if (npcList.ShowUIE is UIExShopSlot exSlot && exSlot.exShopType == exshop.exType)
+                foreach (var entry in shops.ActiveEntries)
                 {
-                    bool pylon = exSlot.exShopType == ExShopType.Pylon;
-                    if (onlyCanBuy)
+                    if (entry.Item.type == itemType)
                     {
-                        if (exshop.shop.TryGetCanBuyEntrys(InExShop, out Item[] contents))
+                        string name = shops.Name;
+                        UIShopItemForNPC slot = new(shops.NpcType, entry);
+                        if (!FlowLayout)
                         {
-                            foreach (Item item in contents)
-                            {
-                                if (!FitsFilter(item, !pylon))
-                                    continue;
-                                UIShopSlot slot = new(item);
-                                shopView.AddElement(slot);
-                            }
+                            slot.hoverText = $"{ContentSamples.NpcsByNetId[slot.npcType].TypeName} [{name}]";
                         }
+                        shopView.AddElement(slot);
                     }
-                    else
-                    {
-                        foreach (var entry in exshop.ActiveEntries)
-                        {
-                            if (!FitsFilter(entry.Item, !pylon))
-                                continue;
-                            UIShopSlot slot = new(entry, exshop.exType);
-                            shopView.AddElement(slot);
-                        }
-                        if (exSlot.exShopType == ExShopType.QoT && shopView.InnerUIE.Count == 0)
-                        {
-                            UIText disable = new(GTV("SpecialShop.QoT.Disable"));
-                            disable.SetSize(disable.TextSize);
-                            shopView.AddElement(disable);
-                        }
-                    }
-                    break;
                 }
+            }
+            foreach (var shop in ExtraShopDataBase.AllShops)
+            {
+                foreach (var entry in shop.Entries)
+                {
+                    if (entry.Item.type == itemType)
+                    {
+                        UIShopItemForEx slot = new(shop.ExShopType, shop.ModName, entry);
+                        if (!FlowLayout)
+                        {
+                            slot.hoverText = shop.DisplayName;
+                        }
+                        shopView.AddElement(slot);
+                    }
+                }
+            }
+            if (shopView.InnerUIE.Count == 0)
+            {
+                UIText none = new(GTV("NoSell"));
+                shopView.AddElement(none);
             }
         }
         else
         {
-            foreach (AbstractNPCShop shop in NPCShopDatabase.AllShops)
+            if (FocusShop(out string shopName, out int npcType, out string exShopType, out string modName))
             {
-                if (shop.NpcType == npcList.ShowUIE.npcType && shop.Name == indexList.ShowUIE.key)
+                if (ExtraShopDataBase.TryGetExtraShop(modName, exShopType, shopName, out ExtraShop exShop))
+                {
+                    bool pylon = exShopType == "Pylon";
+                    if (onlyCanBuy)
+                    {
+                        foreach (var entry in exShop.Entries)
+                        {
+                            if (!entry.Conditions.AllMet() || !FitsFilter(entry.Item, !pylon))
+                                continue;
+                            shopView.AddElement(new UIShopItem(entry.Item));
+                        }
+                    }
+                    else
+                    {
+                        foreach (var entry in exShop.Entries)
+                        {
+                            if (!FitsFilter(entry.Item, !pylon))
+                                continue;
+                            shopView.AddElement(new UIShopItemForEx(exShop.ExShopType, exShop.ModName, entry));
+                        }
+                        if (shopView.InnerUIE.Count == 0)
+                        {
+                            UIText disable = new(exShop.DisableName);
+                            disable.SetSize(disable.TextSize);
+                            shopView.AddElement(disable);
+                        }
+                    }
+                }
+            }
+            else
+            {
+                if (NPCShopDatabase.TryGetNPCShop(NPCShopDatabase.GetShopName(npcType, shopName), out var shop))
                 {
                     if (onlyCanBuy)
                     {
-                        if (shop.TryGetCanBuyEntrys(InExShop, out Item[] contents))
+                        if (shop.TryGetCanBuyEntrys(out Item[] contents))
                         {
                             foreach (Item item in contents)
                             {
                                 if (!FitsFilter(item))
                                     continue;
-                                UIShopSlot slot = new(item);
+                                UIShopItem slot = new(item);
                                 shopView.AddElement(slot);
                             }
                         }
@@ -621,11 +668,9 @@ public class ReBuild : ContainerElement
                         {
                             if (!FitsFilter(entry.Item))
                                 continue;
-                            UIShopSlot slot = new(entry, shop.NpcType);
-                            shopView.AddElement(slot);
+                            shopView.AddElement(new UIShopItemForNPC(shop.NpcType, entry));
                         }
                     }
-                    break;
                 }
             }
         }
@@ -636,5 +681,36 @@ public class ReBuild : ContainerElement
             shopView.AddElement(empty);
         }
         shopView.Calculation();
+    }
+    private void LookupMod()
+    {
+        shopList.ClearAllElements();
+        void AddToShopList(UIShopSlot slot)
+        {
+            slot.BorderHoverToGold();
+            shopList.AddElement(slot);
+            slot.Events.OnLeftDown += evt => LookupIndex();
+        }
+        string modName = modList.ShowUIE.modName;
+        if (ModsByName.TryGetValue(modName, out var info) && info.npcAndHead != null)
+        {
+            foreach (int npcType in info.npcAndHead.Keys)
+            {
+                AddToShopList(new UIShopSlotForNPC(npcType));
+            }
+        }
+        if (ExtraShopDataBase.ModShops.TryGetValue(modName, out var shops) && shops != null)
+        {
+            foreach (string exShopType in shops.Keys)
+            {
+                AddToShopList(new UIShopSlotForEx(modName, exShopType));
+            }
+        }
+        shopList.ChangeShowElement(0);
+        if (shopPanel.IsVisible)
+        {
+            var uie = shopList.expandView.InnerUIE[0];
+            uie.Events.LeftDown(uie);
+        }
     }
 }
