@@ -25,6 +25,7 @@ SellPrice: 售价
 NoSavings: 无
 SearchAny: 搜索物品或NPC
 LookupItem: 查询物品 - {0}
+TravelMerchant: 右键刷新旅商商店
 
 UIButton: {
 	Adjust:
@@ -51,17 +52,19 @@ FakeShops: {
 
 	Vanilla: {
 		Label: 便捷商店
+		Disable: 无结果
 		Spawner: 召唤物商店
 		Fish: 钓鱼商店
 		Other: 杂项商店
 	}
 
-	QoT: {
-		Label: 更好的体验
-		Disable: 需要模组 更好的体验（QoT）
-		Wand: 魔杖商店
-		Locator: 定位球商店
-		Other: 杂项商店
+	Fish: {
+		Label: 钓鱼商店
+		Disable: 无结果
+		FishingRod: 钓竿
+		TackleAndBait: 钓具和鱼饵
+		QuestRewards: 任务奖励
+		Furnitures: 家具
 	}
 }
 
@@ -106,11 +109,6 @@ Configs: {
 				如果启用，玩家可能可以获取超出当前时期的素材
 				请谨慎使用
 				'''
-		}
-
-		FlowLayout: {
-			// Label: Flow Layout
-			// Tooltip: ""
 		}
 	}
 }

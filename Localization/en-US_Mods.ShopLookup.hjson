@@ -25,6 +25,7 @@ SellPrice: Price
 NoSavings: None
 SearchAny: Search item or npc
 LookupItem: Lookup Item - {0}
+TravelMerchant: Right click to refresh the Traveling Merchant shop
 
 UIButton: {
 	Adjust:
@@ -36,7 +37,7 @@ UIButton: {
 	Flow: Flow Layout
 	Strip: Strip Layout
 	Search: Switch to search panel
-	OnlyCanBuy: View only items available for purchase
+	OnlyCanBuy: View only purchasable items
 	Find: Requires {0} in the world
 	Return: Switch to shop panel
 }
@@ -51,17 +52,19 @@ FakeShops: {
 
 	Vanilla: {
 		Label: Convenience shop
+		Disable: No result
 		Spawner: Summoning shop
 		Fish: Fishing shop
 		Other: Other item shop
 	}
 
-	QoT: {
-		Label: Shop for Mod [Quality of Terraria]
-		Disable: Requires Mod [Quality of Terraria] (QoT)
-		Wand: Wand shop
-		Locator: Locator shop
-		Other: Other item shop
+	Fish: {
+		Label: Fishing Shop
+		Disable: No result
+		FishingRod: Fishing Rod
+		TackleAndBait: Tackle and Bait
+		QuestRewards: Quest Rewards
+		Furnitures: Furnitures
 	}
 }
 
@@ -106,11 +109,6 @@ Configs: {
 				If enab1e, players may be able to obtain items beyond the progress
 				Please use with caution
 				'''
-		}
-
-		FlowLayout: {
-			Label: Flow Layout
-			Tooltip: ""
 		}
 	}
 }

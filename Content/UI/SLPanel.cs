@@ -1,5 +1,4 @@
 ﻿using ShopLookup.Content.Data;
-using ShopLookup.Content.Sys;
 using ShopLookup.Content.UI.ExtraUI;
 using System.Linq;
 using System.Text;
@@ -8,7 +7,7 @@ using static ShopLookup.ShopLookup;
 
 namespace ShopLookup.Content.UI;
 
-public class ReBuild : ContainerElement
+public class SLPanel : ContainerElement
 {
     private UIContainerPanel searchShop, searchItem, shopView;
     private UIBottom shopPanel, searchPanel;
@@ -21,14 +20,13 @@ public class ReBuild : ContainerElement
     private bool inShopPanel;
     private bool onlyCanBuy;
     private bool anyFilterActive;
-    private static ref bool FlowLayout => ref SLConfig.Ins.FlowLayout;
+    internal static bool flowLayout;
+    public override bool SkipInMenu => true;
     public override void OnInitialization()
     {
         base.OnInitialization();
-        if (Main.gameMenu)
-            return;
         RemoveAll();
-        FlowLayout = false;
+        flowLayout = false;
 
         UIVnlPanel bg = new(530, 365);
         bg.Info.SetMargin(10);
@@ -58,7 +56,7 @@ public class ReBuild : ContainerElement
         bg.Register(move);
         top += 30;
 
-        UI2FrameImage search = new(AssetLoader.ExtraAssets["Search"]) { hoverText = GTV("UIButton.Search") };
+        UI3FrameImage search = new(AssetLoader.ExtraAssets["Search"], x => !inShopPanel) { hoverText = GTV("UIButton.Search") };
         search.SetPos(-20, top, 1);
         search.Events.OnLeftDown += evt =>
         {
@@ -68,11 +66,11 @@ public class ReBuild : ContainerElement
         bg.Register(search);
         top += 30;
 
-        UI2FrameImage strip = new(AssetLoader.ExtraAssets["StripLayout"]) { hoverText = GTV("UIButton.Strip") };
+        UI3FrameImage strip = new(AssetLoader.ExtraAssets["StripLayout"], x => !flowLayout) { hoverText = GTV("UIButton.Strip") };
         strip.SetPos(-20, top, 1);
         strip.Events.OnLeftDown += evt =>
         {
-            FlowLayout = false;
+            flowLayout = false;
             shopView.autoPos = [10, null];
             shopView.Vscroll.WheelPixel = 110;
             searchItem.autoPos = [10, null];
@@ -86,11 +84,11 @@ public class ReBuild : ContainerElement
         bg.Register(strip);
         top += 30;
 
-        UI2FrameImage flow = new(AssetLoader.ExtraAssets["FlowLayout"]) { hoverText = GTV("UIButton.Flow") };
+        UI3FrameImage flow = new(AssetLoader.ExtraAssets["FlowLayout"], x => flowLayout) { hoverText = GTV("UIButton.Flow") };
         flow.SetPos(-20, top, 1);
         flow.Events.OnLeftDown += evt =>
         {
-            FlowLayout = true;
+            flowLayout = true;
             shopView.autoPos = [10, 10];
             shopView.Vscroll.WheelPixel = 62;
             LookupShop();
@@ -201,11 +199,23 @@ public class ReBuild : ContainerElement
         onlyCanBuy.Events.OnLeftDown += evt =>
         {
             this.onlyCanBuy = !this.onlyCanBuy;
-            FlowLayout = true;
+            flowLayout = true;
             shopView.autoPos = [10, 10];
             shopView.Vscroll.WheelPixel = 62;
             onlyCanBuy.color = this.onlyCanBuy ? Color.Gold : Color.White;
             LookupShop();
+        };
+        onlyCanBuy.Events.OnRightDown += evt =>
+        {
+            shopView.ClearAllElements();
+            flowLayout = true;
+            shopView.autoPos = [10, 10];
+            Chest.SetupTravelShop();
+            foreach (int itemID in Main.travelShop)
+            {
+                if (itemID > ItemID.None)
+                    shopView.AddElement(new UIShopItem(ContentSamples.ItemsByType[itemID]));
+            }
         };
         onlyCanBuy.Events.OnMouseOver += evt =>
         {
@@ -221,6 +231,7 @@ public class ReBuild : ContainerElement
                     .Append(GTV("UIButton.Find", ContentSamples.NpcsByNetId[npcType].TypeName))
                     .Append(']');
             }
+            evt.hoverText += "\n" + GTV("TravelMerchant");
         };
         bg.Register(onlyCanBuy);
 
@@ -446,34 +457,36 @@ public class ReBuild : ContainerElement
                         }
                     }
                 }
-                foreach (ExtraShop exShop in ExtraShopDataBase.AllShops)
+            }
+            HashSet<string> added = [];
+            foreach (ExtraShop exShop in ExtraShopDataBase.AllShops)
+            {
+                if (exShop.TypeName.Contains(text) && added.Add(exShop.LocalPath))
                 {
-                    if (exShop.TypeName.Contains(text))
+                    UIShopSlotForEx slot = new(exShop);
+                    slot.hoverText += "\n" + GTV("Source", " " + (ModsByName[exShop.ModName].mod.DisplayName ?? "Terraria"));
+                    slot.Events.OnLeftDown += evt =>
                     {
-                        UIShopSlotForEx slot = new(exShop);
-                        slot.hoverText += "\n" + GTV("Source", " " + (info.mod.DisplayName ?? "Terraria"));
-                        slot.Events.OnLeftDown += evt =>
+                        UIShopSlotForEx thisSlot = evt as UIShopSlotForEx;
+                        ChangePanel();
+                        foreach (UIModSlot modSlot in modList.expandView.InnerUIE.Cast<UIModSlot>())
                         {
-                            UIShopSlotForEx thisSlot = evt as UIShopSlotForEx;
-                            ChangePanel();
-                            foreach (UIModSlot modSlot in modList.expandView.InnerUIE.Cast<UIModSlot>())
+                            if (modSlot.modName == exShop.ModName)
                             {
-                                if (modSlot.modName == exShop.ModName)
-                                {
-                                    modSlot.Events.LeftDown(modSlot);
-                                    break;
-                                }
+                                modSlot.Events.LeftDown(modSlot);
+                                break;
                             }
-                            foreach (UIShopSlot shopSlot in shopList.expandView.InnerUIE.Cast<UIShopSlot>())
+                        }
+                        foreach (UIShopSlot shopSlot in shopList.expandView.InnerUIE.Cast<UIShopSlot>())
+                        {
+                            if (shopSlot is UIShopSlotForEx exSlot && exSlot.exShopType == thisSlot.exShopType)
                             {
-                                if (shopSlot is UIShopSlotForEx exSlot && exSlot.exShopType == thisSlot.exShopType)
-                                {
-                                    shopSlot.Events.LeftDown(shopSlot);
-                                    break;
-                                }
+                                shopSlot.Events.LeftDown(shopSlot);
+                                break;
                             }
-                        };
-                    }
+                        }
+                    };
+                    searchShop.AddElement(slot);
                 }
             }
             if (searchShop.InnerUIE.Count == 0)
@@ -489,7 +502,7 @@ public class ReBuild : ContainerElement
                     {
                         string name = shop.Name;
                         UIShopItemForNPC slot = new(shop.NpcType, entry);
-                        if (!FlowLayout)
+                        if (!flowLayout)
                         {
                             slot.hoverText = "";
                             string[] tooltips = shop.FullName.Split('/');
@@ -516,7 +529,7 @@ public class ReBuild : ContainerElement
                     if (entry.Item.Name.Contains(text))
                     {
                         UIShopItemForEx slot = new(shop.ExShopType, shop.ModName, entry);
-                        if (!FlowLayout)
+                        if (!flowLayout)
                         {
                             slot.hoverText += new StringBuilder(ModsByName[shop.ModName].mod.DisplayName)
                                 .AppendLine().Append(shop.DisplayName)
@@ -587,7 +600,7 @@ public class ReBuild : ContainerElement
                     {
                         string name = shops.Name;
                         UIShopItemForNPC slot = new(shops.NpcType, entry);
-                        if (!FlowLayout)
+                        if (!flowLayout)
                         {
                             slot.hoverText = $"{ContentSamples.NpcsByNetId[slot.npcType].TypeName} [{name}]";
                         }
@@ -602,7 +615,7 @@ public class ReBuild : ContainerElement
                     if (entry.Item.type == itemType)
                     {
                         UIShopItemForEx slot = new(shop.ExShopType, shop.ModName, entry);
-                        if (!FlowLayout)
+                        if (!flowLayout)
                         {
                             slot.hoverText = shop.DisplayName;
                         }

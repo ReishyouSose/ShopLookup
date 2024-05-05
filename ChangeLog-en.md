@@ -6,6 +6,14 @@
 
 </div>
 
+# v1.0.2.1
+The Traveling Merchant Shop can now be accessed by right-click the "View only purchasable items" button
+# v1.0.2.0
+Fixed a bug not working in multiplayer mode.
+Make the fish shop a standalone shop and add more contents.
+The promotion system by "ForOne" is finally done... ?
+# v1.0.1
+Fixed a bug when re-enter the world.
 # v1.0.0
 UI panel overhaul.
 Added support for fake shops.

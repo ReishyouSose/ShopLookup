@@ -17,6 +17,7 @@
             var slu = ShopLookup.Ins.Name;
             Register(slu, "Pylon", TextureAssets.Item[pylonID].Value, [.. Pylon()]);
             Register(slu, "Vanilla", AssetLoader.ExtraAssets["Vanilla"], [.. Vanilla()]);
+            Register(slu, "Fish", AssetLoader.ExtraAssets["LegendFish"], [.. Fish()]);
         }
         public static void Register(string modNmae, string exShopType, Texture2D icon, params NPCShop[] shops)
         {
@@ -56,7 +57,7 @@
             NPCShop mods = new(-1, "Mods");
             foreach (var entry in ShopNPCData.Pylons)
                 (entry.Item.type < ItemID.Count ? vanilla : mods).Add(entry);
-            vanilla.Add(ItemID.TeleportationPylonVictory, Condition.BestiaryFilledPercent(100));
+            vanilla.Add(ItemID.TeleportationPylonVictory, Condition.DownedMoonLord);
             yield return vanilla;
             yield return mods;
         }
@@ -77,24 +78,46 @@
                 .Add([ItemID.PumpkinMoonMedallion, ItemID.NaughtyPresent], BuyPrice(0, 10), Condition.DownedPlantera)
                 .Add(ItemID.LihzahrdPowerCell, BuyPrice(0, 10), Condition.DownedPlantera)
                 .Add(ItemID.CelestialSigil, BuyPrice(1), Condition.DownedSolarPillar, Condition.DownedVortexPillar, Condition.DownedNebulaPillar, Condition.DownedStardustPillar);
-            yield return new NPCShop(-1, "Fish")
-                .Add(ItemID.ApprenticeBait, BuyPrice(0, 0, 3))
-                .Add(ItemID.JourneymanBait, BuyPrice(0, 0, 5))
-                .Add(ItemID.MasterBait, BuyPrice(0, 0, 15))
-                .Add([ItemID.HotlineFishingHook, ItemID.LavaFishingHook], Condition.Hardmode)
-                .Add([ItemID.GoldenFishingRod, ItemID.HighTestFishingLine, ItemID.AnglerEarring, ItemID.TackleBox]);
             yield return new NPCShop(-1, "Other")
-                .Add(ItemID.FallenStar, BuyPrice(0, 0, 10))
-                .Add(ItemID.Shellphone, BuyPrice(1))
-                .Add(ItemID.GoldenBugNet, Condition.SmashedShadowOrb)
+                .Add(ItemID.FallenStar, BuyPrice(0, 0, 20))
                 .Add(ItemID.Coral, BuyPrice(0, 0, 5), Condition.InBeach)//珊瑚
-                .Add(ItemID.Mushroom, BuyPrice(0, 0, 3), Condition.InShoppingZoneForest)//四种蘑菇
-                .Add(ItemID.ViciousMushroom, BuyPrice(0, 0, 0, 50), Condition.InCrimson)
-                .Add(ItemID.VileMushroom, BuyPrice(0, 0, 0, 50), Condition.InCorrupt)
-                .Add(ItemID.GlowingMushroom, BuyPrice(0, 0, 1), Condition.InGlowshroom)
-                .Add(ItemID.LadyBug, BuyPrice(0, 1), Condition.InShoppingZoneForest)//瓢虫
+                .Add(ItemID.Mushroom, Condition.InShoppingZoneForest)//四种蘑菇
+                .Add([ItemID.ViciousMushroom, ItemID.VileMushroom], Condition.InEvilBiome)
+                .Add(ItemID.GlowingMushroom, Condition.InGlowshroom)
+                .Add(ItemID.LadyBug, Condition.InShoppingZoneForest)//瓢虫
                 .Add(ItemID.TargetDummy, BuyPrice(0, 0, 10))
+                .Add(ItemID.Shellphone, BuyPrice(1))
                 .Add(ItemID.TerrasparkBoots, BuyPrice(1, 14, 51, 4), Condition.DownedGoblinArmy);
+        }
+        private static IEnumerable<NPCShop> Fish()
+        {
+            yield return new NPCShop(-1, "FishingRod")
+                .Add([ItemID.WoodFishingPole, ItemID.ReinforcedFishingPole])
+                .Add([ItemID.FisherofSouls, ItemID.Fleshcatcher], Condition.DownedEowOrBoc)
+                .Add(ItemID.ScarabFishingRod, Condition.InDesert)
+                .Add(ItemID.BloodFishingRod, Condition.BloodMoon)
+                .Add(ItemID.FiberglassFishingPole, Condition.InJungle)
+                .Add([ItemID.MechanicsRod, ItemID.SittingDucksFishingRod], Condition.DownedSkeletron)
+                .Add([ItemID.HotlineFishingHook, ItemID.GoldenFishingRod], Condition.Hardmode);
+            yield return new NPCShop(-1, "TackleAndBait")
+                .Add([ItemID.AnglerHat, ItemID.AnglerVest, ItemID.AnglerPants,
+                    ItemID.HighTestFishingLine, ItemID.AnglerEarring, ItemID.TackleBox])
+                .Add(ItemID.LavaFishingHook, Condition.Hardmode)
+                .Add([ItemID.FishingBobber, ItemID.FishingPotion, ItemID.SonarPotion, ItemID.CratePotion,
+                    ItemID.ApprenticeBait,ItemID.JourneymanBait,ItemID.MasterBait]);
+            yield return new NPCShop(-1, "QuestRewards")
+                .Add([ItemID.FishermansGuide,ItemID. WeatherRadio ,ItemID.Sextant,ItemID.FuzzyCarrot,
+                    ItemID.HoneyAbsorbantSponge, ItemID.BottomlessHoneyBucket, ItemID.SuperAbsorbantSponge,
+                    ItemID.BottomlessBucket, ItemID.GoldenBugNet, ItemID.FishHook, ItemID.FishMinecart,
+                    ItemID.SeashellHairpin, ItemID.MermaidAdornment, ItemID.MermaidTail,
+                    ItemID.FishCostumeMask, ItemID.FishCostumeShirt, ItemID.FishCostumeFinskirt])
+                .Add(ItemID.FinWings, Condition.Hardmode);
+            yield return new NPCShop(-1, "Furnitures")
+                .Add([ItemID.LifePreserver, ItemID.ShipsWheel, ItemID.CompassRose, ItemID.WallAnchor,
+                    ItemID.PillaginMePixels, ItemID.TreasureMap, ItemID.GoldfishTrophy, ItemID.BunnyfishTrophy,
+                    ItemID.SwordfishTrophy, ItemID.SharkteethTrophy, ItemID.ShipInABottle, ItemID.SeaweedPlanter,
+                    ItemID.NotSoLostInParadise, ItemID.Crustography, ItemID.WhatLurksBelow, ItemID.Fangs,
+                    ItemID.CouchGag, ItemID.SilentFish, ItemID.TheDuke]);
         }
     }
 }

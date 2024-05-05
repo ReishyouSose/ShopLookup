@@ -21,7 +21,7 @@ namespace ShopLookup.Content.UI.ExtraUI
         {
             item.isAShopItem = true;
             this.onlyCanBuy = onlyCanBuy;
-            if (Ins.FlowLayout || onlyCanBuy)
+            if (SLPanel.flowLayout || onlyCanBuy)
             {
                 Info.IsSensitive = true;
                 SetSize(52, 52);
@@ -80,7 +80,7 @@ namespace ShopLookup.Content.UI.ExtraUI
         {
             if (ParentElement == null)
                 return;
-            if (!Ins.FlowLayout && !onlyCanBuy)
+            if (!SLPanel.flowLayout && !onlyCanBuy)
             {
                 float width = Info.Width.GetPixelBaseParent(ParentElement.Width);
                 float height = 0;
@@ -97,7 +97,7 @@ namespace ShopLookup.Content.UI.ExtraUI
         {
             if (buying)
                 BuyItem();
-            if (Info.IsMouseHover && Ins.FlowLayout && !onlyCanBuy)
+            if (Info.IsMouseHover && SLPanel.flowLayout && !onlyCanBuy)
                 HoverSlot = this;
         }
         public override void DrawSelf(SpriteBatch sb)
@@ -110,7 +110,7 @@ namespace ShopLookup.Content.UI.ExtraUI
                 {
                     cd.Update(Info.IsMouseHover, buying);
                 }
-                if (!Ins.FlowLayout && !onlyCanBuy)
+                if (!SLPanel.flowLayout && !onlyCanBuy)
                 {
                     ChatManager.DrawColorCodedStringWithShadow(sb, FontAssets.MouseText.Value, cd.Desc,
                      HitBox().TopLeft() + new Vector2(72, y), cd.Color, 0, Vector2.Zero, Vector2.One, -1, 1.5f);

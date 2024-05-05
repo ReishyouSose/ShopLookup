@@ -1,5 +1,6 @@
 using RUIModule;
 using ShopLookup.Content.Data;
+using ForOneAdvSys = ForOneAdvertisementSystem.ForOneAdvertisementSystem;
 
 namespace ShopLookup
 {
@@ -11,10 +12,11 @@ namespace ShopLookup
         internal static Dictionary<int, Texture2D> SpecialNPCHeads { get; private set; }
         public override void Load()
         {
+            ForOneAdvSys.Load(this);
+            ForOneAdvSys.MaxShowTimeInSeconds = 5;
             Ins = this;
-            RUIManager.mod = this;
-            AssetLoader.ExtraLoad += AssetLoader_ExtraLoad;
             AddContent<RUIManager>();
+            AssetLoader.ExtraLoad += AssetLoader_ExtraLoad;
             ShopNames = [];
             LocalizedTextShopName(NPCID.Painter, new() { { "Decor", Language.GetText("GameUI.PainterDecor") } });
             NonPermanentNPCs = [];
@@ -61,7 +63,7 @@ namespace ShopLookup
         private void AssetLoader_ExtraLoad(Dictionary<string, Texture2D> extraAssets)
         {
             string[] files = ["All", "Coins", "NoIcon", "QoT", "Slot", "Vanilla", "Permanent",
-                "StripLayout", "FlowLayout", "Search", "OnlyCanBuy"];
+                "StripLayout", "FlowLayout", "Search", "OnlyCanBuy","LegendFish"];
             string path = GetType().Namespace + "/Assets/";
             foreach (string file in files)
             {

@@ -74,7 +74,7 @@ namespace ShopLookup
         public static string GTV(string key) => Language.GetTextValue(LocalKey + key);
         public static string GTV(string key, params string[] obj) => Language.GetText(LocalKey + key).WithFormatArgs(obj).Value;
         public static Vector2 ScrResolution => new(Main.screenWidth, Main.screenHeight);
-        public static ReBuild SLUI => RUIManager.UIEs[typeof(ReBuild).FullName] as ReBuild;
+        public static SLPanel SLUI => RUIManager.UIEs[typeof(SLPanel).FullName] as SLPanel;
         public static readonly Color G = new(0, 230, 100, 255);
         public static readonly Color R = new(255, 50, 100, 255);
         public static readonly Color Y = new(255, 165, 0, 255);

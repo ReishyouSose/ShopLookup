@@ -29,6 +29,9 @@
     <ProjectReference Include="..\RUIModule\RUIModule.csproj" />
   </ItemGroup>
   <ItemGroup>
+    <Reference Include="ForOneAdvertisementSystem">
+      <HintPath>lib\ForOneAdvertisementSystem.dll</HintPath>
+    </Reference>
     <Reference Include="RUIModule">
       <HintPath>lib\RUIModule.dll</HintPath>
     </Reference>

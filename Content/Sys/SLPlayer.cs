@@ -1,5 +1,4 @@
-﻿using ShopLookup.Content.Data;
-using Terraria.GameInput;
+﻿using Terraria.GameInput;
 
 namespace ShopLookup.Content.Sys
 {
@@ -12,7 +11,6 @@ namespace ShopLookup.Content.Sys
         }
         public override void OnEnterWorld()
         {
-            ShopNPCData.FinishSetup();
             SLUI.OnInitialization();
         }
         public override void ProcessTriggers(TriggersSet triggersSet)

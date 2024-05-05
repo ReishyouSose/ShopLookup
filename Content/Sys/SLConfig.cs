@@ -17,9 +17,6 @@ namespace ShopLookup.Content.Sys
 
         [DefaultValue(false)]
         public bool IgnoreUnknowCds;
-
-        [DefaultValue(false)]
-        public bool FlowLayout;
         public override void OnLoaded() => Ins = this;
     }
 }

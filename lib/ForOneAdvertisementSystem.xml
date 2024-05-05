@@ -1,0 +1,167 @@
+<?xml version="1.0"?>
+<doc>
+    <assembly>
+        <name>ForOneAdvertisementSystem</name>
+    </assembly>
+    <members>
+        <member name="T:ForOneAdvertisementSystem.ForOneAdvertisementSystem">
+            <summary>
+            For One 制作组的推广组件
+            </summary>
+        </member>
+        <member name="P:ForOneAdvertisementSystem.ForOneAdvertisementSystem.Version">
+            <summary>
+            此模块的版本
+            </summary>
+        </member>
+        <member name="P:ForOneAdvertisementSystem.ForOneAdvertisementSystem.Loaded">
+            <summary>
+            是否被加载了
+            </summary>
+        </member>
+        <member name="P:ForOneAdvertisementSystem.ForOneAdvertisementSystem.ShowAdvertisement">
+            <summary>
+            <br/>是否在玩家进入世界时显示推广
+            <br/>默认真
+            <br/>在 Load 之后才可以获取
+            <br/>但在 Load 之前也可以设置
+            </summary>
+        </member>
+        <member name="P:ForOneAdvertisementSystem.ForOneAdvertisementSystem.MaxShowTimeInFrames">
+            <summary>
+            <br/>推广内容的最大显示时间
+            <br/>单位为帧
+            <br/>默认 1200, 即 20 秒
+            <br/>在 Load 之后才可以获取
+            <br/>但在 Load 之前也可以设置
+            </summary>
+        </member>
+        <member name="P:ForOneAdvertisementSystem.ForOneAdvertisementSystem.MaxShowTimeInSeconds">
+            <summary>
+            <br/>推广内容的最大显示时间
+            <br/>单位为秒
+            <br/>默认 20
+            <br/>在 Load 之后才可以获取
+            <br/>但在 Load 之前也可以设置
+            </summary>
+        </member>
+        <member name="M:ForOneAdvertisementSystem.ForOneAdvertisementSystem.Load(Terraria.ModLoader.Mod)">
+            <summary>
+             加载上这个推广系统
+            </summary>
+            <param name="mod">推广源</param>
+        </member>
+        <member name="M:ForOneAdvertisementSystem.ForOneAdvertisementSystem.Load(Terraria.ModLoader.Mod,System.String)">
+            <summary>
+             加载上这个推广系统
+            </summary>
+            <param name="mod">推广源</param>
+            <param name="displayName">推广源的显示名字, 默认为<see cref="P:Terraria.ModLoader.Mod.DisplayName"/></param>
+        </member>
+        <member name="M:ForOneAdvertisementSystem.ForOneAdvertisementSystem.Load(Terraria.ModLoader.Mod,Terraria.Localization.LocalizedText)">
+            <summary>
+             加载上这个推广系统
+            </summary>
+            <param name="mod">推广源</param>
+            <param name="localizedDisplayName">推广源的显示名字, 本地化版本</param>
+        </member>
+        <member name="M:ForOneAdvertisementSystem.ForOneAdvertisementSystem.Load(Terraria.ModLoader.Mod,System.Func{System.String})">
+            <summary>
+             加载上这个推广系统
+            </summary>
+            <param name="mod">推广源</param>
+            <param name="displayNameGetter">推广源的显示名字, 委托版本(每次进入世界时调用一次)</param>
+        </member>
+        <member name="M:ForOneAdvertisementSystem.ForOneAdvertisementSystem.GetLocalizedAdvertisement">
+            <summary>
+            获取推广内容
+            使用前需先检查<see cref="P:ForOneAdvertisementSystem.ForOneAdvertisementSystem.Finished"/>为真才可以使用
+            </summary>
+        </member>
+        <member name="F:ForOneAdvertisementSystem.ForOneAdvertisementSystem.contents">
+            <summary>
+            使用前需先检查<see cref="P:ForOneAdvertisementSystem.ForOneAdvertisementSystem.Succeeded"/>
+            </summary>
+        </member>
+        <member name="M:ForOneAdvertisementSystem.ForOneAdvertisementSystem.LoadStart">
+            <summary>
+            安全使用
+            如果<see cref="F:ForOneAdvertisementSystem.ForOneAdvertisementSystem.loadTask"/>为空则开始任务
+            </summary>
+        </member>
+        <member name="P:ForOneAdvertisementSystem.ForOneAdvertisementSystem.DataPath">
+            <summary>
+            数据保存的路径
+            当连接不成功时调用保存的数据
+            </summary>
+        </member>
+        <member name="M:ForOneAdvertisementSystem.ForOneAdvertisementSystem.SaveData(System.Collections.Generic.Dictionary{System.String,ForOneAdvertisementSystem.ForOneAdvertisementSystem.Content})">
+            <summary>
+            将<paramref name="data"/>存入对应路径的文件中
+            </summary>
+            <param name="data"></param>
+        </member>
+        <member name="M:ForOneAdvertisementSystem.ForOneAdvertisementSystem.LoadData">
+            <summary>
+            如果对应路径有文件, 将其加载出来并返回
+            否则返回空
+            加载出错也会返回空
+            </summary>
+        </member>
+        <member name="F:ForOneAdvertisementSystem.ForOneAdvertisementSystem.LoadResult.None">
+            <summary>
+            默认值, 占位符, 暂时不用于返回值
+            </summary>
+        </member>
+        <member name="F:ForOneAdvertisementSystem.ForOneAdvertisementSystem.LoadResult.Success">
+            <summary>
+            成功
+            </summary>
+        </member>
+        <member name="F:ForOneAdvertisementSystem.ForOneAdvertisementSystem.LoadResult.WrongParameters">
+            <summary>
+            传入参数不正确
+            </summary>
+        </member>
+        <member name="F:ForOneAdvertisementSystem.ForOneAdvertisementSystem.LoadResult.NotSuccessStatusCode">
+            <summary>
+            响应不是成功码
+            </summary>
+        </member>
+        <member name="F:ForOneAdvertisementSystem.ForOneAdvertisementSystem.LoadResult.WrongFormat">
+            <summary>
+            相应的格式不正确
+            </summary>
+        </member>
+        <member name="F:ForOneAdvertisementSystem.ForOneAdvertisementSystem.LoadResult.ErrorInDeserialize">
+            <summary>
+            json解码出现问题
+            </summary>
+        </member>
+        <member name="F:ForOneAdvertisementSystem.ForOneAdvertisementSystem.LoadResult.ErrorContentId">
+            <summary>
+            contentId在第二次中请求没找到
+            </summary>
+        </member>
+        <member name="F:ForOneAdvertisementSystem.ForOneAdvertisementSystem.LoadResult.UnexpectedError">
+            <summary>
+            意料之外的错误
+            </summary>
+        </member>
+        <member name="F:ForOneAdvertisementSystem.AdvertisementNotification.ScaleTime">
+            <summary>
+            从最小变到最大或者从最大变到最小的时间
+            </summary>
+        </member>
+        <member name="F:ForOneAdvertisementSystem.AdvertisementNotification.StartDelay">
+            <summary>
+            从进入世界到开始显示的最小延迟
+            </summary>
+        </member>
+        <member name="F:ForOneAdvertisementSystem.AdvertisementNotification.textSize">
+            <summary>
+            经过缩放的文字大小
+            </summary>
+        </member>
+    </members>
+</doc>
