@@ -6,6 +6,10 @@
 
 </div>
 
+# v1.0.3.0
+Added sales, refunds, and repurchase functions
+Redraw UI icons
+Removed some configs, items can now always be purchased
 # v1.0.2.1
 The Traveling Merchant Shop can now be accessed by right-click the "View only purchasable items" button
 # v1.0.2.0

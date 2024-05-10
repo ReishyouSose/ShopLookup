@@ -9,12 +9,8 @@
     <AdditionalFiles Remove="Assets\EdgeBlur.fx" />
   </ItemGroup>
   <ItemGroup>
-    <None Remove="Assets\All.png" />
     <None Remove="Assets\Coins.png" />
     <None Remove="Assets\EdgeBlur.xnb" />
-    <None Remove="Assets\NoIcon.png" />
-    <None Remove="Assets\QoT.png" />
-    <None Remove="Assets\Slot.png" />
     <None Remove="Assets\Vanilla.png" />
     <None Remove="changelog.txt" />
     <None Remove="description_workshop.txt" />

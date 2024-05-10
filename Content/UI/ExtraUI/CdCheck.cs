@@ -1,5 +1,4 @@
 ﻿using Terraria.UI.Chat;
-using static ShopLookup.Content.Sys.SLConfig;
 
 namespace ShopLookup.Content.UI.ExtraUI
 {
@@ -38,7 +37,7 @@ namespace ShopLookup.Content.UI.ExtraUI
         {
             if (buying)
             {
-                Color = G;
+                Color = ignore ? Y : G;
                 return;
             }
             if (Blink)
@@ -53,11 +52,8 @@ namespace ShopLookup.Content.UI.ExtraUI
                     Color = Y;
                     return;
                 }
-                if (Ins.Portable || Ins.PermanentTips)
-                {
-                    Color = condition.IsMet() ? G : R;
-                    return;
-                }
+                Color = condition.IsMet() ? G : R;
+                return;
             }
             Color = Color.White;
         }
@@ -75,7 +71,7 @@ namespace ShopLookup.Content.UI.ExtraUI
         {
             if (condition.Description.Key == "" || condition.Description.Value == "")
             {
-                desc = GTV("UnknowCds");
+                desc = GTV("Info.UnknowCds");
                 return true;
             }
             desc = condition.Description.Value;

@@ -13,7 +13,7 @@ namespace ShopLookup
         public override void Load()
         {
             ForOneAdvSys.Load(this);
-            ForOneAdvSys.MaxShowTimeInSeconds = 5;
+            ForOneAdvSys.MaxShowTimeInSeconds = 3;
             Ins = this;
             AddContent<RUIManager>();
             AssetLoader.ExtraLoad += AssetLoader_ExtraLoad;
@@ -62,21 +62,12 @@ namespace ShopLookup
 
         private void AssetLoader_ExtraLoad(Dictionary<string, Texture2D> extraAssets)
         {
-            string[] files = ["All", "Coins", "NoIcon", "QoT", "Slot", "Vanilla", "Permanent",
-                "StripLayout", "FlowLayout", "Search", "OnlyCanBuy","LegendFish"];
+            string[] files = ["Vanilla", "Permanent", "LegendFish", "UIButton", "Filter"];
             string path = GetType().Namespace + "/Assets/";
             foreach (string file in files)
             {
                 extraAssets[file] = RUIHelper.T2D(path + file);
             }
-            string[] itemFilters = ["Weapon", "Armor", "Vanity", "Tools", "Materials", "Furniture",
-                "BuildingBlock", "Accessories", "MiscAccessories", "MiscFallback", "Consumables"];
-            path += "ItemFilter/";
-            foreach (string filter in itemFilters)
-            {
-                extraAssets[filter] = RUIHelper.T2D(path + filter);
-            }
-            //AssetLoader.edgeBlur = ModContent.Request<Effect>("ShopLookup/Assets/EdgeBlur", ReLogic.Content.AssetRequestMode.ImmediateLoad).Value;
         }
         public static (int, Type) ModCall(params object[] args)
         {

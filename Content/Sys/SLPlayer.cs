@@ -5,14 +5,14 @@ namespace ShopLookup.Content.Sys
     public class SLPlayer : ModPlayer
     {
         internal static ModKeybind Check;
+        internal static uint SLTime = 1;
         public override void Load()
         {
             Check = KeybindLoader.RegisterKeybind(Mod, "Look up", Microsoft.Xna.Framework.Input.Keys.L);
         }
-        public override void OnEnterWorld()
-        {
-            SLUI.OnInitialization();
-        }
+        public override void OnEnterWorld() => SLUI.OnInitialization();
+        public override bool HoverSlot(Item[] inventory, int context, int slot) => SLUI.HoverCheck(context);
+        public override bool ShiftClickSlot(Item[] inventory, int context, int slot) => SLUI.SellCheck(inventory, context, slot);
         public override void ProcessTriggers(TriggersSet triggersSet)
         {
             if (Check.JustPressed)
@@ -24,6 +24,8 @@ namespace ShopLookup.Content.Sys
                 }
                 else
                     SLUI.Info.IsVisible = !SLUI.IsVisible;
+                SLTime = Main.GameUpdateCount;
+                SLUI.Info.IsVisible = true;
             }
         }
     }

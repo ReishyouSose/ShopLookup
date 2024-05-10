@@ -1,31 +1,28 @@
-NoSell: No shop sell this
-NoResult: No Result
-NoCondition: Any time
+"Keybinds.Look up.DisplayName": Open panel or Lookup Item
 
-Keybinds: {
-	ShopLookup.DisplayName: Shop Lookup
-	"Look up.DisplayName": Look up
+Info: {
+	NoSell: No shop sell this
+	NoResult: No Result
+	NoCondition: Any time
+	Source: From {0}
+	UnknowCds: Unknown condition, ignore can be enabled in ModConfig
+	EmptyShop: Empty shop
+	NoValue: No value
+	SearchAny: Search item or npc
+	LookupItem: Lookup Item - {0}
+	Refund: Can refund:
+	Repurchase: Repurchase:
+	SellTip: Place item below or Shift and left-click
 }
 
-Source: From {0}
-Vanilla: Terraria
-Index: Index |
-Filter: Mod Filer: {0}
-Switch: Left or Right click to switch
-CantAfford: You don't have enough currency
-NoActive: No corresponding NPC visit in the world
-NoMet: Purchase conditions not met
-NoIcon: This mod doesn't have a icon_small pngfile
 Travel: Need two town NPCs in the world
-NonPermanent: Non-Permanent NPC
-NoSpawn: Not fulfill the spawn conditions of this Non-Permanent NPC
-UnknowCds: Unknown condition, ignore can be enabled in ModConfig
-EmptyShop: Empty shop
-SellPrice: Price
-NoSavings: None
-SearchAny: Search item or npc
-LookupItem: Lookup Item - {0}
-TravelMerchant: Right click to refresh the Traveling Merchant shop
+
+Report: {
+	NoMet: Conditions not met
+	NoActive: No corresponding NPC visit in the world
+	CantAfford: You don't have enough currency
+	NotSameStack: Purchase time is different
+}
 
 UIButton: {
 	Adjust:
@@ -35,11 +32,17 @@ UIButton: {
 		'''
 	Move: Hold down the mouse to drag the panel
 	Flow: Flow Layout
-	Strip: Strip Layout
-	Search: Switch to search panel
+	Strip: Strip Layout, will be disabled at some time
+	Shop: Buy items
+	Search: Search items
+	Sell:
+		'''
+		Sell items
+		This page fixed to flow layout
+		'''
 	OnlyCanBuy: View only purchasable items
 	Find: Requires {0} in the world
-	Return: Switch to shop panel
+	TravelMerchant: Right click to refresh the Traveling Merchant shop
 }
 
 FakeShops: {
@@ -71,36 +74,6 @@ FakeShops: {
 Configs: {
 	SLConfig: {
 		DisplayName: Mod Config
-
-		Portable: {
-			Label: Allow Portable Store
-			Tooltip:
-				'''
-				Whether to open the portable store
-				if enable, when you meet the following conditions
-				· Fulfill all selling conditions for the item
-				· Corresponding NPC visiting the world
-				· Have enough currency
-				Then you can directly use the original price in the UI panel
-				(Not affected by NPC's happiness) to buy item
-
-				At the same time, the condition hover tip will be enabled
-				'''
-		}
-
-		PermanentTips: {
-			Label: Permanent Hover Tip
-			Tooltip:
-				'''
-				if enabled
-				Then even if the portable store is disable
-				there also have condition hover tip
-
-				When the mouse hovers over the information slot
-				the sell conditions that have been reached will be highlighted in green
-				otherwise it will be red
-				'''
-		}
 
 		IgnoreUnknowCds: {
 			Label: Ignore unknow buy conditions

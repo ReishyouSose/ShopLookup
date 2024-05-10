@@ -1,31 +1,28 @@
-NoSell: 没有商店售卖这个物品
-NoResult: 无结果
-NoCondition: 任何时候
+"Keybinds.Look up.DisplayName": 打开面板或查询物品
 
-Keybinds: {
-	ShopLookup.DisplayName: 查询售卖
-	// "Look up.DisplayName": Look up
+Info: {
+	NoSell: 没有商店售卖这个物品
+	NoResult: 无结果
+	NoCondition: 任何时候
+	Source: 来自{0}
+	UnknowCds: 未知条件，可在设置中启用忽略
+	EmptyShop: 空商店
+	NoValue: 无价
+	SearchAny: 搜索物品或NPC
+	LookupItem: 查询物品 - {0}
+	Refund: 可退款：
+	Repurchase: 回购：
+	SellTip: 将物品放入下方或用Shift加左键点击
 }
 
-Source: 来自{0}
-Vanilla: 原版
-Index: 索引 |
-Filter: 模组筛选：{0}
-Switch: 左击或右击以切换
-CantAfford: 你没有足够的货币
-NoActive: 世界中没有对应NPC到访
-NoMet: 有未达成的购买条件
-NoIcon: 这个Mod没有icon_small贴图文件
 Travel: 需要世界上有两个城镇NPC
-NonPermanent: 非常驻NPC
-NoSpawn: 不满足这个非常驻NPC的生成条件
-UnknowCds: 未知条件，可在设置中启用忽略
-EmptyShop: 空商店
-SellPrice: 售价
-NoSavings: 无
-SearchAny: 搜索物品或NPC
-LookupItem: 查询物品 - {0}
-TravelMerchant: 右键刷新旅商商店
+
+Report: {
+	NoMet: 有未达成的购买条件
+	NoActive: 世界中没有对应NPC到访
+	CantAfford: 你没有足够的货币
+	NotSameStack: 购买时间不同
+}
 
 UIButton: {
 	Adjust:
@@ -35,11 +32,17 @@ UIButton: {
 		'''
 	Move: 按住以拖动面板
 	Flow: 流式布局
-	Strip: 条式布局
-	Search: 切换到搜索页面
+	Strip: 条式布局，会在某些时候禁用
+	Shop: 购买物品
+	Search: 搜索物品
+	Sell:
+		'''
+		卖出物品
+		此页面固定为流式布局
+		'''
 	OnlyCanBuy: 仅查看可购买的商品
 	Find: 需要世界上有 {0}
-	Return: 切换到商店页面
+	TravelMerchant: 右键刷新旅商商店
 }
 
 FakeShops: {
@@ -71,36 +74,6 @@ FakeShops: {
 Configs: {
 	SLConfig: {
 		DisplayName: 模组配置
-
-		Portable: {
-			Label: 随身商店
-			Tooltip:
-				'''
-				是否启用随身商店
-				如果启用，那么当你满足以下条件时
-				· 达成物品所需售卖条件
-				· 有对应的NPC到访世界
-				· 有足够的货币
-				你就可以直接在UI面板中
-				以原价购买物品（不受NPC幸福度影响）
-
-				同时悬浮条件提示会启用
-				'''
-		}
-
-		PermanentTips: {
-			Label: 常驻悬浮条件提示
-			Tooltip:
-				'''
-				如果启用
-				那么即使关闭随身商店
-				也会有悬浮条件提示
-
-				当鼠标悬浮在信息栏上时
-				已达成的售卖条件会被高亮为绿色
-				反之为红色
-				'''
-		}
 
 		IgnoreUnknowCds: {
 			Label: 忽略不明购买条件

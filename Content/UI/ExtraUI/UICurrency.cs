@@ -1,6 +1,5 @@
 ﻿using RUIModule;
 using ShopLookup.Content.Data;
-using System.Linq;
 using Terraria.UI.Chat;
 
 namespace ShopLookup.Content.UI.ExtraUI;
@@ -13,23 +12,7 @@ public class UICurrency : BaseUIElement
     /// id, stack
     /// </summary>
     private readonly Dictionary<int, int> values;
-    private readonly string valueText;
-    private readonly UIText hasCrc;
     public readonly int value;
-    private int blinkTime;
-    public bool Blink
-    {
-        get
-        {
-            if (blinkTime > 0)
-            {
-                blinkTime--;
-                return true;
-            }
-            return false;
-        }
-    }
-    public Color BlinkColor => blinkTime / 6 % 2 == 0 ? R : Color.White;
     //private readonly ;
     public UICurrency(int value, int currencyID = -1)
     {
@@ -38,107 +21,46 @@ public class UICurrency : BaseUIElement
         this.value = value;
         color = Color.White;
         values = [];
-        float i = 0;
-        float offsetX = FontAssets.MouseText.Value.MeasureString(GTV("SellPrice")).X + 5;
         foreach (var (itemID, rank) in ShopNPCData.Currencys[currencyID])
         {
             int stack = value / rank;
             if (stack > 0)
             {
                 values[itemID] = stack;
-                UIItem c = new(itemID, stack);
-                //c.DrawRec[0] = Color.Red;
-                c.SetPos(offsetX + i, 0);
-                Register(c);
-                i += 20;
-                //valueText += $"[i/s{stack}:{itemID}]";
             }
             value %= rank;
         }
-        hasCrc = new("");
-        hasCrc.SetPos(offsetX + i, 0);
-        hasCrc.ReDraw = sb => DrawHasCurrency(sb, hasCrc.HitBox().TopLeft());
-        hasCrc.Info.IsVisible = false;
-        Register(hasCrc);
-    }
-    public override void LoadEvents()
-    {
-        ParentElement.Events.OnMouseOver += evt => hasCrc.Info.IsVisible = true;
-        ParentElement.Events.OnMouseOut += evt => hasCrc.Info.IsVisible = false;
     }
     public override void DrawSelf(SpriteBatch sb)
     {
         Vector2 pos = HitBox().TopLeft();
-        ChatManager.DrawColorCodedStringWithShadow(sb, FontAssets.MouseText.Value,
-            GTV("SellPrice"), pos, Color.White, 0, Vector2.Zero, Vector2.One, -1, 1.5f);
-    }
-    public void DrawHasCurrency(SpriteBatch sb, Vector2 pos)
-    {
-        Player player = Main.LocalPlayer;
         var font = FontAssets.MouseText.Value;
-        List<Item> inv = [];
-        inv.AddRange(player.inventory);
-        inv.AddRange(player.bank.item);
-        inv.AddRange(player.bank2.item);
-        inv.AddRange(player.bank3.item);
-        inv.AddRange(player.bank4.item);
-        Dictionary<int, int> crcs = ShopNPCData.Currencys[currencyID];
-        long count = 0;
-        foreach (Item item in inv)
+        string text = Lang.tip[49].Value;
+        Vector2 scale = Vector2.One;
+        Vector2 size = ChatManager.GetStringSize(font, text, scale);
+        Vector2 z = Vector2.Zero;
+        ChatManager.DrawColorCodedStringWithShadow(sb, font, text, pos, color, 0, z, scale, -1, 1.5f);
+        pos.X += size.X;
+        foreach (var (coin, stack) in values)
         {
-            if (crcs.TryGetValue(item.type, out int value))
-            {
-                count += item.stack * (long)value;
-            }
-        }
-        color = count >= value ? G : R;
-        if (Blink)
-            color = BlinkColor;
-        TextSnippet[] savings = [new(Lang.inter[66].Value, color), new(" ")];
-        ChatManager.DrawColorCodedStringWithShadow(sb, font, savings, pos, 0, Vector2.Zero, Vector2.One, out _, -1, 1.5f);
-        pos.X += ChatManager.GetStringSize(font, savings, Vector2.One).X;
-        if (count == 0)
-        {
-            ChatManager.DrawColorCodedStringWithShadow(sb, font, GTV("NoSavings"),
-                pos, Color.White, 0, Vector2.Zero, Vector2.One, -1, 1.5f);
-            return;
-        }
-        pos.Y -= 3;
-        Dictionary<int, int> hasCrcs = crcs.ToDictionary(x => x.Key, x => 0);
-        foreach (var (itemID, rank) in crcs)
-        {
-            int stack = (int)(count / rank);
-            count %= rank;
-            hasCrcs[itemID] = stack;
-        }
-        foreach (var (itemID, stack) in hasCrcs)
-        {
-            if (stack > 0)
-            {
-                ChatManager.DrawColorCodedStringWithShadow(sb, font, RUIHelper.ItemText(itemID, stack),
-                    pos, Color.White, 0, Vector2.Zero, Vector2.One, -1, 1.5f);
-                CheckDrawItem(pos, itemID, stack);
-                pos.X += 26;
-            }
+            text = RUIHelper.ItemText(coin, stack);
+            size = ChatManager.GetStringSize(font, text, size);
+            ChatManager.DrawColorCodedStringWithShadow(sb, font, text, pos, color, 0, z, scale, -1, 1.5f);
+            CheckDrawItem(pos, coin, stack);
+            pos.X += size.X;
         }
     }
 
-    private static void CheckDrawItem(Vector2 pos, int itemID, int stack)
+    private void CheckDrawItem(Vector2 pos, int itemID, int stack)
     {
-        if (RUIHelper.NewRec(pos, new(24)).Contains(Main.MouseScreen.ToPoint()))
+        if (Info.CanBeInteract && !Info.IsLocked)
         {
-            Main.HoverItem = new(itemID, stack);
-            Main.hoverItemName = Main.HoverItem.Name;
+            if (RUIHelper.NewRec(pos, new(24)).Contains(Main.MouseScreen.ToPoint()))
+            {
+                Main.HoverItem = new(itemID, stack);
+                Main.hoverItemName = Main.HoverItem.Name;
+            }
+            UIShopItem.HoverSlot = null;
         }
-    }
-    public void StartBlink() => blinkTime = 36;
-    public string ToItemText()
-    {
-        string result = "[c/FFA500:" + GTV("SellPrice") + "] ";
-        foreach (var (id, stack) in values)
-        {
-            result += RUIHelper.ItemText(id, stack);
-        }
-        return result;
     }
 }

@@ -2,7 +2,6 @@
 global using Microsoft.Xna.Framework.Graphics;
 global using RUIModule.RUIElements;
 global using RUIModule.RUISys;
-global using ShopLookup.Content.UI;
 global using System;
 global using System.Collections.Generic;
 global using System.Reflection;
@@ -14,27 +13,38 @@ global using Terraria.ID;
 global using Terraria.Localization;
 global using Terraria.ModLoader;
 global using static ShopLookup.MiscHelper;
+using RUIModule;
+using ShopLookup.Content.Data;
+using ShopLookup.Content.Sys;
+using ShopLookup.Content.UI.ExtraUI;
+using ShopLookup.Content.UI.SLPanel;
+using System.Text;
 
 
 namespace ShopLookup
 {
     public static class MiscHelper
     {
-        public static IEnumerable<(int itemId, int count)> ToCoins(int money)
+        public static IEnumerable<(int itemId, int count)> ToCoins(long value, int currency = -1)
         {
-            int copper = money % 100;
-            money /= 100;
-            int silver = money % 100;
-            money /= 100;
-            int gold = money % 100;
-            money /= 100;
-            int plat = money;
-
-            yield return (ItemID.PlatinumCoin, plat);
-            yield return (ItemID.GoldCoin, gold);
-            yield return (ItemID.SilverCoin, silver);
-            yield return (ItemID.CopperCoin, copper);
+            foreach (var (itemID, rank) in ShopNPCData.Currencys[currency])
+            {
+                int stack = (int)(value / rank);
+                if (stack > 0)
+                    yield return (itemID, stack);
+                value %= rank;
+            }
         }
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="item"></param>
+        /// <param name="useBuyPrice"></param>
+        /// <param name="total">计算堆叠</param>
+        /// <returns></returns>
+        public static IEnumerable<(int itemID, int count)> ToCoins(this Item item, bool useBuyPrice, bool total)
+            => ToCoins((useBuyPrice ? (item.shopCustomPrice ?? item.value) : (item.value / 5)) * (total ? item.stack : 1), item.shopSpecialCurrency);
+
         public static bool HasShop(int npcType)
         {
             foreach (AbstractNPCShop nshop in NPCShopDatabase.AllShops)
@@ -186,6 +196,70 @@ namespace ShopLookup
                 }
             }
             return shop;
+        }
+        public static ref uint SLTime(this Item item) => ref item.GetGlobalItem<SLItem>().SLTime;
+        public static string GetPriceText(UICurrency currency) => GetPriceText(currency.value, currency.currencyID);
+        public static string GetPriceText(long value, int currency = -1)
+        {
+            StringBuilder builder = new();
+            foreach (var (coin, stack) in ToCoins(value, currency))
+            {
+                if (stack > 0)
+                    builder.Append(RUIHelper.ItemText(coin, stack));
+            }
+            if (builder.Length == 0)
+            {
+                builder.Append(GTV("Info.NoValue"));
+            }
+            return builder.ToString();
+        }
+        public static string GetSavings(int currency, out long savings)
+        {
+            Player player = Main.LocalPlayer;
+            List<Item> inv = [];
+            inv.AddRange(player.inventory);
+            inv.AddRange(player.bank.item);
+            inv.AddRange(player.bank2.item);
+            inv.AddRange(player.bank3.item);
+            inv.AddRange(player.bank4.item);
+            Dictionary<int, int> crcs = ShopNPCData.Currencys[currency];
+            savings = 0;
+            foreach (Item item in inv)
+            {
+                if (crcs.TryGetValue(item.type, out int value))
+                {
+                    savings += item.stack * (long)value;
+                }
+            }
+            StringBuilder builder = new();
+            if (savings > 0)
+            {
+                foreach (var (coin, stack) in ToCoins(savings, currency))
+                {
+                    if (stack > 0)
+                    {
+                        builder.Append(' ');
+                        builder.Append(RUIHelper.ItemText(coin, stack));
+                    }
+                }
+            }
+            else
+                builder.Append(GTV("Info.NoValue") + ' ');
+            return builder.ToString();
+        }
+        public static void BuyFromSL(this Item item, UICurrency currency)
+        {
+            SLItem sl = item.GetGlobalItem<SLItem>();
+            sl.SLTime = SLPlayer.SLTime;
+            sl.SLCurrency = currency.currencyID;
+            sl.SLValue = currency.value;
+        }
+        public static bool CanRefund(this Item item, out int value, out int currency)
+        {
+            SLItem sl = item.GetGlobalItem<SLItem>();
+            value = sl.SLValue;
+            currency = sl.SLCurrency;
+            return sl.SLTime == SLPlayer.SLTime;
         }
     }
 }

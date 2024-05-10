@@ -17,9 +17,8 @@ namespace ShopLookup.Content.UI.ExtraUI
         public override void OnInitialization()
         {
             base.OnInitialization();
-            Tex = AssetLoader.ExtraAssets[GetType().Name];
+            Tex = AssetLoader.ExtraAssets["Filter"];
             hoverText = Language.GetTextValue(GetDisplayNameKey());
-            SetSize(Tex.Size());
         }
         public abstract bool FitsFilter(Item entry);
         public abstract string GetDisplayNameKey();
