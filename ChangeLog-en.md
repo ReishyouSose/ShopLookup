@@ -6,6 +6,8 @@
 
 </div>
 
+# v1.0.3.1
+Fixed a bug where keybinds could not close the panel
 # v1.0.3.0
 Added sales, refunds, and repurchase functions
 Redraw UI icons

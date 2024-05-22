@@ -25,7 +25,6 @@ namespace ShopLookup.Content.Sys
                 else
                     SLUI.Info.IsVisible = !SLUI.IsVisible;
                 SLTime = Main.GameUpdateCount;
-                SLUI.Info.IsVisible = true;
             }
         }
     }
