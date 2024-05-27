@@ -11,13 +11,28 @@ public class UICurrency : BaseUIElement
     /// <summary>
     /// id, stack
     /// </summary>
-    private readonly Dictionary<int, int> values;
-    public readonly int value;
+    private Dictionary<int, int> values;
+    public int value;
     //private readonly ;
     public UICurrency(int value, int currencyID = -1)
     {
         SetSize(100, 24);
         this.currencyID = currencyID;
+        this.value = value;
+        color = Color.White;
+        values = [];
+        foreach (var (itemID, rank) in ShopNPCData.Currencys[currencyID])
+        {
+            int stack = value / rank;
+            if (stack > 0)
+            {
+                values[itemID] = stack;
+            }
+            value %= rank;
+        }
+    }
+    public void ResetValue(int value)
+    {
         this.value = value;
         color = Color.White;
         values = [];
@@ -44,7 +59,7 @@ public class UICurrency : BaseUIElement
         foreach (var (coin, stack) in values)
         {
             text = RUIHelper.ItemText(coin, stack);
-            size = ChatManager.GetStringSize(font, text, size);
+            size = ChatManager.GetStringSize(font, text, scale);
             ChatManager.DrawColorCodedStringWithShadow(sb, font, text, pos, color, 0, z, scale, -1, 1.5f);
             CheckDrawItem(pos, coin, stack);
             pos.X += size.X;
@@ -53,7 +68,7 @@ public class UICurrency : BaseUIElement
 
     private void CheckDrawItem(Vector2 pos, int itemID, int stack)
     {
-        if (Info.CanBeInteract && !Info.IsLocked)
+        if (Info.CanBeInteract && !Info.IsLocked && Info.IsMouseHover)
         {
             if (RUIHelper.NewRec(pos, new(24)).Contains(Main.MouseScreen.ToPoint()))
             {

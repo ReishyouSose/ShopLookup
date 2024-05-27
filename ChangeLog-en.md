@@ -6,6 +6,9 @@
 
 </div>
 
+# v1.0.4.0
+Added the function to specify the purchase quantity
+Note that this function does not take effect for repurchases
 # v1.0.3.1
 Fixed a bug where keybinds could not close the panel
 # v1.0.3.0

@@ -14,7 +14,7 @@ public partial class SLPanel : ContainerElement
     private UIDropDownList<UIShopName> indexList;
     private UIDropDownList<UIModSlot> modList;
     private UIDropDownList<UIShopSlot> shopList;
-    private UIInputBox input;
+    private UIInputBox searcher;
     private List<UIItemFilter> filters;
     private bool anyFilterActive;
     private bool onlyCanBuy;
@@ -23,7 +23,7 @@ public partial class SLPanel : ContainerElement
     public override void OnInitialization()
     {
         base.OnInitialization();
-        //RemoveAll();
+        RemoveAll();
         savingsHide = [];
         if (filters != null)
         {
@@ -36,7 +36,7 @@ public partial class SLPanel : ContainerElement
         onlyCanBuy = false;
         flowLayout = false;
 
-        UIVnlPanel bg = new(535, 365);
+        UIVnlPanel bg = new(535, 40 * 9 + 10);
         bg.Info.SetMargin(10);
         bg.SetCenter(0, 0, 0.5f, 0.5f);
         bg.canDrag = true;
@@ -59,6 +59,7 @@ public partial class SLPanel : ContainerElement
         RegisterSellPanel(sellPanel);
 
         RegisterSavings(bg);
+        RegisterStackPanel();
 
         Texture2D UIButton = AssetLoader.ExtraAssets["UIButton"];
 
@@ -117,7 +118,7 @@ public partial class SLPanel : ContainerElement
         bg.Register(sell);
         top += 40;
 
-        UI3FrameImage strip = new(UIButton, x => !flowLayout)
+        UI3FrameImage strip = new(UIButton, _ => !flowLayout)
         {
             scissors = new(0, 30, 90, 30),
             hoverText = GTV("UIButton.Strip", GTV("UIButton.OnlyCanBuy"))
@@ -132,7 +133,7 @@ public partial class SLPanel : ContainerElement
         bg.Register(strip);
         top += 40;
 
-        UI3FrameImage flow = new(UIButton, x => flowLayout)
+        UI3FrameImage flow = new(UIButton, _ => flowLayout)
         {
             scissors = new(0, 4 * 30, 90, 30),
             hoverText = GTV("UIButton.Flow")
@@ -141,6 +142,27 @@ public partial class SLPanel : ContainerElement
         flow.SetSize(30, 30);
         flow.Events.OnLeftDown += evt => ChangeLayout(true);
         bg.Register(flow);
+        top += 40;
+
+        UI3FrameImage stack = new(UIButton, _ => stackPanel.IsVisible)
+        {
+            scissors = new(0, 8 * 30, 90, 30),
+        };
+        stack.SetPos(-30, top, 1);
+        stack.SetSize(30, 30);
+        stack.Events.OnMouseOver += evt =>
+        {
+            StringBuilder build = new(GTV("UIButton.Stack"));
+            build.AppendLine();
+            build.Append(GTV("UIButton.StackCurrent"));
+            build.Append(stacker.text);
+            evt.hoverText = build.ToString();
+        };
+        stack.Events.OnLeftDown += evt => stackPanel.Info.IsVisible = !stackPanel.IsVisible;
+        bg.Register(stack);
+
+        stackPanel.SetPos(bg.Right + 10, bg.Bottom - stackPanel.Height);
+        bg.Events.PostCalculation += evt => stackPanel.SetPos(bg.Right + 10, bg.Bottom - stackPanel.Height);
 
         UIAdjust adjust = new(UIButton)
         {
@@ -178,11 +200,7 @@ public partial class SLPanel : ContainerElement
         {
             int type = Main.mouseItem.type;
             focus.item.SetDefaults(type);
-            if (type == 0)
-            {
-                LookupIndex();
-                LookupShop();
-            }
+            LookupShop();
         };
         bg.Register(focus);
         left += focus.Width + 10;
@@ -365,7 +383,7 @@ public partial class SLPanel : ContainerElement
         if (reLoadView)
         {
             LookupShop();
-            SearchAny(input.Text);
+            SearchAny(searcher.Text);
         }
     }
 }

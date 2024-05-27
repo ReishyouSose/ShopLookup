@@ -132,6 +132,10 @@ namespace ShopLookup.Content.UI.SLPanel
             }
             else
             {
+                if (!indexList.Any(x => x.text == indexList.ShowUIE.text))
+                {
+                    indexList.ChangeShowElement(0);
+                }
                 if (FocusShop(out string shopName, out int npcType, out string exShopType, out string modName))
                 {
                     if (ExtraShopDataBase.TryGetExtraShop(modName, exShopType, shopName, out ExtraShop exShop))

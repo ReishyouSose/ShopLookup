@@ -19,14 +19,14 @@ namespace ShopLookup.Content.UI.SLPanel
             top += inputBg.Height + 10;
             savingsHide.Add(inputBg);
 
-            input = new(GTV("Info.SearchAny"), color: Color.White);
-            input.SetSize(0, 0, 1, 1);
-            input.OnInputText += SearchAny;
-            inputBg.Register(input);
+            searcher = new(GTV("Info.SearchAny"), color: Color.White);
+            searcher.SetSize(0, 0, 1, 1);
+            searcher.OnInputText += SearchAny;
+            inputBg.Register(searcher);
 
             UIClose clear = new();
             clear.SetCenter(-20, 0, 1, 0.5f);
-            clear.Events.OnLeftDown += evt => input.ClearText();
+            clear.Events.OnLeftDown += evt => searcher.ClearText();
             inputBg.Register(clear);
 
             UIVnlPanel npcBg = new(0, 0);

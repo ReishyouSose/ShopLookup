@@ -17,6 +17,9 @@ namespace ShopLookup.Content.Sys
         {
             if (Check.JustPressed)
             {
+                /*SLUI.OnInitialization();
+                SLUI.Info.IsVisible = true;
+                return;*/
                 if (Main.HoverItem.type > ItemID.None)
                 {
                     SLUI.Info.IsVisible = true;

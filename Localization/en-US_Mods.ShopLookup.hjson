@@ -13,6 +13,7 @@ Info: {
 	Refund: Can refund:
 	Repurchase: Repurchase:
 	SellTip: Place item below or Shift and left-click
+	InputStack: Stack
 }
 
 Travel: Need two town NPCs in the world
@@ -43,6 +44,8 @@ UIButton: {
 	OnlyCanBuy: View only purchasable items
 	Find: Requires {0} in the world
 	TravelMerchant: Right click to refresh the Traveling Merchant shop
+	Stack: Change purchase quantity
+	StackCurrent: "Current: "
 }
 
 FakeShops: {

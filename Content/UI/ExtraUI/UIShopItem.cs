@@ -23,7 +23,8 @@ namespace ShopLookup.Content.UI.ExtraUI
         public UIShopItem(Item item, bool flow, IEnumerable<Condition> cds = null) : base(0, 0, opacity: 0)
         {
             Info.IsSensitive = true;
-            currency = new(item.shopCustomPrice ?? item.value, item.shopSpecialCurrency);
+            item.stack = NotUseGlobalStack() ? item.stack : Math.Min(SLUI.BuyStack, item.maxStack);
+            currency = new((item.shopCustomPrice ?? item.value) * (NotUseGlobalStack() ? 1 : item.stack), item.shopSpecialCurrency);
             Register(currency);
             itemSlot = new(item);
             Register(itemSlot);
@@ -104,6 +105,7 @@ namespace ShopLookup.Content.UI.ExtraUI
                 }
             }
         }
+        public virtual bool NotUseGlobalStack() => false;
         public virtual bool CheckAcitve() => true;
         public virtual bool CheckEnough(Item item) => true;
         public virtual void ModifyToolTips(Item item, List<TooltipLine> tooltips)
@@ -156,6 +158,7 @@ namespace ShopLookup.Content.UI.ExtraUI
             }
             ref Item mouse = ref Main.mouseItem;
             int type = itemSlot.item.type;
+            int stack = NotUseGlobalStack() ? 1 : itemSlot.item.stack;
             if (mouse.type != type && mouse.type > ItemID.None)
             {
                 ReSetBuy();
@@ -164,7 +167,7 @@ namespace ShopLookup.Content.UI.ExtraUI
             Player p = Main.LocalPlayer;
             if (Main.mouseLeft)
             {
-                int b = Item.NewItem(p.GetSource_DropAsItem(), p.Hitbox, type);
+                int b = Item.NewItem(p.GetSource_DropAsItem(), p.Hitbox, type, stack);
                 Main.item[b].BuyFromSL(currency);
                 p.BuyItem(currency.value, currency.currencyID);
                 if (!CheckEnough(itemSlot.item))
@@ -172,18 +175,23 @@ namespace ShopLookup.Content.UI.ExtraUI
                 ReSetBuy();
                 return;
             }
-            if (Main.mouseRight)
+            if (Main.mouseRight && SLUI.CanAfford)
             {
                 if (buyTime == 30)
                 {
                     if (mouse.type == ItemID.None)
                     {
-                        mouse = new(type);
+                        mouse = new(type, stack);
                         mouse.BuyFromSL(currency);
+                        p.BuyItem(currency.value, currency.currencyID);
                     }
                     else if (mouse.SLTime() == SLPlayer.SLTime)
                     {
-                        mouse.stack++;
+                        if (mouse.stack + stack <= mouse.maxStack)
+                        {
+                            mouse.stack += stack;
+                            p.BuyItem(currency.value, currency.currencyID);
+                        }
                     }
                     else
                     {
@@ -191,7 +199,6 @@ namespace ShopLookup.Content.UI.ExtraUI
                         ReSetBuy();
                         return;
                     }
-                    p.BuyItem(currency.value, currency.currencyID);
                     buyCD = buyTime = 20;
                     if (!CheckEnough(itemSlot.item))
                         Info.NeedRemove = true;
@@ -200,9 +207,10 @@ namespace ShopLookup.Content.UI.ExtraUI
                 {
                     for (int i = 0; i < buyStack; i++)
                     {
-                        if (ItemCheck(mouse, p))
+                        if (mouse.stack + stack <= mouse.maxStack)
                         {
-                            mouse.stack++;
+                            p.BuyItem(currency.value, currency.currencyID);
+                            mouse.stack += stack;
                             if (!CheckEnough(itemSlot.item))
                             {
                                 Info.NeedRemove = true;
@@ -210,7 +218,10 @@ namespace ShopLookup.Content.UI.ExtraUI
                             }
                         }
                         else
+                        {
+                            ReSetBuy();
                             return;
+                        }
                     }
                     buyCD = --buyTime / 2;
                     if (buyTime == 0)
@@ -223,15 +234,6 @@ namespace ShopLookup.Content.UI.ExtraUI
             }
             else
                 ReSetBuy();
-        }
-        private bool ItemCheck(Item hover, Player p)
-        {
-            if (hover.stack < hover.maxStack && SLUI.CanAfford)
-            {
-                p.BuyItem(currency.value, currency.currencyID);
-                return true;
-            }
-            return ReSetBuy();
         }
         private bool ReSetBuy()
         {
@@ -265,8 +267,9 @@ namespace ShopLookup.Content.UI.ExtraUI
         {
             OnlyCanBuy = true;
         }
-
+        public override bool NotUseGlobalStack() => true;
         public override bool CheckEnough(Item item) => --item.stack > 0;
+
         public override void ModifyToolTips(Item item, List<TooltipLine> tooltips)
         {
             tooltips.Add(new(Mod, "RePurchase", GTV("Info.Repurchase") + GetPriceText(currency))

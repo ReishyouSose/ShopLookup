@@ -13,6 +13,7 @@ Info: {
 	Refund: 可退款：
 	Repurchase: 回购：
 	SellTip: 将物品放入下方或用Shift加左键点击
+	InputStack: 输入数量
 }
 
 Travel: 需要世界上有两个城镇NPC
@@ -43,6 +44,8 @@ UIButton: {
 	OnlyCanBuy: 仅查看可购买的商品
 	Find: 需要世界上有 {0}
 	TravelMerchant: 右键刷新旅商商店
+	Stack: 更改购买数量
+	StackCurrent: 当前：
 }
 
 FakeShops: {
