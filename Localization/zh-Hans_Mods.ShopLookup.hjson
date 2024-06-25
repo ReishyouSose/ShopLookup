@@ -8,6 +8,7 @@ Info: {
 	UnknowCds: 未知条件，可在设置中启用忽略
 	EmptyShop: 空商店
 	NoValue: 无价
+	NoSavings: 无
 	SearchAny: 搜索物品或NPC
 	LookupItem: 查询物品 - {0}
 	Refund: 可退款：

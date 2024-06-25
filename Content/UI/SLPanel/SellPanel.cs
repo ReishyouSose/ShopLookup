@@ -54,8 +54,8 @@ namespace ShopLookup.Content.UI.SLPanel
             item.SetDefaults(0);
             sellView.Calculation();
         }
-        private void ClearSell() => sellView.ClearAllElements();
-        private bool Active(int context) => context is Context.InventoryItem or Context.ChestItem && sellPanel.IsVisible;
+        public void ClearSell() => sellView.ClearAllElements();
+        private bool Active(int context) => IsVisible && context is Context.InventoryItem or Context.ChestItem && sellPanel.IsVisible;
         public bool HoverCheck(int context)
         {
             if (Main.keyState.PressingShift() && Active(context))
@@ -79,7 +79,7 @@ namespace ShopLookup.Content.UI.SLPanel
             if (item.CanRefund(out int value, out int currency))
                 tooltips.Add(new(ShopLookup.Ins, "ReFund", GTV("Info.Refund") + GetPriceText(value * item.stack, currency))
                 { OverrideColor = value > 0 ? Y : Color.Gray });
-            else if (Info.IsVisible && sellPanel.IsVisible && UIShopItem.HoverSlot == null)
+            else if (IsVisible && sellPanel.IsVisible && UIShopItem.HoverSlot == null)
             {
                 tooltips.Add(new(ShopLookup.Ins, "SellPrice", Lang.tip[49].Value + GetPriceText(item.value / 5 * item.stack))
                 { OverrideColor = item.value > 0 ? Color.White : Color.Gray });

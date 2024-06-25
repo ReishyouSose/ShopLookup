@@ -6,6 +6,12 @@
 
 </div>
 
+# v1.0.4.2
+Fixed the issue where some items could be purchased for free
+Fixed the issue where items purchased by left-clicking in multiplayer mode disappear
+# v1.0.4.1
+Fixed a bug where you could use shift+left click to sell items even if the panel was closed as long as you switched to the sell panel
+Now the items sold by the player will be cleaned up correctly when the UI is closed
 # v1.0.4.0
 Added the function to specify the purchase quantity
 Note that this function does not take effect for repurchases

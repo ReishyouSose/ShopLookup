@@ -169,6 +169,8 @@ namespace ShopLookup.Content.UI.ExtraUI
             {
                 int b = Item.NewItem(p.GetSource_DropAsItem(), p.Hitbox, type, stack);
                 Main.item[b].BuyFromSL(currency);
+                if (Main.netMode == NetmodeID.MultiplayerClient)
+                    NetMessage.SendData(MessageID.SyncItem, -1, -1, null, b, 1f);
                 p.BuyItem(currency.value, currency.currencyID);
                 if (!CheckEnough(itemSlot.item))
                     Info.NeedRemove = true;
@@ -255,6 +257,7 @@ namespace ShopLookup.Content.UI.ExtraUI
                 return true;
             return NPC.FindFirstNPC(npcType) > -1;
         }
+        public override void ModifyToolTips(Item item, List<TooltipLine> tooltips) { }
     }
     public class UIShopItemForEx(string exShopType, string modName, bool flow, AbstractNPCShop.Entry entry) : UIShopItem(entry.Item, flow, entry.Conditions)
     {

@@ -244,7 +244,7 @@ namespace ShopLookup
                 }
             }
             else
-                builder.Append(GTV("Info.NoValue") + ' ');
+                builder.Append(GTV("Info.NoSavings"));
             return builder.ToString();
         }
         public static void BuyFromSL(this Item item, UICurrency currency)

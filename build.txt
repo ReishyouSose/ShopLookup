@@ -1,6 +1,6 @@
 ﻿displayName = Shop Expand 商店扩展
 author = Reits
-version = 1.0.4.0
+version = 1.0.4.2
 side = Client
 hideCode = True
 hideResources = True

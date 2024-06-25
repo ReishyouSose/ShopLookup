@@ -17,17 +17,18 @@ namespace ShopLookup.Content.Sys
         {
             if (Check.JustPressed)
             {
-                /*SLUI.OnInitialization();
-                SLUI.Info.IsVisible = true;
-                return;*/
                 if (Main.HoverItem.type > ItemID.None)
                 {
                     SLUI.Info.IsVisible = true;
                     SLUI.LookupItem(Main.HoverItem.type);
                 }
                 else
+                {
                     SLUI.Info.IsVisible = !SLUI.IsVisible;
-                SLTime = Main.GameUpdateCount;
+                    if (!SLUI.IsVisible)
+                        SLUI.ClearSell();
+                    SLTime = Main.GameUpdateCount;
+                }
             }
         }
     }

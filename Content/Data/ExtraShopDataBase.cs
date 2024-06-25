@@ -64,8 +64,8 @@
         private static IEnumerable<NPCShop> Vanilla()
         {
             yield return new NPCShop(-1, "Spawner")
-                .Add([ItemID.SlimeCrown, ItemID.SuspiciousLookingEye])
-                .Add([ItemID.WormFood, ItemID.BloodySpine], Condition.SmashedShadowOrb)
+                .Add([ItemID.SlimeCrown, ItemID.SuspiciousLookingEye], BuyPrice(0, 1))
+                .Add([ItemID.WormFood, ItemID.BloodySpine], BuyPrice(0, 2, 50), Condition.SmashedShadowOrb)
                 .Add(ItemID.GoblinBattleStandard, BuyPrice(0, 5))
                 .Add(ItemID.BloodMoonStarter, BuyPrice(0, 1))
                 .Add(ItemID.Abeemination, BuyPrice(0, 3))

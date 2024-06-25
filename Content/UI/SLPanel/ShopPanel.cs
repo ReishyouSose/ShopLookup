@@ -71,6 +71,7 @@ public partial class SLPanel : ContainerElement
         {
             Info.IsVisible = false;
             SLPlayer.SLTime = Main.GameUpdateCount;
+            ClearSell();
         };
         bg.Register(close);
         top += 40;

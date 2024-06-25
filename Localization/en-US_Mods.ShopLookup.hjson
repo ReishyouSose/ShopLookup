@@ -8,6 +8,7 @@ Info: {
 	UnknowCds: Unknown condition, ignore can be enabled in ModConfig
 	EmptyShop: Empty shop
 	NoValue: No value
+	NoSavings: None
 	SearchAny: Search item or npc
 	LookupItem: Lookup Item - {0}
 	Refund: Can refund:
