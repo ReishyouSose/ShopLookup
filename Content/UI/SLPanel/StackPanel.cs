@@ -106,11 +106,14 @@ namespace ShopLookup.Content.UI.SLPanel
                 BuyStack = stack.Value;
             }
             stacker.ChangeText(BuyStack.ToString(), false);
-            foreach (UIShopItem slot in shopView.InnerUIE.Concat(searchItem.InnerUIE).Cast<UIShopItem>())
+            foreach (BaseUIElement uie in shopView.InnerUIE.Concat(searchItem.InnerUIE))
             {
-                Item item = slot.itemSlot.item;
-                item.stack = Math.Min(item.maxStack, BuyStack);
-                slot.currency.ResetValue((item.shopCustomPrice ?? item.value) * item.stack);
+                if (uie is UIShopItem slot)
+                {
+                    Item item = slot.itemSlot.item;
+                    item.stack = Math.Min(item.maxStack, BuyStack);
+                    slot.currency.ResetValue((item.shopCustomPrice ?? item.value) * item.stack);
+                }
             }
         }
         private bool CDCompleted()

@@ -6,6 +6,8 @@
 
 </div>
 
+# v1.0.4.3
+Fixed some bugs
 # v1.0.4.2
 Fixed the issue where some items could be purchased for free
 Fixed the issue where items purchased by left-clicking in multiplayer mode disappear
