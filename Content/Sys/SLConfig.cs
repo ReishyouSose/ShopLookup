@@ -10,7 +10,7 @@ namespace ShopLookup.Content.Sys
         public SLConfig() => Ins = this;
 
         [DefaultValue(false)]
-        public bool IgnoreUnknowCds;
+        public bool IgnoreUnknownCds;
         public override void OnLoaded() => Ins = this;
     }
 }

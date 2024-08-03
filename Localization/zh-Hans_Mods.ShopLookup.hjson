@@ -79,7 +79,7 @@ Configs: {
 	SLConfig: {
 		DisplayName: 模组配置
 
-		IgnoreUnknowCds: {
+		IgnoreUnknownCds: {
 			Label: 忽略不明购买条件
 			Tooltip:
 				'''

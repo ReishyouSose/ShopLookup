@@ -1,4 +1,5 @@
-﻿using Terraria.UI.Chat;
+﻿using ShopLookup.Content.Sys;
+using Terraria.UI.Chat;
 
 namespace ShopLookup.Content.UI.ExtraUI
 {
@@ -6,6 +7,7 @@ namespace ShopLookup.Content.UI.ExtraUI
     {
         public readonly Condition condition;
         public readonly bool ignore;
+        private bool unknown;
         private readonly string desc;
         private int blinkTime;
         public Color Color { get; private set; }
@@ -29,15 +31,21 @@ namespace ShopLookup.Content.UI.ExtraUI
         {
             this.condition = condition;
             ignore = IgnoreCondition(out desc);
+            if (CheckUnKnow())
+            {
+                unknown = true;
+                desc = GTV("Info.UnknowCds");
+            }
             Desc = desc;
             Color = Color.White;
             Calculate(maxWidth);
         }
         public void Update(bool mouseHover, bool buying)
         {
+            bool notNeed = ignore || unknown && SLConfig.Ins.IgnoreUnknownCds;
             if (buying)
             {
-                Color = ignore ? Y : G;
+                Color = notNeed ? Y : G;
                 return;
             }
             if (Blink)
@@ -47,7 +55,7 @@ namespace ShopLookup.Content.UI.ExtraUI
             }
             if (mouseHover)
             {
-                if (ignore)
+                if (notNeed)
                 {
                     Color = Y;
                     return;
@@ -66,14 +74,9 @@ namespace ShopLookup.Content.UI.ExtraUI
         {
             blinkTime = 36;
         }
-
+        private bool CheckUnKnow() => condition.Description.Key == "" || condition.Description.Value == "";
         private bool IgnoreCondition(out string desc)
         {
-            if (condition.Description.Key == "" || condition.Description.Value == "")
-            {
-                desc = GTV("Info.UnknowCds");
-                return true;
-            }
             desc = condition.Description.Value;
             return condition == Condition.AnotherTownNPCNearby || condition == Condition.HappyEnoughToSellPylons;
         }

@@ -79,7 +79,7 @@ Configs: {
 	SLConfig: {
 		DisplayName: Mod Config
 
-		IgnoreUnknowCds: {
+		IgnoreUnknownCds: {
 			Label: Ignore unknow buy conditions
 			Tooltip:
 				'''

@@ -6,6 +6,10 @@
 
 </div>
 
+# v1.0.4.5
+Completion localization
+# v1.0.4.4
+The config to ignore unknown conditions is now correctly quoted
 # v1.0.4.3
 Fixed some bugs
 # v1.0.4.2
